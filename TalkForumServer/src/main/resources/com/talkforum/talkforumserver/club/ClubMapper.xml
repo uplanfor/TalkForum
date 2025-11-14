@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.talkforum.talkforumserver.club.ClubMapper">
+    <select id="getClubList" resultType="com.talkforum.talkforumserver.common.vo.ClubShortInfoVO">
+        SELECT 
+            id,
+            name,
+            description,
+            member_count,
+            created_at
+        FROM club
+        LIMIT #{offset}, #{count}
+    </select>
+
+    <select id="getClubById" resultType="com.talkforum.talkforumserver.common.dto.ClubProfileDTO">
+        SELECT 
+            id,
+            name,
+            description,
+            background_link,
+            member_count,
+            created_at,
+            updated_at
+        FROM club
+        WHERE id = #{clubId}
+    </select>
+
+    <update id="updateClub" parameterType="com.talkforum.talkforumserver.common.dto.ClubProfileDTO">
+        UPDATE club
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="backgroundLink != null">background_link = #{backgroundLink},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{clubId}
+    </update>
+
+    <delete id="deleteClub">
+        DELETE FROM club
+        WHERE id = #{clubId}
+    </delete>
+</mapper>

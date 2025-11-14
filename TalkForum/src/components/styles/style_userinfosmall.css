@@ -1,0 +1,58 @@
+.user-info-small {
+    display: flex;
+    min-width: 50px;
+}
+
+.user-info-small span {
+    display: flex;
+    height: 100%;
+    user-select: none;
+    align-items: center;
+}
+
+.user-info-small button.login-button {
+    background-color: var(--secondary-warm-1);
+    border: none;
+    border-radius: 20px;
+    padding: 5px 10px;
+    cursor: pointer;
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    line-height: 30px;
+    box-sizing: border-box;
+    margin: auto 0;
+    outline: none;
+    font: inherit;
+}
+
+
+/* Base styles */
+.user-info-small img {
+    display: block;
+    width: 50px;
+    height: 50px;
+    padding: 9px;
+    border-radius: 100%;
+}
+
+/* Mobile styles */
+@media screen and (max-width: 600px) {
+    .user-info-small span,
+    .user-info-small .login-button {
+        display: none;
+    }
+}
+
+/* Desktop styles */
+@media screen and (min-width: 601px) {
+    .user-info-small img {
+        display: block;
+        width: 50px;
+        height: 50px;
+    }
+}
+
+

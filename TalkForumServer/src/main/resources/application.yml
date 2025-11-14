@@ -1,0 +1,25 @@
+
+spring:
+  application:
+    name: TalkForum
+
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/TalkForum
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 16729438
+
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 10MB
+
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+jwt:
+  secret-key: "XyvhaihdoehEF+gaosfcotynyogmeltoehsshlrybghsbschsb="
+  expire: 3600000

@@ -1,0 +1,67 @@
+.mail-list {
+    display: block;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding-top: 70px;
+    user-select: none;
+}
+
+
+.mail-list .mail-item {
+    box-sizing: content-box;
+    display: flex;
+    width: calc(100% - 10px);
+    margin: 5px;
+    /* padding: 9px; */
+    height: 70px;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+.mail-list .mail-item:hover {
+    border-radius: 8px;
+    background-color: var(--neutral-border);
+}
+
+
+.mail-item img {
+    display: block;
+    width: 70px;
+    height: 70px;
+    border-radius: 100%;
+    border: 1px solid var(--neutral-border);
+    background-color: var(--secondary-cool);
+    color: var(--primary);
+    object-fit: cover;
+}
+
+
+.mail-item .combo {
+    width: calc(100% - 70px);
+    padding: 9px 0 0 9px;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+
+.mail-list .mail-item h3 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 0;
+    margin-bottom: 4px; /* 手动控制标题和描述的间距，更美观 */
+    font-size: 16px;
+}
+
+.mail-list .mail-item p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 0;
+    margin-bottom: 0;
+    color: var(--neutral-text-secondary); /* 次要文本用中性色，符合主题规范 */
+    font-size: 14px;
+}

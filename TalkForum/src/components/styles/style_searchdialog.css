@@ -1,0 +1,133 @@
+.cover {
+    position: fixed;
+    z-index: 9999;
+    background-color: var(--neutral-bg);
+    padding: 9px;
+    width: 100%;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    opacity: 1;
+    /* transform: translateY(0); */
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.cover.closing {
+    opacity: 0;
+    transform: translateX(100%);
+    pointer-events: none;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    border-radius: 9px;
+    padding: 0 5px;
+}
+
+.header .combo {
+    display: flex;
+    flex: 1;
+    height: 100%;
+    align-items: center;
+    padding-left: 18px;
+    border-radius: 9px;
+    border: 1px solid var(--neutral-border);
+}
+
+.header input {
+    flex: 1;
+    outline: none;
+    height: 100%;
+    background-color: transparent;
+    padding: 0 9px;
+    border: 0;
+}
+
+.header svg {
+    margin-right: 9px;
+    width: 20px;
+    height: 20px;
+}
+
+.header button {
+    box-sizing: border-box;
+    border: 0;
+    background-color: var(--primary);
+    border-radius: 9px;
+    height: 100%;
+    width: 70px;
+    cursor: pointer;
+}
+
+.content {
+    margin: 9px auto;
+    width: 100%;
+    user-select: none;
+}
+
+.content p {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.content p span {
+    display: block;
+    margin: 4px;
+    background-color: var(--primary);
+    padding: 4px;
+    border-radius: 18px;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 600px) {
+    .cover {
+        padding: 0;
+    }
+
+    .header {
+        height: 48px;
+        padding: 0 12px;
+        position: relative;
+    }
+
+    .header svg {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+    }
+
+    .header .combo {
+        padding-left: 8px;
+        margin-right: 8px;
+        height: 36px;
+    }
+
+    .header input {
+        font-size: 14px;
+        height: 36px;
+    }
+
+    .header button {
+        width: 70px;
+        height: 36px;
+        margin: 0 8px;
+        font-size: 14px;
+    }
+
+    .content {
+        padding: 8px 12px;
+    }
+
+    .content h2 {
+        font-size: 16px;
+        margin-bottom: 6px;
+    }
+
+    .content p span {
+        margin: 3px;
+        padding: 4px 8px;
+        font-size: 13px;
+    }
+}

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.talkforum.talkforumserver.post.PostMapper">
+    <select id="getPost" resultType="com.talkforum.talkforumserver.common.entity.Post">
+        SELECT * FROM post WHERE id = #{postId}
+    </select>
+
+    <select id="getPosts" resultType="com.talkforum.talkforumserver.common.entity.Post">
+        SELECT * FROM post
+        <where>
+            <if test="clubId != null">AND club_id = #{clubId}</if>
+            <if test="userId != null">AND user_id = #{userId}</if>
+            <if test="status != null">AND status = #{status}</if>
+            <if test="isEssence != null">AND is_essence = #{isEssence}</if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+
+    <insert id="addPost" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO post (
+            title, content, user_id, club_id, status
+        ) VALUES (
+            #{title}, #{content}, #{userId}, #{clubId}, #{status},
+        )
+    </insert>
+
+    <update id="updatePost">
+        UPDATE post
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="isEssence != null">is_essence = #{isEssence},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deletePost">
+        UPDATE post SET status = 'DELETED' WHERE post_id = #{postId}
+    </update>
+
+    <update id="auditPost">
+        UPDATE post SET status = 'PASS', updated_at = NOW() WHERE id = #{postId}
+    </update>
+
+    <update id="essencePost">
+        UPDATE post SET is_essence = #{isEssence}, updated_at = NOW() WHERE id = #{postId}
+    </update>
+</mapper>

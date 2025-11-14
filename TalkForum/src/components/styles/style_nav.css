@@ -1,0 +1,146 @@
+nav {
+    display: flex;
+    position: fixed;
+    flex-direction: row;
+    width: 100%;
+    height: 50px;
+    background-color: var(--primary);
+    box-shadow: 0 2px 8px var(--neutral-shadow);
+    z-index: 9;
+}
+
+nav .title {
+    display: flex;
+    align-items: center;
+    font-weight: bolder;
+    height: 100%;
+    padding: 0 9px;
+}
+
+
+nav img {
+    display: block;
+    width: 50px;
+    height: 50px;
+    padding: 9px;
+}
+
+nav ul {
+    display: flex;
+    height: 100%;
+    user-select: none;
+    align-items: center;
+}
+
+nav li {
+    margin-left: 5px;
+    display: block;
+    width: 45px;
+    text-align: center;
+}
+
+
+.search-container {
+    display: flex;
+    align-items: center;
+    margin: 9px;
+    margin-left: auto;
+    background-color: var(--secondary-warm-1);
+    border-radius: 9px;
+    padding: 0 9px;
+}
+
+.search-container input {
+    border: 0;
+    outline: none;
+    background-color: transparent;
+    padding: 0 9px;
+}
+
+.search-container svg {
+    width: 16px;
+    height: 16px;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 50px;
+    z-index: 9;
+}
+
+footer ul {
+    display: none;
+    user-select: none;
+    background-color: var(--secondary-warm-1);
+}
+
+footer ul li {
+    display: flex;
+    flex: 1;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+footer .post {
+    position: fixed;
+    display: flex;
+    right: 18px;
+    bottom: 18px;
+    width: 65px;
+    height: 65px;
+    border-radius: 100%;
+    background-color: var(--primary);
+    color: var(--secondary-warm-2);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-weight: bolder;
+    user-select: none;
+    cursor: pointer;
+}
+
+footer .post svg {
+    width: 70%;
+    height: 70%;
+
+}
+
+
+
+@media screen and (max-width: 600px) {
+
+    nav ul,
+    nav .title {
+        display: none;
+    }
+
+    
+    .user-info-small {
+        width: 50px;
+        margin-left: auto;
+    }
+
+    .search-container {
+        flex: 1;
+        max-width: calc(90% - 70px); /* 90% of remaining space minus user info width */
+    }
+
+    .post {
+        right: none;
+        left: 50%;
+        transform: translate(-50%, 9px);
+    }
+
+    footer ul {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+}
