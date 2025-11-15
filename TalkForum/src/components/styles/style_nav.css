@@ -48,6 +48,7 @@ nav li {
     background-color: var(--secondary-warm-1);
     border-radius: 9px;
     padding: 0 9px;
+    width: 100px;
 }
 
 .search-container input {
@@ -55,6 +56,7 @@ nav li {
     outline: none;
     background-color: transparent;
     padding: 0 9px;
+    width: 100%;
 }
 
 .search-container svg {
@@ -108,6 +110,11 @@ footer .post svg {
 
 }
 
+@media screen and (min-width: 800px) {
+    .search-container {
+        width: 250px;
+    }
+}
 
 
 @media screen and (max-width: 600px) {
@@ -118,14 +125,14 @@ footer .post svg {
     }
 
     
-    .user-info-small {
-        width: 50px;
+    /* .user-info-small {
+        width: fit-content;
         margin-left: auto;
-    }
+    } */
 
     .search-container {
         flex: 1;
-        max-width: calc(90% - 70px); /* 90% of remaining space minus user info width */
+        max-width: calc(90% - 80px); /* 90% of remaining space minus user info width */
     }
 
     .post {

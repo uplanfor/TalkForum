@@ -10,8 +10,6 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 
 
-
-
 const Nav = () => {
     const [searchDialogVisible, setSearchDialogVisible] = useState(false);
     const showSearchDialog = () => {
@@ -32,7 +30,7 @@ const Nav = () => {
             </ul>
             <div className="search-container">
                 <MagnifyingGlassIcon />
-                <input type="text" placeholder="search something..." onClick={showSearchDialog} />
+                <input type="text" placeholder="seek fun" onClick={showSearchDialog} />
             </div>
 
             <UserInfoSmall></UserInfoSmall>

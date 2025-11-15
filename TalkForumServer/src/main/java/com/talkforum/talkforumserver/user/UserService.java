@@ -7,13 +7,14 @@ import com.talkforum.talkforumserver.common.vo.UserVO;
 
 public interface UserService {
     public UserVO registerUser(UserDTO user) throws RuntimeException;
-    public UserVO getUser(long userId);
-    public Result setUserProfile(UserProfileDTO user);
-    public Result changePassword(long userId, String oldPassword, String newPassword);
+    public UserVO getUserById(Long userId);
+    public UserVO getUserByEmail(String email);
+    public void setUserProfile(UserProfileDTO user);
+    public void changePassword(long userId, String oldPassword, String newPassword);
 
-    public Result updateStatus(long userId, String status);
-    public Result resetUserPassword(long userId);
-    public Result deleteUser(long userId);
-    public Result setUserRole(long userId, String role);
+    public void updateStatus(long userId, String status);
+    public void resetUserPassword(long userId);
+    public void deleteUser(long userId);
+    public void setUserRole(long userId, String role);
     
 }

@@ -12,11 +12,11 @@ interface UserState {
 
 const initialState: UserState = {
     id: 0,
-    email: '',
-    name: 'asdfaf',
-    role: '',
-    avatarLink: 'https://pic1.imgdb.cn/item/6905cbfa3203f7be00bf6e98.webp',
-    backgroudLink: '',
+    email: 'please@login.com',
+    name: 'Unknown',
+    role: 'USER',
+    avatarLink: '1',
+    backgroudLink: 'https://img-s.msn.cn/tenant/amp/entityid/BB1msDBR?w=0&h=0&q=50&m=6&f=jpg&u=t',
     isLoggedIn: false,
 };
 

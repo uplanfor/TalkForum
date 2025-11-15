@@ -12,4 +12,6 @@ public class UserDTO {
     public String email;
     @NotNull
     public String password;
+    public String role;
+    public String inviteCode;
 }

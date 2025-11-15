@@ -8,6 +8,9 @@ import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.PasswordHelper;
 import com.talkforum.talkforumserver.common.vo.UserVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
+import com.talkforum.talkforumserver.constant.UserConstant;
+import com.talkforum.talkforumserver.invitecode.InviteCodeMapper;
+import com.talkforum.talkforumserver.invitecode.InviteCodeService;
 import com.talkforum.talkforumserver.user.UserMapper;
 import com.talkforum.talkforumserver.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private InviteCodeMapper inviteCodeMapper;
 
     @Override
     public UserVO registerUser(UserDTO user) throws RuntimeException {
@@ -32,53 +37,74 @@ public class UserServiceImpl implements UserService {
         if (!user.email.matches("^\\w+@\\w+\\.\\w+$")) {
             throw new RuntimeException("Invalid email format");
         }
-        user.password = PasswordHelper.encryptPassword(user.password);
-        UserVO userVO = getUser(user.id);
-        if (userVO != null) {
-            throw new RuntimeException("User already exists");
+        if (userMapper.countUserByNameOrEmail(user.name, user.email) > 0) {
+            throw new RuntimeException("The user already exists. Please choose other name or email!");
         }
-        userMapper.addUser(user);
-        return getUser(user.id);
+        user.password = PasswordHelper.encryptPassword(user.password);
+        // 自动注册管理员身份
+        if (user.name.equals("MASTER")) {
+            user.role = UserConstant.ROLE_ADMIN;
+        } else {
+            if (user.inviteCode == null) {
+                throw new RuntimeException("Only with invite code can you register!");
+            }
+
+            if (inviteCodeMapper.checkInviteCodeValid(user.inviteCode) == 0) {
+                throw new RuntimeException(
+                        "The invite code cannot be used because it does not exist, has expired, or has reached its maximum usage limit");
+            }
+            user.role = UserConstant.ROLE_USER;
+        }
+
+
+        try {
+            userMapper.addUser(user);
+            inviteCodeMapper.updateUsedCount(user.inviteCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to add user!Maybe your invite code is invalid!");
+        }
+        return getUserById(user.id);
     }
 
     @Override
-    public UserVO getUser(long userId) {
+    public UserVO getUserById(Long userId) {
         return userMapper.getUserVOById(userId);
     }
 
     @Override
-    public Result setUserProfile(UserProfileDTO user) {
+    public UserVO getUserByEmail(String email) {
+        return userMapper.getUserVOByEmail(email);
+    }
+
+    @Override
+    public void setUserProfile(UserProfileDTO user) {
         userMapper.setUserProfile(user);
-        return Result.success();
     }
 
     @Override
-    public Result updateStatus(long userId, String status) {
+    public void updateStatus(long userId, String status) {
         userMapper.updateUserStatus(userId, status);
-        return Result.success();
     }
 
     @Override
-    public Result resetUserPassword(long userId) {
+    public void resetUserPassword(long userId) {
         userMapper.resetUserPassword(userId,
                 PasswordHelper.encryptPassword(PasswordHelper.encryptPassword(ServerConstant.DEFAULT_PASSWORD)));
-        return Result.success();
     }
 
     @Override
-    public Result deleteUser(long userId) {
+    public void deleteUser(long userId) {
         userMapper.deleteUser(userId);
-        return Result.success();
     }
 
     @Override
-    public Result setUserRole(long userId, String role) {
+    public void setUserRole(long userId, String role) {
         userMapper.setUserRole(userId, role);
-        return Result.success();
     }
 
     @Override
-    public Result changePassword(long userId, String oldPassword, String newPassword) throws RuntimeException {
+    public void changePassword(long userId, String oldPassword, String newPassword) throws RuntimeException {
         // 验证新密码格式
         if (newPassword.length() < 8 || newPassword.length() > 32 ||
                 !newPassword.matches(ServerConstant.USER_PASSWORD_RULE)) {
@@ -91,7 +117,6 @@ public class UserServiceImpl implements UserService {
             // 加密新密码并更新
             String encryptedPassword = PasswordHelper.encryptPassword(newPassword);
             userMapper.resetUserPassword(userId, encryptedPassword);
-            return Result.success();
         } else {
             throw new RuntimeException("Wrong password!");
         }

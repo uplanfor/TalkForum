@@ -17,4 +17,5 @@ public class User {
     public String status;
     public String avatarLink;
     public String backgroundLink;
+    public String usedInviteCode;
 }

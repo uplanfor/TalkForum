@@ -11,9 +11,11 @@ import com.talkforum.talkforumserver.common.entity.User;
 public interface UserMapper {
     int addUser(UserDTO user);
     UserVO getUserVOById(long userId);
+    UserVO getUserVOByEmail(String email);
     User getUserLoginInfoByNameOrEmail(String nameOrEmail);
     User getUserLoginInfoById(long id);
     void setUserProfile(UserProfileDTO userProfile);
+    int countUserByNameOrEmail(String name, String email);
 
     void updateUserStatus(long userId, String status);
     void resetUserPassword(long userId, String hashPassword);

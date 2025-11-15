@@ -8,13 +8,6 @@ interface RequestConfig extends AxiosRequestConfig {
   };
 }
 
-// 通用响应格式
-interface ApiResponse<T = any> {
-  code: number | string;
-  message: string;
-  data: T;
-}
-
 class Request {
   private instance: AxiosInstance;
 
@@ -29,35 +22,17 @@ class Request {
       },
     });
 
-    // 响应拦截器：处理认证
+    // 响应拦截器：直接返回数据
     this.instance.interceptors.response.use(
-      (response: AxiosResponse<ApiResponse<any>>) => {
-        return response.data.data; // 返回实际数据
-      },
-      (error: AxiosError<ApiResponse>) => {
-        // 判断是否为需要认证的请求
-        const isAuthRequest = error.config?.headers?.['X-Auth-Required'] === true;
-        
-        if (isAuthRequest && error.response) {
-          const isUnauthorized = error.response.status === 401;
-          const hasNoLoginCode = String(error.response.data?.code) === 'NO_LOGIN';
-          if (isUnauthorized || hasNoLoginCode) {
-            if (typeof window !== 'undefined') {
-              window.location.href = '/'; // 跳转首页
-            }
-            return Promise.reject(new Error('Authentication required'));
+      (response: AxiosResponse) => response,
+      (error: AxiosError) => {
+        // 处理认证失败
+        if (error.config?.headers?.['X-Auth-Required'] === true && 
+            error.response?.status === 401) {
+          if (typeof window !== 'undefined') {
+            window.location.href = '/';
           }
         }
-
-        // 其他错误处理
-        if (!error.response) {
-          return Promise.reject(new Error('Network error'));
-        }
-
-        if (error.response.status >= 500) {
-          return Promise.reject(new Error('Server error'));
-        }
-
         return Promise.reject(error);
       }
     );
@@ -79,31 +54,12 @@ class Request {
     const config: RequestConfig = {
       method,
       url,
-      headers: {},
+      headers: isAuth ? { 'X-Auth-Required': true } : {},
+      [method === 'get' || method === 'delete' ? 'params' : 'data']: data
     };
 
-    // 标记需要认证的请求
-    if (isAuth) {
-      if (config.headers) {
-        config.headers['X-Auth-Required'] = true;
-      }
-    }
-
-    // GET/DELETE使用params，POST/PUT使用data
-    if (method === 'get' || method === 'delete') {
-      config.params = data;
-    } else {
-      config.data = data;
-    }
-
-    try {
-      const response = await this.instance.request<ApiResponse<T>>(config);
-      // 返回实际数据
-      return response.data.data as T;
-    } catch (error) {
-      console.error(`[${method?.toUpperCase()}] ${url} request failed:`, error);
-      throw error;
-    }
+    const response = await this.instance.request<T>(config);
+    return response.data;
   }
 
   // 基础HTTP方法

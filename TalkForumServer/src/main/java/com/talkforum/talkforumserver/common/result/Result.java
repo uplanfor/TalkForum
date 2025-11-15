@@ -25,8 +25,8 @@ public class Result{
         return new Result(200, true, message, data);
     }
 
-    public static Result success(Object data){
-        return new Result(200, true, "success", data);
+    public static Result success(String message){
+        return new Result(200, true, message, null);
     }
 
     public static Result success(){

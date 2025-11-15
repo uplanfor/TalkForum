@@ -32,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
     private JWTHelper jwtHelper;
 
     @Override
-    public Result login(LoginDTO loginDTO, HttpServletResponse response) throws RuntimeException {
+    public UserVO login(LoginDTO loginDTO, HttpServletResponse response) throws RuntimeException {
         User loginCheck = userMapper.getUserLoginInfoByNameOrEmail(loginDTO.nameOrEmail);
         if (loginCheck == null) {
             throw new RuntimeException("Wrong username or password!");
@@ -45,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
             information.put("id", loginCheck.id);
             information.put("role", loginCheck.role);
             CookieHelper.setCookie(response, ServerConstant.LOGIN_COOKIE, (jwtHelper.generateJWTToken(information)));
-            return Result.success();
+            return new UserVO(loginCheck);
         }  else {
             throw new RuntimeException("Wrong username or password!");
         }
@@ -55,5 +55,17 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(String token, HttpServletResponse response) {
         CookieHelper.removeCookie(response, ServerConstant.LOGIN_COOKIE);
+    }
+
+
+    @Override
+    public UserVO auth(long userId, HttpServletResponse response)
+    {
+        try {
+            return userMapper.getUserVOById(userId);
+        } catch (Exception e) {
+            CookieHelper.removeCookie(response, ServerConstant.LOGIN_COOKIE);
+            throw new RuntimeException("Timeout, please sign in again!");
+        }
     }
 }
