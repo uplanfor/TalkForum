@@ -25,12 +25,12 @@ public class PostController {
 
     @GetMapping("/{postId}")
     public Result getPost(@PathVariable Long postId) {
-        return Result.success("sucess to get post information!", postService.getPost(postId));
+        return Result.success("Success to get post information!", postService.getPost(postId));
     }
 
     @GetMapping("/")
     public Result getPosts(PostRequestDTO postRequestDTO) {
-        return Result.success("sucess to get post list!", postService.getPosts(postRequestDTO));
+        return Result.success("Success to get post list!", postService.getPosts(postRequestDTO));
     }
 
     @LoginRequired
@@ -38,7 +38,7 @@ public class PostController {
     public Result commitPost(PostCommitDTO postCommitDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         postCommitDTO.userId = ((Number)(information.get("id"))).longValue();
-        return Result.success("sucess to commit post!", postService.commitPost(postCommitDTO, (String)(information.get("role"))));
+        return Result.success("Success to commit post!", postService.commitPost(postCommitDTO, (String)(information.get("role"))));
     }
 
     @LoginRequired
@@ -47,7 +47,7 @@ public class PostController {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         postEditDTO.userId = ((Number)(information.get("id"))).longValue();
         postService.editPost(postEditDTO, (String)(information.get("role")));
-        return Result.success("sucess to edit post!");
+        return Result.success("Success to edit post!");
     }
 
     @LoginRequired
@@ -57,20 +57,20 @@ public class PostController {
         long userId = ((Number)(information.get("id"))).longValue();
         String role = (String)(information.get("role"));
         postService.deletePost(postId, userId, role);
-        return Result.success("sucess to delete post!");
+        return Result.success("Success to delete post!");
     }
 
     @ModeratorRequired
     @PutMapping("/{postId}/audit")
     public Result auditPost(@PathVariable Long postId) {
         postService.auditPost(postId);
-        return Result.success("sucess to audit post!");
+        return Result.success("Success to audit post!");
     }
 
     @ModeratorRequired
     @PutMapping("/{postId}/essence")
     public Result essencePost(@PathVariable Long postId, int isEssence) {
         postService.essencePost(postId, isEssence);
-        return Result.success("sucess to modity!");
+        return Result.success("Success to modify!");
     }
 }

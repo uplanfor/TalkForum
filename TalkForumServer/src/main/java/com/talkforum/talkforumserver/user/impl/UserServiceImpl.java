@@ -59,7 +59,9 @@ public class UserServiceImpl implements UserService {
 
         try {
             userMapper.addUser(user);
-            inviteCodeMapper.updateUsedCount(user.inviteCode);
+            if(user.inviteCode != null) {
+                inviteCodeMapper.updateUsedCount(user.inviteCode);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to add user!Maybe your invite code is invalid!");

@@ -31,12 +31,22 @@
 
 
 /* Base styles */
-.user-info-small img {
-    display: block;
+.user-info-small .img-t {
+    display: flex;
     width: 50px;
     height: 50px;
-    padding: 9px;
+    padding: 5px;
+    justify-content: center;
+    align-items: center;
     border-radius: 100%;
+}
+
+.user-info-small .img-t img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+    background-color:  var(--neutral-bg);
 }
 
 
@@ -44,19 +54,14 @@
 /* Mobile styles */
 @media screen and (max-width: 600px) {
     .logged-in span,
-    .logged-out img {
+    .logged-out .img-t {
         display: none;
     }
 }
 
 /* Desktop styles */
 @media screen and (min-width: 600px) {
-    .user-info-small img {
-        display: block;
-        width: 50px;
-        height: 50px;
-    }
-    .logged-out img {
+    .logged-out .img-t {
     display: none;
 }
 }

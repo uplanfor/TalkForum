@@ -44,6 +44,7 @@ public class AuthServiceImpl implements AuthService {
             Map<String, Object> information = new HashMap<>();
             information.put("id", loginCheck.id);
             information.put("role", loginCheck.role);
+            userMapper.updateLoginTime(loginCheck.id);
             CookieHelper.setCookie(response, ServerConstant.LOGIN_COOKIE, (jwtHelper.generateJWTToken(information)));
             return new UserVO(loginCheck);
         }  else {

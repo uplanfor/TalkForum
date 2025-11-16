@@ -8,6 +8,7 @@ import com.talkforum.talkforumserver.common.vo.UserVO;
 public interface UserService {
     public UserVO registerUser(UserDTO user) throws RuntimeException;
     public UserVO getUserById(Long userId);
+//    public  getUsers
     public UserVO getUserByEmail(String email);
     public void setUserProfile(UserProfileDTO user);
     public void changePassword(long userId, String oldPassword, String newPassword);

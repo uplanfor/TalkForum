@@ -18,6 +18,7 @@ public class UserVO {
     public String avatarLink;
     public String backgroundLink;
 
+
     public UserVO() {}
 
     public UserVO(User user) {
@@ -30,5 +31,6 @@ public class UserVO {
         this.lastLoginAt = user.lastLoginAt;
         this.status = user.status;
         this.avatarLink = user.avatarLink;
+        this.backgroundLink = user.backgroundLink;
     }
 }

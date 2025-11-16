@@ -13,7 +13,7 @@ public interface UserMapper {
     UserVO getUserVOById(long userId);
     UserVO getUserVOByEmail(String email);
     User getUserLoginInfoByNameOrEmail(String nameOrEmail);
-    User getUserLoginInfoById(long id);
+    User getUserLoginInfoById(long userId);
     void setUserProfile(UserProfileDTO userProfile);
     int countUserByNameOrEmail(String name, String email);
 
@@ -21,4 +21,5 @@ public interface UserMapper {
     void resetUserPassword(long userId, String hashPassword);
     void deleteUser(long userId);
     void setUserRole(long userId, String role);
+    void updateLoginTime(long userId);
 }

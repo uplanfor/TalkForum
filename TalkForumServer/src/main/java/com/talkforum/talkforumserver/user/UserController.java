@@ -52,22 +52,22 @@ public class UserController {
         return Result.success("Success to change password!");
     }
 
+//    @AdminRequired
+//    @GetMapping("/admin/")
+//    public Result getUsers(int page, int pageSize) {
+//        // TODO:实现getUsers
+//        return Result.success("Success to get users!", userService.getUsers(page, pageSize));
+//    }
+
     @AdminRequired
-    @PutMapping("/{userId}/role")
+    @PutMapping("/admin/{userId}/role")
     public Result setUserRole(@PathVariable long userId, String role) {
         userService.setUserRole(userId, role);
         return Result.success("Success to change role!");
     }
 
     @AdminRequired
-    @DeleteMapping("/{userId}")
-    public Result deleteUser(@PathVariable long userId) {
-        userService.deleteUser(userId);
-        return Result.success("Success to delete user!");
-    }
-
-    @AdminRequired
-    @PutMapping("/{userId}/reset")
+    @PutMapping("/admin/{userId}/reset")
     public Result resetUserPassword(@PathVariable long userId) {
         userService.resetUserPassword(userId);
         return Result.success("Success to reset password!");

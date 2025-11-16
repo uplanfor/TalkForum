@@ -2,7 +2,7 @@
     display: block;
     position: relative;
     width: 100%;
-    min-height: 100px;
+    min-height: 300px;
     padding-bottom: 76px;
     background-color: var(--neutral-bg);
     z-index: 2;
@@ -30,6 +30,17 @@
     background-color: var(--neutral-bg);
 }
 
+
+.container .center-text {
+    position: absolute;
+    width: fit-content;
+    height: fit-content;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--neutral-text);
+    text-align: center;
+}
 
 .list {
     padding-top: 9px;

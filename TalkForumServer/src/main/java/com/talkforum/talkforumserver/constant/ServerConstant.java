@@ -9,9 +9,9 @@ public class ServerConstant {
      * 2. 必须包含：大写字母、小写字母、数字、至少1种特殊字符
      * 3. 允许的特殊字符：!@#$%^&*()_-+=[]{}|;:,.?~`
      */
-    public static final String USER_PASSWORD_RULE = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_\\-+=[\\]{}|;:,.?~`])[a-zA-Z\\d!@#$%^&*()_\\-+=[\\]{}|;:,.?~`]{8,20}$";
+    public static final String USER_PASSWORD_RULE = "^[a-zA-Z0-9 !\\\"#$%&'()*+,-./:;<=>?@\\\\[\\\\]^_`{|}~]{8,32}$";
 
-    public static final String PASSWORD_RULE_WARNING = "Password must be 8-20 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*()_-+=[]{}|;:,.?~`). Spaces are not allowed.";
+    public static final String PASSWORD_RULE_WARNING = "Password must be 8-20 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character. Spaces are not allowed.";
 
     public static final String DEFAULT_PASSWORD = "Qu123456!";
 }
