@@ -1,4 +1,4 @@
-import "../assets/normalise.css"
+import "../assets/normalize.css"
 import "./styles/style_nav.css"
 import logoLink from "/logo.ico"
 import UserInfoSmall from "./UserInfoSmall";
@@ -17,8 +17,13 @@ const Nav = () => {
             setSearchDialogVisible(true);
         }
     }
+    const [postDialogVisible, setPostDialogVisible] = useState(false);
+    const showPostDialog = () => {
+        setPostDialogVisible(true);
+    }
     return <>
-        {/* <PostDialog></PostDialog> */}
+        {postDialogVisible && <PostDialog onClose={() => setPostDialogVisible(false)}></PostDialog>}
+        {searchDialogVisible && <SearchDialog onClose={() => setSearchDialogVisible(false)}/>}
         <nav>
             <img src={logoLink} alt="Talk Forum" />
             <span className="title">Talk Forum</span>
@@ -36,7 +41,6 @@ const Nav = () => {
             <UserInfoSmall></UserInfoSmall>
 
         </nav>
-        {searchDialogVisible && <SearchDialog onClose={() => setSearchDialogVisible(false)}/>}
         <footer>
             <ul>
                 <li><Link to="/">Home</Link></li>
@@ -45,7 +49,7 @@ const Nav = () => {
                 <li><Link to="/mail">Mail</Link></li>
                 <li><Link to="/me">Me</Link></li>
             </ul>
-            <div className="post">
+            <div className="post" onClick={showPostDialog}>
                 <PlusIcon />
             </div>
         </footer>

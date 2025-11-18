@@ -15,6 +15,17 @@ spring:
       max-file-size: 1MB
       max-request-size: 10MB
 
+  jackson:
+    # 1. 禁止返回“数字时间戳”（确保返回字符串格式）
+    serialization:
+      write-dates-as-timestamps: false
+    # 2. 后端统一用UTC时区（避免后端时区干扰，前端按自己时区转）
+    time-zone: UTC
+    # 3. 配置日期格式（带UTC时区+毫秒，前端易解析）
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSXXX
+    # 4. 适配Java 8+的日期类型（如LocalDateTime、OffsetDateTime）
+    java-time-format: yyyy-MM-dd'T'HH:mm:ss.SSSXXX
+
 
 mybatis:
   configuration:
@@ -22,4 +33,4 @@ mybatis:
 
 jwt:
   secret-key: "XyvhaihdoehEF+gaosfcotynyogmeltoehsshlrybghsbschsb="
-  expire: 3600000
+  expire: 3600000 # 1 hr

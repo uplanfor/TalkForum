@@ -1,4 +1,4 @@
-import "../assets/normalise.css";
+import "../assets/normalize.css";
 import "./styles/style_postscontainer.css";
 import Request from "../utils/Request";
 import { useState, useEffect } from "react";

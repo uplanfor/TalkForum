@@ -1,4 +1,4 @@
-import "../assets/normalise.css"
+import "../assets/normalize.css"
 import "./styles/style_userinfosmall.css"
 
 import { useDispatch, useSelector } from "react-redux";
@@ -15,12 +15,18 @@ const UserInfoSmall = () => {
     navigate("/login");
   }
 
+
   return (
     <div className={`user-info-small ${isLoggedIn ? "logged-in" : "logged-out"}`}>
       {isLoggedIn ? (<span>{name}</span>) : (<button className="login-button" onClick={toLogin}>Login</button>)}
       <div className="img-t">
         <img src={avatarLink} alt="Failed" />
       </div>
+        <ul className="menu">
+          <li>My Profile</li>
+          <li>Settings</li>
+          <li>Sign Out</li>
+        </ul>
     </div>
   )
 }

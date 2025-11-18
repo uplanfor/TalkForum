@@ -1,15 +1,19 @@
 .info-container {
     position: absolute;
     width: 90%;
-    height: 80%;
+    height: 81%;
     padding: 18px;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -45%);
     max-width: 800px;
-    max-height: 170px;
+    max-height: 250px;
     color: var(--neutral-module);
-    background-color: rgba(0, 0, 0, .3);
+    background-color: rgba(255, 255, 255, .1);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    border-radius: 9px;
+    overflow: hidden;
 }
 .info-container .info {
     display: flex;
@@ -26,7 +30,27 @@
     background-color:  var(--neutral-bg);
 }
 .info .info-combo {
+    padding-left: 9px;
     width: calc(100% - 90px);
+}
+
+.info .info-combo h4 {
+    font-size: larger;
+}
+
+
+.info .info-combo span {
+    display: inline-block;
+    padding: 3px;
+    border-radius: 18px;
+    color: var(--neutral-bg);
+    font-size: medium;
+}
+
+
+
+.info .info-combo p, .info-container .intro {
+    font-size: large;
 }
 
 .info-container .intro {
@@ -38,7 +62,7 @@
 @media screen and (min-width: 600px) {
     .info-container {
         max-width: 800px;
-        max-height: 400px;
+        max-height: 300px;
     }
 
     .info-container .info {

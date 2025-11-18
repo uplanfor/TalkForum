@@ -1,4 +1,4 @@
-import "../assets/normalise.css"
+import "../assets/normalize.css"
 import "./styles/style_backgroundimg.css"
 import React from "react";
 
@@ -12,8 +12,8 @@ interface BackgroundImgProps {
 
 const BackgroundImg = (props : BackgroundImgProps) => {
     const { src, style, children } = props;
-    return <div className="background-img-container">
-        <img className="background-img" src={src} alt="Background" style={style} />
+    return <div className="background-img-container"  style={style}>
+        <img className="background-img" src={src} alt="Background" />
         {children}
     </div>;
 }

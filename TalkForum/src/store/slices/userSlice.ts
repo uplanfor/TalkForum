@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { DefaultBackgroundUrl, DefaultAvatarUrl } from '../../constants/default';
 
 interface UserState {
     id: number;
@@ -8,17 +9,19 @@ interface UserState {
     intro: string;
     avatarLink: string;
     backgroundLink: string;
+    lastLoginAt?: string;
     isLoggedIn: boolean;
 }
 
 const initialState: UserState = {
     id: 0,
     email: 'please@login.com',
-    name: 'Unknown',
+    name: 'You have not logged in yet!',
     intro: "Please login and you will see more fun!",
     role: 'USER',
-    avatarLink: 'https://pic1.imgdb.cn/item/6905cbfa3203f7be00bf6e98.webp',
-    backgroundLink: 'https://img-s.msn.cn/tenant/amp/entityid/BB1msDBR?w=0&h=0&q=50&m=6&f=jpg&u=t',
+    avatarLink: DefaultAvatarUrl,
+    backgroundLink: DefaultBackgroundUrl,
+    // lastLoginAt: null,
     isLoggedIn: false,
 };
 

@@ -12,6 +12,8 @@ import ThemeUtil from './utils/ThemeUtil';
 import Mail from './pages/Mail';
 import Club from './pages/Club';
 import Request from "./utils/Request";
+import Post from "./pages/Post";
+import Space from "./pages/Space";
 import { useDispatch } from 'react-redux';
 import { userLogout, userLogin } from './store/slices/userSlice';
 import { type AppDispatch } from './store';
@@ -89,6 +91,8 @@ const App = () => {
           <Route path="/me" element={<Me />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/post/:postId" element={<Post />} />
+          <Route path="/space/:spaceType/:id" element={<Space />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Provider>

@@ -4,13 +4,22 @@ import { type ThemeKey, THEMES, DEFAULT_THEME_KEY, type Theme, type ThemeChangeC
 class ThemeUtil {
   private static currentThemeKey: ThemeKey = DEFAULT_THEME_KEY;
   private static callbacks: Set<ThemeChangeCallback> = new Set();
+  private static systemThemeListener: MediaQueryList | null = null;
+
+  private static getSystemTheme(): ThemeKey {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'teal';
+    }
+    return 'teal';
+  }
 
   /**
    * 加载指定主题
    * @param themeKey 主题key
    */
   static loadTheme(themeKey: ThemeKey): void {
-    const theme = THEMES[themeKey];
+    const actualThemeKey = themeKey === 'default' ? this.getSystemTheme() : themeKey;
+    const theme = THEMES[actualThemeKey];
     if (!theme) return;
 
     // 应用CSS变量
@@ -21,8 +30,10 @@ class ThemeUtil {
     // 更新当前主题
     this.currentThemeKey = themeKey;
     
-    // 保存到localStorage
-    localStorage.setItem('theme', themeKey);
+    // 只有非default主题才保存到localStorage
+    if (themeKey !== 'default') {
+      localStorage.setItem('theme', themeKey);
+    }
 
     // 触发回调
     this.notifyThemeChange(theme);
@@ -67,7 +78,17 @@ class ThemeUtil {
     if (savedTheme && THEMES[savedTheme]) {
       this.loadTheme(savedTheme);
     } else {
-      this.loadTheme(DEFAULT_THEME_KEY);
+      this.loadTheme('default');
+    }
+    
+    // 监听系统主题变化
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      this.systemThemeListener = window.matchMedia('(prefers-color-scheme: dark)');
+      this.systemThemeListener.addListener(() => {
+        if (this.currentThemeKey === 'default') {
+          this.loadTheme('default');
+        }
+      });
     }
   }
 

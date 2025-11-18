@@ -1,6 +1,6 @@
 import PostContainer from "../components/PostsContainer";
 import Nav from "../components/Nav";
-import "../assets/normalise.css"
+import "../assets/normalize.css"
 import "./styles/style_club.css"
 
 const Club = () => {

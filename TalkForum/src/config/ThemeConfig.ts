@@ -1,6 +1,6 @@
 // src/config/ThemeConfig.ts
 /** 主题 key 联合类型 */
-export type ThemeKey = 'teal' | 'yellow' | 'pink' | 'dark';
+export type ThemeKey = 'default' | 'teal' | 'yellow' | 'pink' | 'dark';
 
 /** CSS 变量类型 */
 export interface ThemeVariables {

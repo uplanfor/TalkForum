@@ -1,5 +1,5 @@
 import Nav from "../components/Nav";
-import "../assets/normalise.css"
+import "../assets/normalize.css"
 import "./styles/style_mail.css"
 import MessageSvg from "../assets/message.svg"
 // import 

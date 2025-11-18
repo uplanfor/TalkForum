@@ -1,4 +1,4 @@
-import "../assets/normalise.css"
+import "../assets/normalize.css"
 import Nav from "../components/Nav";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"

@@ -1,4 +1,4 @@
-import "../assets/normalise.css"
+import "../assets/normalize.css"
 import React from "react";
 import "./styles/style_login.css";
 import Request from "../utils/Request";

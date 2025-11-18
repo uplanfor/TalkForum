@@ -1,4 +1,4 @@
-import "../assets/normalise.css"
+import "../assets/normalize.css"
 import "./styles/style_postcard.css"
 import { EyeIcon } from "@heroicons/react/20/solid";
 import { HandThumbUpIcon } from "@heroicons/react/24/solid";
