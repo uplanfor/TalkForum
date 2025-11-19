@@ -1,0 +1,35 @@
+.setting-dialog-container {
+    width: 100%;
+    height: 100%;
+}
+
+.setting-dialog-container li {
+    display: block;
+    list-style: none;
+    height: 50px;
+    line-height: 50px;
+    font-size: large;
+    padding: 0 9px;
+}
+
+.setting-dialog-container li:hover {
+    border-radius: 9px;
+    background-color: var(--neutral-border);
+}
+
+.setting-dialog-container li select {
+    min-width: 70px;
+    margin: 0 9px;
+    padding: 5px;
+    border: none;
+    border-radius: 9px;
+    background-color: var(--neutral-bg);
+    color: var(--neutral-text-main);
+    outline: none;
+}
+
+
+.setting-dialog-container li select option {
+    outline: none;
+    border: 0;
+}

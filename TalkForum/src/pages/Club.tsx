@@ -25,6 +25,7 @@ const Club = () => {
                 </li> */}
                 <p className="center-text">You haven't followed any club yet.</p>
             </ul>
+            <h2>Club Latest</h2>
         </div>
         <PostContainer />
     </>

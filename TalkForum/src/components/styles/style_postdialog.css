@@ -64,10 +64,9 @@
     height: 16px;
 }
 
-/* 焦点状态 */
 .post-dialog-input:focus,
 .post-dialog-textarea:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(45, 91, 255, 0.2);
+    box-shadow: 0 0 0 2px var(--neutral-shadow);
 }

@@ -98,7 +98,7 @@ const Login = () => {
           console.log(res.data)
           // 写入slice
           dispatch(userLogin(res.data));
-          navigate(-1); // 回退到上一页
+          navigate("/"); // 回退到上一页
         } else {
           Msg.error(res.message || 'Sign in failed!', 3000);
         }
@@ -129,7 +129,7 @@ const Login = () => {
     <div className="login-container">
       <div className="login-form">
         <h2>{isLogin ? "Sign in to TalkForum" : "Sign up to TalkForum"}</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} autoComplete="off">
           {isLogin ? (
             // 登录表单：仅显示 用户名/邮箱 + 密码（共用字段保留值）
             <>

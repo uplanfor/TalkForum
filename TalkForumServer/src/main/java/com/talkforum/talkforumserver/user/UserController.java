@@ -1,15 +1,13 @@
 package com.talkforum.talkforumserver.user;
 
+import com.talkforum.talkforumserver.auth.AuthService;
 import com.talkforum.talkforumserver.common.anno.AdminRequired;
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
-import com.talkforum.talkforumserver.common.dto.UserDTO;
-import com.talkforum.talkforumserver.common.dto.UserProfileDTO;
+import com.talkforum.talkforumserver.common.dto.*;
 import com.talkforum.talkforumserver.common.result.Result;
-import com.talkforum.talkforumserver.common.util.CookieHelper;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
-import com.talkforum.talkforumserver.common.vo.UserVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
-import com.talkforum.talkforumserver.invitecode.InviteCodeService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +21,8 @@ public class UserController {
 
     @Autowired
     private JWTHelper jwtHelper;
+    @Autowired
+    private AuthService authService;
 
     @PostMapping("/")
     public Result registerUser(@RequestBody UserDTO user) {
@@ -45,10 +45,13 @@ public class UserController {
 
     @LoginRequired
     @PutMapping("/changePassword")
-    public Result changePassword(String oldPassword, String newPassword, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+    public Result changePassword(
+            @RequestBody ChangePasswordDTO dto,
+            @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, HttpServletResponse httpServletResponse) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         long userId = ((Number)(information.get("id"))).longValue();
-        userService.changePassword(userId, oldPassword, newPassword);
+        userService.changePassword(userId, dto.getOldPassword(), dto.getNewPassword());
+        authService.logout(token, httpServletResponse);
         return Result.success("Success to change password!");
     }
 
@@ -61,8 +64,8 @@ public class UserController {
 
     @AdminRequired
     @PutMapping("/admin/{userId}/role")
-    public Result setUserRole(@PathVariable long userId, String role) {
-        userService.setUserRole(userId, role);
+    public Result setUserRole(@PathVariable long userId, @RequestBody UserRoleDTO dto) {
+        userService.setUserRole(userId, dto.getRole());
         return Result.success("Success to change role!");
     }
 
@@ -75,8 +78,8 @@ public class UserController {
 
     @AdminRequired
     @PutMapping("/{userId}/status")
-    public Result updateUserStatus(@PathVariable long userId, String status) {
-         userService.updateStatus(userId, status);
+    public Result updateUserStatus(@PathVariable long userId, @RequestBody UserStatusDTO dto) {
+         userService.updateStatus(userId, dto.getStatus());
          return Result.success("Success to update user status!");
     }
 }

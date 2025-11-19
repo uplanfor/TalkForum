@@ -1,4 +1,4 @@
-import "../assets/normalize.css"
+// import "../assets/normalize.css"
 import "./styles/style_postdialog.css"
 import PopUpDialogBase from "./PopUpDialogBase"
 import { type PopUpDialogButton } from "./PopUpDialogBase"

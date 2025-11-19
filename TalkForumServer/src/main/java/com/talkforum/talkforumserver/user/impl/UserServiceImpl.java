@@ -107,6 +107,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changePassword(long userId, String oldPassword, String newPassword) throws RuntimeException {
+        System.out.println(oldPassword);
+        System.out.println(newPassword);
         // 验证新密码格式
         if (newPassword.length() < 8 || newPassword.length() > 32 ||
                 !newPassword.matches(ServerConstant.USER_PASSWORD_RULE)) {
@@ -120,7 +122,7 @@ public class UserServiceImpl implements UserService {
             String encryptedPassword = PasswordHelper.encryptPassword(newPassword);
             userMapper.resetUserPassword(userId, encryptedPassword);
         } else {
-            throw new RuntimeException("Wrong password!");
+            throw new RuntimeException("Your login password is wrong!");
         }
 
     }

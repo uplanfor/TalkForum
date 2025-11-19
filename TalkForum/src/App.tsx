@@ -1,4 +1,4 @@
-
+import "./assets/normalize.css"
 import { Route, Routes, useLocation } from "react-router-dom";
 import { Provider } from "react-redux";
 import { useEffect, useState } from "react";

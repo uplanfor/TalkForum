@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
             information.put("role", loginCheck.role);
             userMapper.updateLoginTime(loginCheck.id);
             CookieHelper.setCookie(response, ServerConstant.LOGIN_COOKIE, (jwtHelper.generateJWTToken(information)));
+            loginCheck.lastLoginAt = new Date();
             return new UserVO(loginCheck);
         }  else {
             throw new RuntimeException("Wrong username or password!");

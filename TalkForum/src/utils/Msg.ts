@@ -86,7 +86,7 @@ const Msg = {
         countEl = document.createElement('span');
         countEl.className = 'msg-count';
         Object.assign(countEl.style, {
-          position: "absolute",
+          position: "fixed",
           top: "-12px",
           left: "-12px",
           fontSize: "16px",
@@ -99,7 +99,7 @@ const Msg = {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          zIndex: "10001",
+          zIndex: "99999999",
           boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
           border: "2px solid white"
         });
@@ -317,22 +317,22 @@ const Msg = {
 
   // 1. 成功消息（绿色）
   success(text: string, duration?: number, is_block?: boolean): void {
-    this._showMsg('success', text, duration, is_block, { bgColor: "#10b981", icon: "✓" });
+    this._showMsg('success', text, duration, is_block, { bgColor: "#0feda3ff", icon: "✓" });
   },
 
   // 2. 通知消息（蓝色）
   notice(text: string, duration?: number, is_block?: boolean): void {
-    this._showMsg('notice', text, duration, is_block, { bgColor: "#3b82f6", icon: "i" });
+    this._showMsg('notice', text, duration, is_block, { bgColor: "#75fdffff", icon: "i" });
   },
 
   // 3. 警告消息（橙色）
   warn(text: string, duration?: number, is_block?: boolean): void {
-    this._showMsg('warn', text, duration, is_block, { bgColor: "#f59e0b", icon: "!" });
+    this._showMsg('warn', text, duration, is_block, { bgColor: "#e8e508ff", icon: "!" });
   },
 
   // 4. 错误消息（红色）
   error(text: string, duration?: number, is_block?: boolean): void {
-    this._showMsg('error', text, duration, is_block, { bgColor: "#ef4444", icon: "×" });
+    this._showMsg('error', text, duration, is_block, { bgColor: "#f32525ff", icon: "×" });
   }
 };
 

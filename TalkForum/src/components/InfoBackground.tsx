@@ -1,4 +1,4 @@
-import "../assets/normalize.css"
+// import "../assets/normalize.css"
 import "./styles/style_infobackground.css";
 import { useDispatch, useSelector } from "react-redux";
 import { type RootState, type AppDispatch } from "../store";

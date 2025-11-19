@@ -1,16 +1,21 @@
-import "../assets/normalize.css"
+// import "../assets/normalize.css"
 import "./styles/style_nav.css"
 import logoLink from "/logo.ico"
 import UserInfoSmall from "./UserInfoSmall";
 import SearchDialog from "./SearchDialog";
 import PostDialog from "./PostDialog";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import Msg from "../utils/msg";
+import { Link, useNavigate } from "react-router-dom";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+import { useDispatch, useSelector } from "react-redux";
+import { type RootState, type AppDispatch } from "../store";
 
 
 const Nav = () => {
+    const navigate = useNavigate();
+    const user = useSelector((state: RootState) => state.user);
     const [searchDialogVisible, setSearchDialogVisible] = useState(false);
     const showSearchDialog = () => {
         if (window.innerWidth < 600) {
@@ -18,12 +23,18 @@ const Nav = () => {
         }
     }
     const [postDialogVisible, setPostDialogVisible] = useState(false);
-    const showPostDialog = () => {
-        setPostDialogVisible(true);
+    const tryShowPostDialog = () => {
+        if (user.isLoggedIn) {
+
+            setPostDialogVisible(true);
+        } else {
+            Msg.error("Please sign in first to write your post!");
+            navigate("/login");
+        }
     }
     return <>
         {postDialogVisible && <PostDialog onClose={() => setPostDialogVisible(false)}></PostDialog>}
-        {searchDialogVisible && <SearchDialog onClose={() => setSearchDialogVisible(false)}/>}
+        {searchDialogVisible && <SearchDialog onClose={() => setSearchDialogVisible(false)} />}
         <nav>
             <img src={logoLink} alt="Talk Forum" />
             <span className="title">Talk Forum</span>
@@ -49,7 +60,7 @@ const Nav = () => {
                 <li><Link to="/mail">Mail</Link></li>
                 <li><Link to="/me">Me</Link></li>
             </ul>
-            <div className="post" onClick={showPostDialog}>
+            <div className="post" onClick={tryShowPostDialog}>
                 <PlusIcon />
             </div>
         </footer>

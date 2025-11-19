@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "../assets/normalize.css"
+// import "../assets/normalize.css"
 import "./styles/style_searchdialog.css"
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";

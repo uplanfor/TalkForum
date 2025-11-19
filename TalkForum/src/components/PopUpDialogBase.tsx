@@ -1,7 +1,7 @@
-import "../assets/normalize.css";
+// import "../assets/normalize.css";
 import "./styles/style_popupdialogbase.css";
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 // 底部按钮配置类型
 export interface PopUpDialogButton {
@@ -33,9 +33,27 @@ const PopUpDialogBase: React.FC<PopUpDialogBaseProps> = ({
   style,
   showCloseIcon = true,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const handleContainerClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
+
+  const handleClose = () => {
+    const container = containerRef.current;
+    if (container) {
+      container.classList.add('slide-out');
+      container.addEventListener('animationend', () => {
+        onClose();
+      }, { once: true });
+    }
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container.classList.add('slide-in');
+    }
+  }, []);
 
   return (
     <div
@@ -43,17 +61,18 @@ const PopUpDialogBase: React.FC<PopUpDialogBaseProps> = ({
       style={style}
     >
       <div
+        ref={containerRef}
         className="popup-dialog-base-container"
         onClick={handleContainerClick}
       >
         {/* 头部区域 */}
         <div className="popup-dialog-base-header">
           {showCloseIcon && (
-            <XMarkIcon
-              className="popup-dialog-base-close"
-              onClick={onClose}
-              aria-label="Close dialog"
-            />
+          <XMarkIcon
+            className="popup-dialog-base-close"
+            onClick={handleClose}
+            aria-label="Close dialog"
+          />
           )}
           {title && <h2 className="popup-dialog-base-title">{title}</h2>}
         </div>
