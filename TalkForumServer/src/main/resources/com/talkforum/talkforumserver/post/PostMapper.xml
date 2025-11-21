@@ -16,11 +16,11 @@
         ORDER BY created_at DESC
     </select>
 
-    <insert id="addPost" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    <insert id="addPost" useGeneratedKeys="true" keyProperty="postCommitDTO.id" keyColumn="id">
         INSERT INTO post (
             title, content, user_id, club_id, status
         ) VALUES (
-            #{title}, #{content}, #{userId}, #{clubId}, #{status},
+            #{postCommitDTO.title}, #{postCommitDTO.content}, #{postCommitDTO.userId}, #{postCommitDTO.clubId}, #{status}
         )
     </insert>
 

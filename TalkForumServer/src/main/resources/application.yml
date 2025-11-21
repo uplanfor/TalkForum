@@ -26,6 +26,12 @@ spring:
     # 4. 适配Java 8+的日期类型（如LocalDateTime、OffsetDateTime）
     java-time-format: yyyy-MM-dd'T'HH:mm:ss.SSSXXX
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 16729438
+
 
 mybatis:
   configuration:
@@ -33,4 +39,4 @@ mybatis:
 
 jwt:
   secret-key: "XyvhaihdoehEF+gaosfcotynyogmeltoehsshlrybghsbschsb="
-  expire: 3600000 # 1 hr
+  expire: 5400000  # 1.5 hr

@@ -38,4 +38,8 @@ public class JWTHelper {
     public Map<String, Object> parseJWTToken(String jwt) throws JwtException {
         return parseJWTToken(jwt, secret_key);
     }
+
+    public int getExpire() {
+        return expire;
+    }
 }

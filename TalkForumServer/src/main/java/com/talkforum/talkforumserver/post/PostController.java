@@ -35,7 +35,7 @@ public class PostController {
 
     @LoginRequired
     @PostMapping("/")
-    public Result commitPost(PostCommitDTO postCommitDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+    public Result commitPost(@RequestBody PostCommitDTO postCommitDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         postCommitDTO.userId = ((Number)(information.get("id"))).longValue();
         return Result.success("Success to commit post!", postService.commitPost(postCommitDTO, (String)(information.get("role"))));
@@ -43,7 +43,7 @@ public class PostController {
 
     @LoginRequired
     @PutMapping("/")
-    public Result editPost(PostEditDTO postEditDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+    public Result editPost(@RequestBody PostEditDTO postEditDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         postEditDTO.userId = ((Number)(information.get("id"))).longValue();
         postService.editPost(postEditDTO, (String)(information.get("role")));

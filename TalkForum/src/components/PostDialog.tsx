@@ -1,13 +1,19 @@
 // import "../assets/normalize.css"
 import "./styles/style_postdialog.css"
+import Request from "../utils/Request";
 import PopUpDialogBase from "./PopUpDialogBase"
 import { type PopUpDialogButton } from "./PopUpDialogBase"
+import { useRef, useState } from "react";
+import  Msg  from "../utils/Msg";
 
 interface PostDialogProps {
   onClose: () => void;
 }
 
 const PostDialog = ({ onClose }: PostDialogProps) => {
+  const titleRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const [clubId, setClubId] = useState<number>(0);
   // 底部按钮配置
   const bottomBtns : PopUpDialogButton[] = [
     {
@@ -19,8 +25,21 @@ const PostDialog = ({ onClose }: PostDialogProps) => {
     },
     {
       text: "Post",
-      onClick: () => {
-        onClose();
+      onClick: async () => {
+        if(!contentRef.current) {return;}
+        await Request.post_auth("/api/posts/", {
+          title: titleRef.current?.value == "" ? null : titleRef.current?.value,
+          content: contentRef.current.value,
+          club_id: clubId == 0? null : clubId
+        }).then((res) => {
+          if (res.success) {
+            Msg.success(res.message);
+          onClose();
+          } else {
+            Msg.error(res.message);
+          }
+          console.log(res);
+        });
       },
       type: "submit"
     }
@@ -54,10 +73,12 @@ const PostDialog = ({ onClose }: PostDialogProps) => {
           type="text" 
           className="post-dialog-input"
           placeholder="Post title (optional)"
+          ref={titleRef}
         />
         <textarea
           className="post-dialog-textarea"
           placeholder="What's on your mind?"
+          ref={contentRef}
         ></textarea>
       </div>
     </PopUpDialogBase>

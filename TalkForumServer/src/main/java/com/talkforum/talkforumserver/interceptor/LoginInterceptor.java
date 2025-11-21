@@ -1,23 +1,33 @@
 package com.talkforum.talkforumserver.interceptor;
 
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
+import com.talkforum.talkforumserver.common.entity.User;
+import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
 import com.talkforum.talkforumserver.common.util.CookieHelper;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
+import com.talkforum.talkforumserver.common.vo.UserVO;
+import com.talkforum.talkforumserver.constant.RedisKeyConstant;
 import com.talkforum.talkforumserver.constant.ServerConstant;
+import com.talkforum.talkforumserver.constant.UserConstant;
+import com.talkforum.talkforumserver.user.UserService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Map;
 
+
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
     @Autowired
     private JWTHelper jwtHelper;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -40,8 +50,13 @@ public class LoginInterceptor implements HandlerInterceptor {
             return false;
         } else {
             try {
-                jwtHelper.parseJWTToken(value);
-            } catch (JwtException e) {
+                Map<String, Object> information = jwtHelper.parseJWTToken(value);
+                long userId = ((Number)(information.get("id"))).longValue();
+                Object v =  stringRedisTemplate.opsForValue().get(RedisKeyConstant.TOKEN_USER + userId);
+                if (v == null) {
+                    throw new BusinessRuntimeException("invalid token");
+                }
+            } catch (RuntimeException e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json;charset=UTF-8");
                 response.getWriter().write("{\"code\":401,\"success\":false,\"message\":\"Invalid token, please login again!\"}");

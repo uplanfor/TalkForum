@@ -18,8 +18,6 @@ public class AuthController {
     @Autowired
     private AuthService authService;
     @Autowired
-    private UserMapper userMapper;
-    @Autowired
     private JWTHelper jwtHelper;
 
     @PostMapping("/login")
@@ -31,10 +29,13 @@ public class AuthController {
     @LoginRequired
     @PostMapping("/logout")
     public Result logout(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, HttpServletResponse response) {
-        authService.logout(token, response);
+        Map<String, Object> information = jwtHelper.parseJWTToken(token);
+        long userId = ((Number)(information.get("id"))).longValue();
+        authService.logout(userId, response);
         return Result.success("Sign out successfully!");
     }
 
+    @LoginRequired
     @GetMapping("/")
     public Result auth(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, HttpServletResponse response) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);

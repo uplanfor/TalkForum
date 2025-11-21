@@ -8,6 +8,7 @@ import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class UserController {
     private AuthService authService;
 
     @PostMapping("/")
-    public Result registerUser(@RequestBody UserDTO user) {
+    public Result registerUser(@Valid @RequestBody UserDTO user) {
         return Result.success("Sign up successfully", userService.registerUser(user));
     }
 
@@ -36,7 +37,7 @@ public class UserController {
 
     @LoginRequired
     @PutMapping("/")
-    public Result setUserProfile(@RequestBody UserProfileDTO user, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+    public Result setUserProfile(@Valid @RequestBody UserProfileDTO user, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         user.id = ((Number)(information.get("id"))).longValue();
         userService.setUserProfile(user);
@@ -51,7 +52,7 @@ public class UserController {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         long userId = ((Number)(information.get("id"))).longValue();
         userService.changePassword(userId, dto.getOldPassword(), dto.getNewPassword());
-        authService.logout(token, httpServletResponse);
+        authService.logout(userId, httpServletResponse);
         return Result.success("Success to change password!");
     }
 

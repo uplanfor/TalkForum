@@ -55,7 +55,7 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
       backgroundLink: formData.get("backgroundLink") as string
     };
 
-    await Request.put("/api/user/", submitData).then((res) => {
+    await Request.put_auth("/api/user/", submitData).then((res) => {
       if (res.success) {
         Msg.success("Profile updated successfully!");
         dispatch(userLogin({...showState,...submitData}));

@@ -7,6 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public interface AuthService {
     UserVO login(LoginDTO loginDTO, HttpServletResponse response) throws RuntimeException;
-    void logout(String token, HttpServletResponse response);
+    void logout(long userID, HttpServletResponse response);
     UserVO auth(long userId, HttpServletResponse response);
 }
