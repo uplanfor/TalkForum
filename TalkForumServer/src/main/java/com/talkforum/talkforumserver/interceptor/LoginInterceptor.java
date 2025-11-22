@@ -57,6 +57,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                     throw new BusinessRuntimeException("invalid token");
                 }
             } catch (RuntimeException e) {
+                CookieHelper.removeCookie(response, ServerConstant.LOGIN_COOKIE);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json;charset=UTF-8");
                 response.getWriter().write("{\"code\":401,\"success\":false,\"message\":\"Invalid token, please login again!\"}");

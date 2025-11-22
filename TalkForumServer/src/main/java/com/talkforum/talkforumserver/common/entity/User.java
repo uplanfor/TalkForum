@@ -11,6 +11,7 @@ public class User {
     public String password;
     public String name;
     public String role;
+    public int fansCount;
     public String intro;
     public Date createdAt;
     public Date lastLoginAt;

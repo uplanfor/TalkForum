@@ -10,6 +10,7 @@ CREATE TABLE `user` (
   `password` varchar(128) NOT NULL COMMENT '加密存储的密码（如bcrypt哈希）',
   `name` varchar(32) NOT NULL COMMENT '用户名',
   `role` varchar(16) NOT NULL DEFAULT 'USER' COMMENT '角色（USER/MODERATOR/ADMIN）',
+  `fans_count` int NOT NULL DEFAULT 0 COMMENT '粉丝数',
   `intro` varchar(128) NOT NULL DEFAULT 'Hello~' COMMENT '用户的自我介绍',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '注册时间',
   `last_login_at` datetime DEFAULT NULL COMMENT '最近上线时间（可空，未登录时无值）',
@@ -87,6 +88,7 @@ CREATE TABLE `club` (
 CREATE TABLE `post` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '帖子唯一标识',
   `title` varchar(64) COMMENT '帖子标题',
+  `brief` text NOT NULL COMMENT '帖子简介',
   `content` text NOT NULL COMMENT '帖子内容',
   `user_id` bigint NOT NULL COMMENT '作者用户ID',
   `club_id` bigint DEFAULT NULL COMMENT '所属圈子ID（可选）',

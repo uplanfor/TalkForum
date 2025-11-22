@@ -46,6 +46,13 @@ public class Result{
         return new Result(400, false, message, null);
     }
 
+
+
+
+    public static Result error(String message, Object data){
+        return new Result(400, false, message, data);
+    }
+
     public static Result error(){
         return new Result(400, false, "error", null);
     }

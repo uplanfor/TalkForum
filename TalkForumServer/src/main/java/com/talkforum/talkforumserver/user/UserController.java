@@ -1,5 +1,6 @@
 package com.talkforum.talkforumserver.user;
 
+import com.sun.istack.NotNull;
 import com.talkforum.talkforumserver.auth.AuthService;
 import com.talkforum.talkforumserver.common.anno.AdminRequired;
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -33,6 +34,11 @@ public class UserController {
     @GetMapping("/{userId}")
     public Result getUser(@PathVariable long userId) {
         return Result.success("Success to get user information", userService.getUserById(userId));
+    }
+
+    @GetMapping("/simple")
+    public Result getSimpleUsersInfo(long[] userIds) {
+        return Result.success("Success to get user simple information", userService.getSimpleUsersInfo(userIds));
     }
 
     @LoginRequired

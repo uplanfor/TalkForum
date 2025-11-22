@@ -7,9 +7,10 @@ import lombok.Data;
 public class PostRequestDTO {
     String keywords;
     Long clubId;
+    Long userId;
+    int isEssence = 0;
 
-    @NotNull
-    int page;
+    Long cursor;
     @NotNull
     int pageSize;
 }

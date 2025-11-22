@@ -5,6 +5,8 @@ import PopUpDialogBase from "./PopUpDialogBase"
 import { type PopUpDialogButton } from "./PopUpDialogBase"
 import { useRef, useState } from "react";
 import  Msg  from "../utils/Msg";
+import { postsCommitPostAuth } from "../api/ApiPosts";
+
 
 interface PostDialogProps {
   onClose: () => void;
@@ -27,11 +29,7 @@ const PostDialog = ({ onClose }: PostDialogProps) => {
       text: "Post",
       onClick: async () => {
         if(!contentRef.current) {return;}
-        await Request.post_auth("/api/posts/", {
-          title: titleRef.current?.value == "" ? null : titleRef.current?.value,
-          content: contentRef.current.value,
-          club_id: clubId == 0? null : clubId
-        }).then((res) => {
+        await postsCommitPostAuth(contentRef.current.value, titleRef.current?.value, clubId == 0 ? null : clubId).then((res) => {
           if (res.success) {
             Msg.success(res.message);
           onClose();

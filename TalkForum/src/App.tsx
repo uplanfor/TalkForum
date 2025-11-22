@@ -11,12 +11,12 @@ import NotFound from "./pages/NotFound";
 import ThemeUtil from './utils/ThemeUtil';
 import Mail from './pages/Mail';
 import Club from './pages/Club';
-import Request from "./utils/Request";
 import Post from "./pages/Post";
 import Space from "./pages/Space";
 import { useDispatch } from 'react-redux';
 import { userLogout, userLogin } from './store/slices/userSlice';
 import { type AppDispatch } from './store';
+import { authGetLoginInfo } from "./api/ApiAuth";
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 // import './App.css'
@@ -42,7 +42,7 @@ const RefreshLoginInfo = () => {
 
     const fetchAuthInfo = async () => {
       try {
-        const res = await Request.get('/api/auth/');
+        const res = await authGetLoginInfo();
         
         if (res.success) {
           // 确保数据结构匹配 UserState，缺失字段用默认值兜底

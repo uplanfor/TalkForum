@@ -5,6 +5,7 @@ import com.talkforum.talkforumserver.common.dto.UserProfileDTO;
 import com.talkforum.talkforumserver.common.entity.User;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
 import com.talkforum.talkforumserver.common.util.PasswordHelper;
+import com.talkforum.talkforumserver.common.vo.SimpleUserVO;
 import com.talkforum.talkforumserver.common.vo.UserVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
@@ -14,6 +15,8 @@ import com.talkforum.talkforumserver.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 @Service
@@ -84,6 +87,12 @@ public class UserServiceImpl implements UserService {
         return userVO;
     }
 
+
+    @Override
+    public List<SimpleUserVO> getSimpleUsersInfo(long[] userIds) {
+        return userMapper.getSimpleUsersInfo(userIds);
+    }
+
     @Override
     public void setUserProfile(UserProfileDTO user) {
         userMapper.setUserProfile(user);
@@ -112,8 +121,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changePassword(long userId, String oldPassword, String newPassword) throws BusinessRuntimeException {
-        System.out.println(oldPassword);
-        System.out.println(newPassword);
         // 验证新密码格式
         if (newPassword.length() < 8 || newPassword.length() > 32 ||
                 !newPassword.matches(ServerConstant.USER_PASSWORD_RULE)) {

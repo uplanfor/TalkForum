@@ -5,6 +5,9 @@ import com.talkforum.talkforumserver.common.dto.PostEditDTO;
 import com.talkforum.talkforumserver.common.dto.PostRequestDTO;
 import com.talkforum.talkforumserver.common.entity.Post;
 import com.talkforum.talkforumserver.common.result.Result;
+import com.talkforum.talkforumserver.common.util.MarkdownIntroHelper;
+import com.talkforum.talkforumserver.common.vo.PostListVO;
+import com.talkforum.talkforumserver.common.vo.PostVO;
 import com.talkforum.talkforumserver.constant.PostConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
 import com.talkforum.talkforumserver.post.PostMapper;
@@ -27,19 +30,27 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getPosts(PostRequestDTO postRequestDTO) {
-        return postMapper.getPosts(postRequestDTO);
+    public PostListVO getPosts(PostRequestDTO postRequestDTO) {
+        List<PostVO> posts = postMapper.getPosts(postRequestDTO);
+
+        boolean hasMore = posts.size() == postRequestDTO.getPageSize();
+        Long cursor = hasMore ? posts.get(posts.size() - 1).id : null;
+        return new PostListVO(posts, hasMore, cursor);
     }
 
     @Override
     public Post commitPost(PostCommitDTO postCommitDTO, String role) {
-        postMapper.addPost(postCommitDTO, role.equals(UserConstant.ROLE_USER) ? PostConstant.PENDING : PostConstant.PASS);
+        postMapper.addPost(postCommitDTO,
+                role.equals(UserConstant.ROLE_USER) ? PostConstant.PENDING : PostConstant.PASS,
+                MarkdownIntroHelper.getIntro(postCommitDTO.content, PostConstant.MAX_POST_LENGTH));
         return postMapper.getPost(postCommitDTO.id);
     }
 
     @Override
     public void editPost(PostEditDTO postEditDTO,  String role) {
-        postMapper.updatePost(postEditDTO, role.equals(UserConstant.ROLE_USER) ? PostConstant.PENDING : PostConstant.PASS);
+        postMapper.updatePost(postEditDTO,
+                role.equals(UserConstant.ROLE_USER) ? PostConstant.PENDING : PostConstant.PASS,
+                MarkdownIntroHelper.getIntro(postEditDTO.content, PostConstant.MAX_POST_LENGTH));
     }
 
     @Override

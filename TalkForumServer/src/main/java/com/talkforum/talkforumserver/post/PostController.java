@@ -8,6 +8,7 @@ import com.talkforum.talkforumserver.common.dto.PostRequestDTO;
 import com.talkforum.talkforumserver.common.entity.Post;
 import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
+import com.talkforum.talkforumserver.common.vo.PostListVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,10 @@ public class PostController {
 
     @GetMapping("/")
     public Result getPosts(PostRequestDTO postRequestDTO) {
+        PostListVO postListVO = postService.getPosts(postRequestDTO);
+        if (postListVO.getData().isEmpty()) {
+            return Result.error("No more posts!", postListVO);
+        }
         return Result.success("Success to get post list!", postService.getPosts(postRequestDTO));
     }
 

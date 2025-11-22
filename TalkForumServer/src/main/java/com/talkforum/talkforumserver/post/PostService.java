@@ -6,12 +6,13 @@ import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.dto.PostCommitDTO;
 import com.talkforum.talkforumserver.common.dto.PostRequestDTO;
 import com.talkforum.talkforumserver.common.entity.Post;
+import com.talkforum.talkforumserver.common.vo.PostListVO;
 
 import java.util.List;
 
 public interface PostService {
     Post getPost(Long postId);
-    List<Post> getPosts(PostRequestDTO postRequestDTO);
+    PostListVO getPosts(PostRequestDTO postRequestDTO);
     Post commitPost(PostCommitDTO postCommitDTO, String role);
     void editPost(PostEditDTO postEditDTO, String role);
     void deletePost(Long postId, long userId, String role);

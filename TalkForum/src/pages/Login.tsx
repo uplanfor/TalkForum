@@ -1,19 +1,42 @@
 import "../assets/normalize.css"
-import React from "react";
+import React, { use, useEffect } from "react";
 import "./styles/style_login.css";
 import Request from "../utils/Request";
 import { useNavigate } from "react-router-dom";
-import Msg from '../utils/msg.ts';
+import Msg from '../utils/Msg.ts';
 
 // 在Login.tsx顶部添加导入
 import { useDispatch } from 'react-redux';
 import { userLogin } from '../store/slices/userSlice';
 import { type AppDispatch } from '../store'; // 导入类型定义
+import { authGetLoginInfo, authSignIn } from "../api/ApiAuth.ts";
+import { usersSignOn } from "../api/ApiUsers.ts";
 
 const Login = () => {
   const [isLogin, setIsLogin] = React.useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    (async () => {
+
+      // 判断用户是否支持cookie
+      if (!navigator.cookieEnabled) {
+        Msg.error("Please enable cookies to use TalkForum!", 3000);
+        return;
+      }
+      // 判断用户是否登录
+      try {
+
+        const res = await authGetLoginInfo();
+        if (res.success) {
+          // 已登录，跳转到首页
+          navigate("/");
+        }
+      } catch (error) {
+      }
+    })()
+  }, []);
 
   // 1. 用状态管理所有表单字段（切换时保留共用字段值）
   const [formData, setFormData] = React.useState({
@@ -56,7 +79,7 @@ const Login = () => {
         Msg.error("Password cannot be empty!", 3000);
         return false;
       }
-    } 
+    }
     // 注册表单校验（非空 + 密码一致性）
     else {
       if (!username.trim()) {
@@ -89,10 +112,7 @@ const Login = () => {
     try {
       if (isLogin) {
         // 登录请求：从状态中获取数据（无需依赖FormData）
-        const res = await Request.post('/api/auth/login', {
-          nameOrEmail: formData.username,
-          password: formData.password
-        });
+        const res = await authSignIn(formData.username, formData.password);
         if (res.success) {
           Msg.success('Sign in successfully!');
           console.log(res.data)
@@ -104,12 +124,7 @@ const Login = () => {
         }
       } else {
         // 注册请求：构造注册参数
-        const res = await Request.post('/api/user/', {
-          name: formData.username,
-          email: formData.email,
-          password: formData.password,
-          inviteCode: formData.inviteCode.trim() || undefined // 空字符串转为undefined
-        });
+        const res = await usersSignOn(formData.username, formData.email, formData.password, formData.inviteCode.trim() || undefined);
         if (res.success) {
           Msg.success('Sign up successfully! Please sign in!', 3000);
           setIsLogin(true); // 切换到登录表单

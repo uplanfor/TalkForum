@@ -1,21 +1,19 @@
-package com.talkforum.talkforumserver.common.entity;
+package com.talkforum.talkforumserver.common.vo;
 
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class Post {
+public class PostVO {
     public Long id;
     public String title;
-    public String content;
     public Long userId;
     public Long clubId;
     public String brief;
     public String status;
     public Character isEssence;
     public Date createdAt;
-    public Date updatedAt;
     public Integer viewCount;
     public Integer likeCount;
     public Integer commentCount;

@@ -12,6 +12,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import Request from "../utils/Request";
 import Msg from "../utils/Msg";
+import { authSignOut } from "../api/ApiAuth";
 
 const UserInfoSmall = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -25,7 +26,7 @@ const UserInfoSmall = () => {
   }
 
   const toSignOut = async () => {
-    await Request.post("/api/auth/logout");
+    await authSignOut();
     dispatch(userLogout());
     Msg.success("Sign out successfully");
   };

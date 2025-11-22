@@ -6,11 +6,28 @@ import InfiniteScroll from "react-infinite-scroller";
 import PostCard, { type PostCardProps } from "./PostCard";
 import PostCardPlaceholder from "./PostCardPlaceholder";
 import { DefaultAvatarUrl, DefaultBackgroundUrl } from "../constants/default";
+import { usersGetSimpleUsersInfo, type SimpleUserInfo } from "../api/ApiUsers";
+import { postsGetPostList } from "../api/ApiPosts";
 
 interface PostContainerProps {
   tabs?: string[];
   defaultTab?: number;
 }
+
+
+interface ApiPostData {
+  data: PostCardProps[];
+  cursor: number;
+  hasMore: boolean;
+}
+
+interface PostApiResponce {
+  success: boolean;
+  data: ApiPostData;
+  code: number;
+  message: string;
+}
+
 
 const PostContainer = ({
   tabs = [],
@@ -18,51 +35,81 @@ const PostContainer = ({
 }: PostContainerProps) => {
   const [posts, setPosts] = useState<PostCardProps[]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(1);
+  const [cursor, setCursor] = useState<number | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [curTabIndex, setCurTabIndex] = useState((defaultTab > 0 && defaultTab < tabs.length) ? defaultTab : 0);
+  const [simpleUserInfo, setSimpleUserInfo] = useState<Map<number, SimpleUserInfo>>(new Map<number, SimpleUserInfo>());
 
-  const mocApi = (resolve: Function, reject: Function) => {
-    setTimeout(() => {
-      const data = [];
-      for (let i = 0; i < 10; i++) {
-        const a = page * 10 - 9 + i;
-        data.push({
-          avatarLink: DefaultAvatarUrl,
-          title: `Post Title ${i + 1}`,
-          brief: `Post Brief ${i + 1}`,
-          coverLink: a % 3 === 0 ? DefaultBackgroundUrl : null,
-          authorId: 1,
-          authorName: `Author Name ${a}`,
-          postId: a,
-          clubId: 1,
-          viewCount: 100,
-          likeCount: 10,
-          commentCount: 10,
-        });
-      }
-      resolve({
-        data,
-        hasMore: true,
-      });
-    }, 1000);
-  }
 
   const loadMore = async () => {
     if (!hasMore) {
       return;
     }
 
-    const result = await new Promise<{ data: PostCardProps[]; hasMore: boolean }>(mocApi);
-    setPage((prev) => prev + 1);
-    setPosts((prev) => [...prev, ...result.data]);
+    try {
+      const result = await new Promise<PostApiResponce>((resolve) => {
+        setTimeout(async () => {
+          // get next posts
+          let res = await postsGetPostList(10, cursor);
+
+          // to see if there are some users' information need to be cached
+          let needCacheTarget: number[] = []
+          res.data.data.forEach((item: PostCardProps) => {
+            const userId = item.userId;
+            if (!simpleUserInfo.has(userId) && !needCacheTarget.includes(userId)) {
+              needCacheTarget.push(userId);
+            }
+          });
+
+          let hereSimpleUserInfo = new Map<number, SimpleUserInfo>(simpleUserInfo);
+          // cache users' information
+          if (needCacheTarget.length > 0) {
+            let cacheRes = await usersGetSimpleUsersInfo(needCacheTarget);
+            if (cacheRes.success && cacheRes.data?.length > 0) {
+              cacheRes.data.forEach((item: any) => {
+                hereSimpleUserInfo.set(item.id, {
+                  avatarLink: item.avatarLink,
+                  name: item.name,
+                });
+              });
+            }
+
+
+          }
+          // update cache
+          setSimpleUserInfo(hereSimpleUserInfo);
+
+          // update authorName and avatarLink
+          let list = res.data.data;
+          list.forEach((item: PostCardProps) => {
+            if (hereSimpleUserInfo.has(item.userId)) {
+              item.avatarLink = hereSimpleUserInfo.get(item.userId)?.avatarLink || DefaultAvatarUrl;
+              item.authorName = hereSimpleUserInfo.get(item.userId)?.name || "UNKNOWN";
+            } else {
+              item.avatarLink = DefaultAvatarUrl;
+              item.authorName = "UNKNOWN";
+            }
+          });
+
+          resolve(res);
+        }, 1024);
+      });
+
+      if (result.success && !isRefreshing) {
+        setCursor(result.data.cursor);
+        setPosts((prev) => [...prev, ...result.data.data]);
+        setHasMore(result.data.hasMore);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     setPosts([]);
     setHasMore(true);
-    setPage(1);
+    setCursor(null);
     setIsRefreshing(false);
   };
 
@@ -83,15 +130,15 @@ const PostContainer = ({
             ))}
           </div>
         )}
-        <InfiniteScroll loadMore={loadMore} hasMore={hasMore} loader={
-            (<div key={0}>
-              <PostCardPlaceholder/>
-              <PostCardPlaceholder/>
-              <PostCardPlaceholder/>
-            </div>)}>
+        <InfiniteScroll loadMore={loadMore} hasMore={hasMore} threshold={512} loader={
+          (<div key={0}>
+            <PostCardPlaceholder />
+            <PostCardPlaceholder />
+          </div>)}>
           {posts.map((post) => (
-            <PostCard key={post.postId} {...post} />
+            <PostCard key={post.id} {...post} />
           ))}
+          {(!hasMore && <div style={{ textAlign: "center" }}>No more posts</div>)}
         </InfiniteScroll>
       </div>
     </div>

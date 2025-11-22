@@ -10,6 +10,7 @@ import { Navigate, useNavigate } from "react-router-dom"
 import { UserType } from "../constants/default";
 import Request from "../utils/Request";
 import Msg from "../utils/Msg";
+import { usersChangePasswordAuth, usersUpdateProfileAuth, type UserProfile } from "../api/ApiUsers";
 
 interface ProfileDialogProps {
   onClose: () => void;
@@ -48,14 +49,14 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
 
     // collect form data
     const formData = new FormData(formRef.current);
-    const submitData = {
+    const submitData : UserProfile = {
       name: formData.get("name") as string,
       intro: formData.get("intro") as string,
       avatarLink: formData.get("avatarLink") as string,
       backgroundLink: formData.get("backgroundLink") as string
     };
 
-    await Request.put_auth("/api/user/", submitData).then((res) => {
+    await usersUpdateProfileAuth(submitData).then((res) => {
       if (res.success) {
         Msg.success("Profile updated successfully!");
         dispatch(userLogin({...showState,...submitData}));
@@ -74,7 +75,7 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
       Msg.error("Please input your old and new password!");
       return;
     }
-    const res = await Request.put("/api/user/changePassword", { oldPassword, newPassword });
+    const res = await usersChangePasswordAuth(oldPassword, newPassword);
     if (res.success) {
       Msg.success("Successfully changed your password, please login again!");
       navigate("/login");

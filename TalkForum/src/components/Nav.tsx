@@ -4,7 +4,7 @@ import logoLink from "/logo.ico"
 import UserInfoSmall from "./UserInfoSmall";
 import SearchDialog from "./SearchDialog";
 import PostDialog from "./PostDialog";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Msg from "../utils/msg";
 import { Link, useNavigate } from "react-router-dom";
 import { PlusIcon } from "@heroicons/react/24/solid";
@@ -12,8 +12,16 @@ import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { useDispatch, useSelector } from "react-redux";
 import { type RootState, type AppDispatch } from "../store";
 
+interface NavProps {
+    changeColorTarget? : ReactNode;
+    hasFooter? : boolean;
+}
 
-const Nav = () => {
+
+const Nav = ({
+    hasFooter = true,
+    changeColorTarget = null
+}) => {
     const navigate = useNavigate();
     const user = useSelector((state: RootState) => state.user);
     const [searchDialogVisible, setSearchDialogVisible] = useState(false);
@@ -52,7 +60,7 @@ const Nav = () => {
             <UserInfoSmall></UserInfoSmall>
 
         </nav>
-        <footer>
+        {hasFooter &&(<footer>
             <ul>
                 <li><Link to="/">Home</Link></li>
                 <li><Link to="/club">Club</Link></li>
@@ -63,7 +71,7 @@ const Nav = () => {
             <div className="post" onClick={tryShowPostDialog}>
                 <PlusIcon />
             </div>
-        </footer>
+        </footer>)}
     </>
 };
 

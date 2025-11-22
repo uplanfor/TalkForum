@@ -5,22 +5,26 @@
         SELECT * FROM post WHERE id = #{postId}
     </select>
 
-    <select id="getPosts" resultType="com.talkforum.talkforumserver.common.entity.Post">
-        SELECT * FROM post
+    <select id="getPosts" resultType="com.talkforum.talkforumserver.common.vo.PostVO">
+        SELECT
+        id, title, brief, user_id,
+        club_id, status, is_essence, created_at,
+        view_count, like_count, comment_count
+        FROM post
         <where>
+            status = 'PASS'
             <if test="clubId != null">AND club_id = #{clubId}</if>
-            <if test="userId != null">AND user_id = #{userId}</if>
-            <if test="status != null">AND status = #{status}</if>
-            <if test="isEssence != null">AND is_essence = #{isEssence}</if>
+            <if test="cursor != null">AND id &lt; #{cursor}</if>
         </where>
-        ORDER BY created_at DESC
+        ORDER BY id DESC <!-- 按id降序，id越大越新 -->
+        LIMIT #{pageSize} <!-- 建议参数名改为pageSize（更规范） -->
     </select>
 
     <insert id="addPost" useGeneratedKeys="true" keyProperty="postCommitDTO.id" keyColumn="id">
         INSERT INTO post (
-            title, content, user_id, club_id, status
+            title, content, user_id, club_id, status, brief
         ) VALUES (
-            #{postCommitDTO.title}, #{postCommitDTO.content}, #{postCommitDTO.userId}, #{postCommitDTO.clubId}, #{status}
+            #{postCommitDTO.title}, #{postCommitDTO.content}, #{postCommitDTO.userId}, #{postCommitDTO.clubId}, #{status}, #{brief}
         )
     </insert>
 
@@ -31,7 +35,8 @@
             <if test="content != null">content = #{content},</if>
             <if test="status != null">status = #{status},</if>
             <if test="isEssence != null">is_essence = #{isEssence},</if>
-            updated_at = NOW()
+            updated_at = NOW(),
+            brief = #{brief}
         </set>
         WHERE id = #{id}
     </update>

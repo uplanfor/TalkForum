@@ -1,15 +1,8 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { DefaultBackgroundUrl, DefaultAvatarUrl } from '../../constants/default';
+import type { UserInfo } from '../../api/ApiAuth';
 
-interface UserState {
-    id: number;
-    email: string;
-    name: string;
-    role : string;
-    intro: string;
-    avatarLink: string;
-    backgroundLink: string;
-    lastLoginAt?: string;
+interface UserState extends UserInfo {
     isLoggedIn: boolean;
 }
 
@@ -23,6 +16,7 @@ const initialState: UserState = {
     backgroundLink: DefaultBackgroundUrl,
     // lastLoginAt: null,
     isLoggedIn: false,
+    fansCount: 0,
 };
 
 const userSlice = createSlice({

@@ -9,12 +9,16 @@
     </insert>
 
     <select id="getUserVOById" resultType="com.talkforum.talkforumserver.common.vo.UserVO">
-         SELECT * from user where id = #{userId}
+         SELECT id, email, name, role, fans_count,
+                intro, created_at, last_login_at, status,
+                avatar_link, background_link from user where id = #{userId}
     </select>
 
 
     <select id="getUserVOByEmail" resultType="com.talkforum.talkforumserver.common.vo.UserVO">
-        SELECT * from user where email = #{email}
+        SELECT id, email, name, role, fans_count,
+               intro, created_at, last_login_at, status,
+               avatar_link, background_link from user where email = #{email}
     </select>
 
     <select id="getUserLoginInfoByNameOrEmail" resultType="com.talkforum.talkforumserver.common.entity.User">
@@ -23,6 +27,22 @@
 
     <select id="getUserLoginInfoById" resultType="com.talkforum.talkforumserver.common.entity.User">
         SELECT * FROM user WHERE id = #{userId}
+    </select>
+
+    <select id="getSimpleUsersInfo" resultType="com.talkforum.talkforumserver.common.vo.SimpleUserVO">
+        SELECT id, name, avatar_link from user
+        <where>
+            <if test="userIds != null and userIds.length > 0">
+                id IN
+                <foreach collection="array" item="userId" open="("  separator="," close=")">
+                #{userId}  <!-- 占位符（MyBatis自动防SQL注入） -->
+                </foreach>
+            </if>
+            <!-- 若userIds为空，查询条件为1=0（返回空集合，避免全表查询） -->
+            <if test="userIds == null or userIds.length == 0">
+                1 = 0
+            </if>
+        </where>
     </select>
 
     <update id="setUserProfile">
