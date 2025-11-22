@@ -1,0 +1,148 @@
+@import 'https://unpkg.com/highlight.js@11.9.0/styles/vs2015.css';
+
+.post-document {
+    display: block;
+    position: relative;
+    width: 100%;
+    min-height: calc(100vh - 500px);
+    padding-bottom: 76px;
+    background-color: var(--neutral-bg);
+    z-index: 2;
+
+    line-height: 1.6;
+}
+
+
+.post-document::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -24px;
+    height: 24px;
+    background-color: var(--neutral-bg);
+    z-index: 3;
+    border-top-left-radius: 54px;
+    border-top-right-radius: 54px;
+}
+
+.post-document .post-window {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.post-window {
+    padding: 9px;
+}
+
+
+.post-document h1,
+.post-document h2,
+.post-document h3,
+.post-document h4,
+.post-document h5,
+.post-document h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.post-document h1 {
+    font-size: 2rem;
+    border-bottom: 1px solid var(--neutral-text-main);
+    padding-bottom: 0.3em;
+}
+
+.post-document h2 {
+    font-size: 1.5rem;
+    border-bottom: 1px solid var(--neutral-text-main);
+    padding-bottom: 0.2em;
+}
+
+.post-document h3 {
+    font-size: 1.25rem;
+}
+
+.post-document h4 {
+    font-size: 1.1rem;
+}
+
+.post-document h5,
+.post-document h6 {
+    font-size: 1rem;
+}
+
+/* 段落样式 */
+.post-document p {
+    margin-bottom: 1em;
+}
+
+/* 列表样式 */
+.post-document ul,
+.post-document ol {
+    margin-bottom: 1em;
+    padding-left: 1.5em;
+}
+
+.post-document li {
+    margin-bottom: 0.5em;
+}
+
+.post-document ul li {
+    list-style-type: disc;
+}
+
+.post-document ol li {
+    list-style-type: decimal;
+}
+
+/* 表格样式 */
+.post-document table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+}
+
+.post-document table th,
+.post-document table td {
+    border: 1px solid var(--neutral-border);
+    padding: 0.5em;
+    text-align: left;
+}
+
+.post-document table th {
+    background-color: var(--primary);
+    font-weight: 600;
+}
+
+.post-document code {
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace; /* 等宽字体 */
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+/* 代码块 & 行内代码样式 */
+.post-document pre {
+    background-color: #1f1f1f;
+    border-radius: 4px;
+    padding: 1em;
+    overflow-x: auto;
+    margin-bottom: 1em;
+    color: #d4d1c3;
+}
+
+.post-document code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.9em;
+    background-color: #f5f5f5;
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+}
+
+.post-document pre code {
+    background-color: transparent;
+    padding: 0;
+    font-size: 0.95em;
+}
