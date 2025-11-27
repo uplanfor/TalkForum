@@ -9,14 +9,14 @@
     </insert>
 
     <select id="getUserVOById" resultType="com.talkforum.talkforumserver.common.vo.UserVO">
-         SELECT id, email, name, role, fans_count,
+         SELECT id, email, name, role, fans_count, following_count,
                 intro, created_at, last_login_at, status,
                 avatar_link, background_link from user where id = #{userId}
     </select>
 
 
     <select id="getUserVOByEmail" resultType="com.talkforum.talkforumserver.common.vo.UserVO">
-        SELECT id, email, name, role, fans_count,
+        SELECT id, email, name, role, fans_count, following_count,
                intro, created_at, last_login_at, status,
                avatar_link, background_link from user where email = #{email}
     </select>

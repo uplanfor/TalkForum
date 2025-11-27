@@ -12,6 +12,7 @@ public class UserVO {
     public String name;
     public String role;
     public int fansCount;
+    public int followingCount;
     public String intro;
     public Date createdAt;
     public Date lastLoginAt;
@@ -34,5 +35,6 @@ public class UserVO {
         this.avatarLink = user.avatarLink;
         this.backgroundLink = user.backgroundLink;
         this.fansCount = user.fansCount;
+        this.followingCount = user.followingCount;
     }
 }

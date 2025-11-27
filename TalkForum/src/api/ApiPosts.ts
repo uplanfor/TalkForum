@@ -1,22 +1,22 @@
 import type ApiResponse from "./ApiResponse";
 import Request from "../utils/Request";
 
-interface Post {
+export interface PostType {
     id: number;
     title: string;
     content: string;
     userId: number;
     clubId: number | null;
     status: number;
-    isEssence: boolean;
+    isEssence: number;
     createdAt: string;
     updatedAt: string;
     viewCount: number;
     likeCount: number;
     commentCount: number;
 }
+interface PostResponse extends ApiResponse<PostType> {}
 
-interface PostResponse extends ApiResponse<Post> {}
 
 
 /*
@@ -42,4 +42,19 @@ export const postsGetPostDetailInformation = async (postId: string | number) : P
  */
 export const postsGetPostList = async(pageSize: number, cursor?: number | null) : Promise<ApiResponse> => {
     return Request.get<ApiResponse>('/api/posts/', {pageSize, cursor});
+};
+
+
+/*
+ * to delete a post
+ */
+export const postsDeletePost = async (postId: string | number) : Promise<ApiResponse> => {
+    return Request.delete<ApiResponse>(`/api/posts/${postId}`);
+};
+
+/*
+ * to modify a post
+ */
+export const postsModifyPost = async (postId: string | number, content: string, title?: string, clubId?: number | null) : Promise<ApiResponse> => {
+    return Request.put<ApiResponse>(`/api/posts/${postId}`, {content, title, clubId});
 };

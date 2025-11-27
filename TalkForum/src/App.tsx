@@ -11,15 +11,12 @@ import NotFound from "./pages/NotFound";
 import ThemeUtil from './utils/ThemeUtil';
 import Mail from './pages/Mail';
 import Club from './pages/Club';
-import Post from "./pages/Post";
-import Space from "./pages/Space";
 import { useDispatch } from 'react-redux';
 import { userLogout, userLogin } from './store/slices/userSlice';
 import { type AppDispatch } from './store';
 import { authGetLoginInfo } from "./api/ApiAuth";
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
-// import './App.css'
 
 
 const NavigationScroll = () => {
@@ -43,7 +40,7 @@ const RefreshLoginInfo = () => {
     const fetchAuthInfo = async () => {
       try {
         const res = await authGetLoginInfo();
-        
+
         if (res.success) {
           // 确保数据结构匹配 UserState，缺失字段用默认值兜底
           dispatch(userLogin(res.data));
@@ -80,23 +77,21 @@ const RefreshLoginInfo = () => {
 const App = () => {
   ThemeUtil.init();
   return (
-    <>
-      <Provider store={store}>
-        <NavigationScroll />
-        <RefreshLoginInfo />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/club" element={<Club />} />
-          <Route path="/mail" element={<Mail />} />
-          <Route path="/me" element={<Me />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/post/:postId" element={<Post />} />
-          <Route path="/space/:spaceType/:id" element={<Space />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Provider>
-    </>
+    <Provider store={store}>
+      <NavigationScroll />
+      <RefreshLoginInfo />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/club" element={<Club />} />
+        <Route path="/mail" element={<Mail />} />
+        <Route path="/me" element={<Me />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/admin" element={<Admin />} />
+        {/* <Route path="/post/:postId" element={<Post />} />
+        <Route path="/space/:spaceType/:id" element={<Space />} /> */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Provider>
   )
 }
 

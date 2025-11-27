@@ -32,6 +32,81 @@ class InternalRenderer extends Renderer {
     return `<h${depth} id="${id}">${text}</h${depth}>`;
   }
 
+  table(token: Tokens.Table): string {
+    const headerHtml = token.header
+      .map((cell, index) => {
+        const align = token.align[index]; // 当前列的对齐方式
+        const alignStyle = align ? `style="text-align: ${align};"` : "";
+        return `<th ${alignStyle}>${cell.text}</th>`;
+      })
+      .join("");
+    const thead = `<tr>${headerHtml}</tr>`;
+
+    // 2. 生成表体 HTML（TableCell[][] -> <td> 标签，结合 align 对齐）
+    const bodyHtml = token.rows
+      .map((row) => {
+        const tdHtml = row
+          .map((cell, index) => {
+            const align = token.align[index];
+            const alignStyle = align ? `style="text-align: ${align};"` : "";
+            return `<td ${alignStyle}>${cell.text}</td>`;
+          })
+          .join("");
+        return `<tr>${tdHtml}</tr>`;
+      })
+      .join("");
+    const tbody = bodyHtml;
+
+    // 3. 完整表格结构 + 外层滚动容器
+    return `<div class="table-wrapper"><table>
+      <thead>${thead}</thead>
+      <tbody>${tbody}</tbody>
+    </table></div>`;
+  }
+
+  code(token: Tokens.Code): string {
+    const language = (token.lang || "shell").toUpperCase();
+    const highlightedCode = token.text;
+    const codeBlockId = `code-block-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    const codeLines = highlightedCode.split('\n'); // 按换行符分割代码
+    const lineCount = codeLines.length; // 总行数（含空行，确保行号连续）
+    const lineNumbersHtml = Array.from({ length: lineCount }, (_, i) =>
+      `<span class="code-line-number">${i + 1}</span>`
+    ).join('');
+
+    const header = `
+  <div class="code-block-header">
+    <span class="code-lang-tag">${language}</span>
+    <label for="${codeBlockId}" class="code-collapse-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </label>
+    <input 
+      type="checkbox" 
+      id="${codeBlockId}" 
+      class="code-collapse-checkbox" 
+      hidden
+      ${lineCount <= 20 ? "checked" : ""}
+    >
+  </div>
+`;
+
+    const codeContent = `
+      <div class="code-block-content">
+        <div class="code-container">
+          <!-- 行号列 -->
+          <div class="code-line-numbers">${lineNumbersHtml}</div>
+          <!-- 代码列（保留原有高亮） -->
+          <pre><code class="hljs language-${language}">${highlightedCode}</code></pre>
+        </div>
+      </div>
+    `;
+
+    return `<div class="code-block">${header}${codeContent}</div>`;
+  }
+
   // 获取目录树（内部用，不对外暴露）
   getTocTree(): TocNode[] {
     return this.tocTree;
@@ -59,13 +134,20 @@ export async function parseMarkdown(text: string): Promise<{ html: string; tocNo
     markedInstance.use(markedHighlight({
       langPrefix: "hljs language-",
       highlight: (code, lang) => {
-        const language = hljs.getLanguage(lang)? lang : "shell";
+        const language = hljs.getLanguage(lang) ? lang : "shell";
         return hljs.highlight(code, { language }).value;
       },
     }));
 
     // 4. 注册自定义 Renderer（收集目录）.解析 Markdown
-    const html = await markedInstance.parse(text, {renderer});
+    const html = await markedInstance.parse(text, { renderer });
+
+    // // 4.1 将树转换为json格式
+
+    // const tocNodeTree = renderer.getTocTree();
+    // const jsonTocNodeTree = JSON.stringify(tocNodeTree);
+    // console.log("目录树：", renderer.getTocTree());
+    // console.log("目录树JSON：", jsonTocNodeTree);
 
     // 5. 返回结果（严格匹配用户要求的结构）
     return {

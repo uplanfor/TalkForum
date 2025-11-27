@@ -32,9 +32,9 @@ public class PostController {
     @GetMapping("/")
     public Result getPosts(PostRequestDTO postRequestDTO) {
         PostListVO postListVO = postService.getPosts(postRequestDTO);
-        if (postListVO.getData().isEmpty()) {
-            return Result.error("No more posts!", postListVO);
-        }
+//        if (postListVO.getData().isEmpty()) {
+//            return Result.error("No more posts!", postListVO);
+//        }
         return Result.success("Success to get post list!", postService.getPosts(postRequestDTO));
     }
 

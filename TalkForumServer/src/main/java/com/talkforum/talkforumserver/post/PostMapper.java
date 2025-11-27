@@ -12,6 +12,7 @@ import java.util.List;
 @Mapper
 public interface PostMapper {
     Post getPost(Long postId);
+    Post getPostCheck(Long postId);
     List<PostVO> getPosts(PostRequestDTO postRequestDTO);
     int addPost(PostCommitDTO postCommitDTO, String status, String brief);
     int updatePost(PostEditDTO postEditDTO, String status, String brief);

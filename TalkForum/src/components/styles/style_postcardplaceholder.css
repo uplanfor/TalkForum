@@ -1,7 +1,15 @@
 .skeleton {
     position: relative;
-    overflow: hidden;
+    display: block;
+    margin: 18px 0;
+    width: 100%;
+    height: fit-content;
     background-color: var(--neutral-module);
+    border: 1px solid var(--neutral-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 8px var(--neutral-shadow);
+    overflow: hidden;
 }
 
 .skeleton::after {

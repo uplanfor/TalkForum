@@ -8,7 +8,7 @@ import { type RootState, type AppDispatch } from "../store";
 import { userLogout, userLogin } from "../store/slices/userSlice";
 import { Navigate, useNavigate } from "react-router-dom"
 import { UserType } from "../constants/default";
-import Request from "../utils/Request";
+import { debounce } from "../utils/debounce&throttle";
 import Msg from "../utils/Msg";
 import { usersChangePasswordAuth, usersUpdateProfileAuth, type UserProfile } from "../api/ApiUsers";
 
@@ -25,24 +25,7 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
   const newPasswordRef = useRef<HTMLInputElement>(null);
   if (!showState.isLoggedIn) { return <Navigate to="/login" /> }
 
-  const bottomBtns: PopUpDialogButton[] = [
-    {
-      text: "Cancel",
-      onClick: () => {
-        onClose();
-      },
-      type: "cancel"
-    },
-    {
-      text: "Commit Profile Changes",
-      onClick: () => {
-        // formRef.current?.dispatchEvent(new Event('submit'));
-        formRef.current?.requestSubmit();
-      },
-      type: "submit"
-    }
-  ];
-
+  
   const handleSubmit =  async(e: React.FormEvent) => {
     e.preventDefault();
     if (!formRef.current) { return; }
@@ -61,13 +44,22 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
         Msg.success("Profile updated successfully!");
         dispatch(userLogin({...showState,...submitData}));
       } else {
-        Msg.error(res.message, 5);
+        Msg.error(res.message, 5000);
       }
     });
   };
 
   const changePassword = async (e: React.MouseEvent) => {
     e.preventDefault();
+    changePasswordWithSafety();
+  }
+  
+  // 节流
+  const debounceHandleSubmit = debounce(()=>{
+      formRef.current?.requestSubmit();
+  }, 300);
+
+  const changePasswordWithSafety = debounce(async ()=>{
     if (!oldPasswordRef.current ||!newPasswordRef.current) { return; }
     const oldPassword = oldPasswordRef.current.value;
     const newPassword = newPasswordRef.current.value;
@@ -81,9 +73,25 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
       navigate("/login");
       dispatch(userLogout());
     } else {
-      Msg.error(res.message, 5);
+      Msg.error(res.message, 5000);
     }
-  }
+  }, 300);
+
+  const bottomBtns: PopUpDialogButton[] = [
+    {
+      text: "Cancel",
+      onClick: () => {
+        onClose();
+      },
+      type: "cancel"
+    },
+    {
+      text: "Commit Profile Changes",
+      onClick: debounceHandleSubmit,
+      type: "submit"
+    }
+  ];
+
 
   const handleImgBackgroundError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     e.currentTarget.src = "/";
@@ -94,6 +102,7 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
     e.currentTarget.src = "/";
     e.currentTarget.onerror = null;
   };
+
 
 
   return (

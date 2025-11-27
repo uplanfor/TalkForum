@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
         }
         user.password = PasswordHelper.encryptPassword(user.password);
         // 自动注册管理员身份
-        if (user.name.equals("MASTER")) {
+        if (user.email.equals("master@talkforum.top")) {
             user.role = UserConstant.ROLE_ADMIN;
         } else {
             if (user.inviteCode == null) {

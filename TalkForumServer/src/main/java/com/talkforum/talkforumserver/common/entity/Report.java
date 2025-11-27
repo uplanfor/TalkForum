@@ -10,7 +10,7 @@ public class Report {
     public Long userId;
     public String reportType;
     public String reportTargetType;
-    public String reportTarget;
+    public Long reportTarget;
     public String reason;
     public String status;
     public Date createAt;

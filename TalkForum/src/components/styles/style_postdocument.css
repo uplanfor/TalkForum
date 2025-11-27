@@ -4,14 +4,23 @@
     display: block;
     position: relative;
     width: 100%;
-    min-height: calc(100vh - 500px);
+    min-height: 100vh;
     padding-bottom: 76px;
     background-color: var(--neutral-bg);
     z-index: 2;
-
     line-height: 1.6;
 }
 
+.post-document .badge {
+    padding: 1px 5px;
+    border-radius: 18px;
+    background-color: var(--primary);
+    color: var(--neutral-module);
+}
+
+.post-window {
+    min-height: calc(100vh - 300px);
+}
 
 .post-document::before {
     content: "";
@@ -27,122 +36,311 @@
 }
 
 .post-document .post-window {
-    width: 100%;
+    width: calc(100% - 18px);
     max-width: 800px;
     margin: 0 auto;
+    padding: 9px 18px;
+    color: var(--neutral-text-main);
+    background-color: var(--neutral-module);
+    border-radius: 16px;
 }
-
+/* 
 .post-window {
     padding: 9px;
+} */
+
+.post-header .post-title {
+  color: var(--primary);
+}
+  
+.post-header .author-info {
+  box-sizing: content-box;
+  display: flex;
+  height: 50px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--neutral-border);
+}
+
+.post-header .author-info img{
+  width: 50px;
+  height: 50px;
+}
+
+.post-header .author-info .author-combo {
+  flex: 1;
+  padding-left: 9px;
+  height: 50px;
+}
+
+.post-header .author-info .author-combo .author-name {
+  display: block;
+  height: 30px;
+  line-height: 30px;
+  font-weight: bolder;
+}
+
+.post-header .author-info .author-combo .post-date {
+  display: block;
+  height: 20px;
+  line-height: 20px;
 }
 
 
-.post-document h1,
-.post-document h2,
-.post-document h3,
-.post-document h4,
-.post-document h5,
-.post-document h6 {
+.post-content {
+  padding-top: 9px;
+  min-height: 200px;
+}
+
+
+.post-content h1,
+.post-content h2,
+.post-content h3,
+.post-content h4,
+.post-content h5,
+.post-content h6 {
     margin-top: 1.5em;
     margin-bottom: 0.5em;
     font-weight: 600;
     line-height: 1.3;
 }
 
-.post-document h1 {
+.post-content h1 {
     font-size: 2rem;
     border-bottom: 1px solid var(--neutral-text-main);
     padding-bottom: 0.3em;
 }
 
-.post-document h2 {
+.post-content h2 {
     font-size: 1.5rem;
     border-bottom: 1px solid var(--neutral-text-main);
     padding-bottom: 0.2em;
 }
 
-.post-document h3 {
+.post-content h3 {
     font-size: 1.25rem;
 }
 
-.post-document h4 {
+.post-content h4 {
     font-size: 1.1rem;
 }
 
-.post-document h5,
-.post-document h6 {
+.post-content h5,
+.post-content h6 {
     font-size: 1rem;
 }
 
 /* 段落样式 */
-.post-document p {
+.post-content p {
     margin-bottom: 1em;
 }
 
 /* 列表样式 */
-.post-document ul,
-.post-document ol {
+.post-content ul,
+.post-content ol {
     margin-bottom: 1em;
     padding-left: 1.5em;
 }
 
-.post-document li {
+.post-content li {
     margin-bottom: 0.5em;
 }
 
-.post-document ul li {
+.post-content ul li {
     list-style-type: disc;
 }
 
-.post-document ol li {
+.post-content ol li {
     list-style-type: decimal;
 }
 
-/* 表格样式 */
-.post-document table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 1em;
+.post-content img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 9px;
 }
 
-.post-document table th,
-.post-document table td {
+/* 表格样式 */
+.post-content .table-wrapper {
+  width: 100%;
+  overflow: hidden; /* 先设置默认隐藏（裁剪圆角） */
+  overflow-x: auto; /* 再单独开启横向滚动（优先级更高） */
+  margin: 1em 0;
+  border-radius: 9px;
+  /* 可选：添加边框盒模型，避免边框占额外宽度 */
+  box-sizing: border-box;
+}
+
+/* 表格样式：补充 white-space: nowrap，防止单元格换行（确保触发滚动） */
+.post-content table {
+  width: 100%;
+  min-width: 100%; /* 内容不足时占满容器 */
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 9px;
+  border: 1px solid var(--neutral-border);
+  box-sizing: border-box; /* 避免边框导致表格宽度超出容器 */
+}
+
+.post-content table th,
+.post-content table td {
     border: 1px solid var(--neutral-border);
     padding: 0.5em;
     text-align: left;
 }
 
-.post-document table th {
+.post-content table th {
     background-color: var(--primary);
     font-weight: 600;
+    border-bottom: 1px solid var(--neutral-border); /* 表头下边框 */
+    border-right: 1px solid var(--neutral-border); /* 表头右侧边框 */
 }
 
-.post-document code {
+/* .post-content table tr:nth-child(even) {
+    background-color: var(--secondary-warm-1);
+} */
+
+.post-content table tr:nth-child(odd) {
+    background-color: var(--secondary-warm-1);
+}
+
+.post-content table tr:last-child td {
+    border-bottom: none;
+}
+
+.post-content table td:last-child,
+.post-content table th:last-child {
+    border-right: none;
+}
+
+.post-content table td:first-child,
+.post-content table th:first-child {
+    border-left: none;
+}
+
+.post-content table thead tr th {
+    border-top: none;
+}
+
+/* 代码样式 */
+/* 代码样式 - 保留所有颜色配置 + 折叠功能生效 */
+.post-content code {
   font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace; /* 等宽字体 */
   font-size: 0.9em;
   line-height: 1.5;
+    box-sizing: border-box;
 }
 
-/* 代码块 & 行内代码样式 */
-.post-document pre {
-    background-color: #1f1f1f;
-    border-radius: 4px;
-    padding: 1em;
-    overflow-x: auto;
-    margin-bottom: 1em;
-    color: #d4d1c3;
+.post-content .code-block {
+  width: 100%;
+  margin: 1em 0;
+  border-radius: 4px; /* 复用你现有 pre 圆角 */
+  overflow: hidden;
 }
 
-.post-document code {
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 0.9em;
-    background-color: #f5f5f5;
-    padding: 0.2em 0.4em;
-    border-radius: 4px;
+.post-content .code-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5em 1em;
+  background-color: var(--primary); /* 保留你的颜色变量 */
+  color: var(--neutral-module); /* 保留你的颜色变量 */
+  cursor: pointer;
 }
 
-.post-document pre code {
-    background-color: transparent;
-    padding: 0;
-    font-size: 0.95em;
+.post-content .code-lang-tag {
+  font-size: 0.9em;
+  font-weight: 600;
+}
+
+.post-content .code-collapse-btn {
+  transition: transform 0.2s ease;
+}
+
+/* 🌟 修复：input选中时旋转图标（不删颜色，仅改选择器） */
+.post-content .code-block-header:has(.code-collapse-checkbox:checked) .code-collapse-btn {
+  transform: rotate(180deg);
+}
+
+/* 代码内容区（保留你原有配置，补全默认折叠） */
+.post-content .code-block-content {
+  max-height: 0; /* 补全默认折叠状态，不删任何颜色 */
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+/* 🌟 修复：input选中时展开内容（仅改选择器，不碰颜色） */
+.post-content .code-block-header:has(.code-collapse-checkbox:checked) ~ .code-block-content {
+     /* 最大高度，超出纵向滚动 */
+  max-height: 800px;
+  overflow-y: auto;
+}
+
+/* 保留你原有代码（修正拼写错误：typp→type，不删颜色） */
+.code-block-header input[type="checkbox"]:checked {
+}
+
+/* 行号 + 代码 并列容器（保留你的背景色 #1f1f1f） */
+.post-content .code-container {
+  display: grid;
+  grid-template-columns: auto 1fr; /* 行号列自适应宽度，代码列占满剩余 */
+  background-color: #1f1f1f; /* 保留你的颜色 */
+}
+
+/* 行号列样式（保留所有配置） */
+.post-content .code-line-numbers {
+  padding: 1em 0.8em;
+  text-align: right;
+  user-select: none; /* 禁止选中行号 */
+}
+
+/* 单个行号样式（保留你的颜色 #888） */
+.post-content .code-line-number {
+  display: block;
+  font-size: 0.95em;
+  color: #888; /* 保留你的行号颜色 */
+  line-height: 1.5; /* 与代码行高一致，确保对齐 */
+}
+
+/* 保留你的 pre 样式（颜色 #d4d1c3 不变） */
+.post-content pre {
+  border-radius: 4px;
+  padding: 1em;
+  overflow-x: auto;
+  margin-bottom: 1em;
+  color: #d4d1c3; /* 保留你的代码文字颜色 */
+}
+
+/* 保留你的行内 code 样式（背景色 #f5f5f5 不变） */
+.post-content code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.9em;
+  background-color: #f5f5f5; /* 保留你的行内代码背景色 */
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+}
+
+/* 保留你的 pre 内 code 样式（背景透明不变） */
+.post-content pre code {
+  background-color: transparent;
+  padding: 0;
+  font-size: 0.95em;
+}
+
+/* 覆盖原有 pre 的 margin 和 border-radius（避免冲突，不碰颜色） */
+.post-content .code-block pre {
+  margin: 0;
+  border-radius: 0;
+  padding-left: 1em; /* 代码与行号的间距 */
+}
+
+/* 隐藏原生复选框（不影响颜色，仅优化显示） */
+.post-content .code-collapse-checkbox {
+  display: none;
+}
+
+
+.post-document .post-comment h2 {
+  border-top: 1px solid var(--neutral-border);
+  color: var(--primary);
 }

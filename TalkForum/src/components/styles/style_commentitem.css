@@ -1,0 +1,32 @@
+.comment-item {
+  display: flex;
+}
+
+.comment-item .comment-user-avatar {
+    width: 50px;
+}
+
+.comment-item .comment-user-avatar img {
+    display: block;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--neutral-module);
+    border: 1px solid var(--neutral-border);
+}
+
+
+.comment-item .comment-info {
+    flex: 1;
+    padding-left: 9px;
+}
+
+.comment-item .comment-info .comment-date {
+    color: var(--neutral-text-secondary);
+}
+
+.comment-item .comment-info .comment-date span {
+    cursor: pointer;
+    color: var(--primary);
+    user-select: none;
+}

@@ -33,7 +33,6 @@ const Nav = ({
     const [postDialogVisible, setPostDialogVisible] = useState(false);
     const tryShowPostDialog = () => {
         if (user.isLoggedIn) {
-
             setPostDialogVisible(true);
         } else {
             Msg.error("Please sign in first to write your post!");

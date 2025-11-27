@@ -5,6 +5,10 @@
         SELECT * FROM post WHERE id = #{postId}
     </select>
 
+    <select id="getPostCheck" resultType="com.talkforum.talkforumserver.common.entity.Post">
+        SELECT user_id FROM post WHERE id = #{postId}
+    </select>
+
     <select id="getPosts" resultType="com.talkforum.talkforumserver.common.vo.PostVO">
         SELECT
         id, title, brief, user_id,
@@ -17,7 +21,7 @@
             <if test="cursor != null">AND id &lt; #{cursor}</if>
         </where>
         ORDER BY id DESC <!-- 按id降序，id越大越新 -->
-        LIMIT #{pageSize} <!-- 建议参数名改为pageSize（更规范） -->
+        LIMIT #{pageSize}
     </select>
 
     <insert id="addPost" useGeneratedKeys="true" keyProperty="postCommitDTO.id" keyColumn="id">
@@ -42,7 +46,7 @@
     </update>
 
     <update id="deletePost">
-        UPDATE post SET status = 'DELETED' WHERE post_id = #{postId}
+        UPDATE post SET status = 'DELETED' WHERE id = #{postId}
     </update>
 
     <update id="auditPost">

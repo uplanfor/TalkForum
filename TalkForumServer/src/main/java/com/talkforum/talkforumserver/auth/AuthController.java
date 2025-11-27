@@ -4,6 +4,7 @@ import com.talkforum.talkforumserver.common.anno.LoginRequired;
 import com.talkforum.talkforumserver.common.dto.LoginDTO;
 import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
+import com.talkforum.talkforumserver.common.vo.UserVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.user.UserMapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,6 +41,11 @@ public class AuthController {
     public Result auth(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, HttpServletResponse response) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         long userId = ((Number)(information.get("id"))).longValue();
-        return Result.success("Success to update information!", authService.auth(userId, response));
+        UserVO result = authService.auth(userId, response);
+        if (result == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return Result.error("Unknown user!", result);
+        }
+        return Result.success("Success to update information!", result);
     }
 }

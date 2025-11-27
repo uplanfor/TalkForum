@@ -12,6 +12,7 @@ public class User {
     public String name;
     public String role;
     public int fansCount;
+    public int followingCount;
     public String intro;
     public Date createdAt;
     public Date lastLoginAt;

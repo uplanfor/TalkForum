@@ -2,7 +2,7 @@ import "./styles/style_postcardplaceholder.css"
 
 const PostCardPlaceholder = () => {
     return (
-        <div className="card skeleton">
+        <div className="post-card skeleton">
             <div className="author-info">
                 <div className="skeleton-avatar" />
                 <div className="author-info-text">

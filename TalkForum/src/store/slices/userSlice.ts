@@ -17,6 +17,7 @@ const initialState: UserState = {
     // lastLoginAt: null,
     isLoggedIn: false,
     fansCount: 0,
+    followingCount: 0,
 };
 
 const userSlice = createSlice({

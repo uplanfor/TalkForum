@@ -1,21 +1,39 @@
 // import "../assets/normalize.css"
 import "./styles/style_postdialog.css"
-import Request from "../utils/Request";
 import PopUpDialogBase from "./PopUpDialogBase"
 import { type PopUpDialogButton } from "./PopUpDialogBase"
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import  Msg  from "../utils/Msg";
 import { postsCommitPostAuth } from "../api/ApiPosts";
+import { throttle } from "../utils/debounce&throttle";
 
 
 interface PostDialogProps {
   onClose: () => void;
+  notification: string;
+  title: string;
+  clubInputId: number;
+  content: string;
 }
 
-const PostDialog = ({ onClose }: PostDialogProps) => {
+const PostDialog = ({ onClose, notification="Create New Post", title="", clubInputId=0, content="" }: PostDialogProps) => {
   const titleRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
-  const [clubId, setClubId] = useState<number>(0);
+  const [clubId, setClubId] = useState<number>(clubInputId);
+
+  const throttleCommitPost = throttle(async () => {
+        if(!contentRef.current) {return;}
+        await postsCommitPostAuth(contentRef.current.value, titleRef.current?.value, clubId == 0 ? null : clubId).then((res) => {
+          if (res.success) {
+            Msg.success(res.message);
+            onClose();
+          } else {
+            Msg.error(res.message);
+          }
+          console.log(res);
+        });
+      }, 500);
+
   // 底部按钮配置
   const bottomBtns : PopUpDialogButton[] = [
     {
@@ -27,17 +45,8 @@ const PostDialog = ({ onClose }: PostDialogProps) => {
     },
     {
       text: "Post",
-      onClick: async () => {
-        if(!contentRef.current) {return;}
-        await postsCommitPostAuth(contentRef.current.value, titleRef.current?.value, clubId == 0 ? null : clubId).then((res) => {
-          if (res.success) {
-            Msg.success(res.message);
-          onClose();
-          } else {
-            Msg.error(res.message);
-          }
-          console.log(res);
-        });
+      onClick: () => {
+        throttleCommitPost();
       },
       type: "submit"
     }
@@ -57,9 +66,21 @@ const PostDialog = ({ onClose }: PostDialogProps) => {
     </div>
   );
 
+  useEffect(() => {
+    // 给标题输入框赋值
+    if (titleRef.current) {
+      titleRef.current.value = title;
+    }
+    // 给内容文本域赋值
+    if (contentRef.current) {
+      contentRef.current.value = content;
+      contentRef.current.focus();
+    }
+  }, []);
+
   return (
     <PopUpDialogBase
-      title="Create New Post"
+      title={notification}
       onClose={onClose}
       footerLeft={footerLeft}
       bottomBtns={bottomBtns}

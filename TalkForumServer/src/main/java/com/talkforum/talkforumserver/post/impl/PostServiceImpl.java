@@ -55,7 +55,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void deletePost(Long postId, long userId, String role) {
-        Post post = postMapper.getPost(postId);
+        Post post = postMapper.getPostCheck(postId);
         if (post == null) {
             throw new RuntimeException("the post is null!");
         }

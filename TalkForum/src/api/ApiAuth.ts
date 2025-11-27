@@ -12,6 +12,7 @@ export interface UserInfo {
     lastLoginAt?: string;
     isLoggedIn: boolean;
     fansCount: number;
+    followingCount: number;
 }
 
 export interface AuthResponse extends ApiResponse<UserInfo> {}

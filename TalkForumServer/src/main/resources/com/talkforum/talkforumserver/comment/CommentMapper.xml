@@ -1,5 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.talkforum.talkforumserver.comment.CommentMapper">
+    <select id="getComments" resultType="com.talkforum.talkforumserver.common.entity.Comment">
+        SELECT
+        c.id, c.post_id, c.user_id, c.parent_id, c.content,
+        c.status, c.created_at, c.like_count, c.comment_count
+        FROM comment c
+        WHERE EXISTS (
+            SELECT 1 FROM post p  <!-- 仅查询存不存在，这是技巧-->
+            WHERE p.id = c.post_id AND p.status = 'PASS'
+        )
+        AND c.status = 'PASS'
+        AND c.post_id = #{postId}
+        <if test="parentId != null">AND c.parent_id = #{parentId}</if>
+        <if test="cursor != null">AND c.id &lt; #{cursor}</if>
+        ORDER BY c.id DESC
+        LIMIT #{pageSize}
+    </select>
+
+    <select id="getComment" resultType="com.talkforum.talkforumserver.common.entity.Comment">
+        SELECT
+        c.id, c.post_id, c.user_id, c.parent_id, c.content,
+        c.status, c.created_at, c.like_count, c.comment_count
+        FROM comment c
+        WHERE EXISTS (
+            SELECT 1 FROM post p
+            WHERE p.id = c.post_id AND p.status = 'PASS'
+        )
+        AND c.status = #{pass}
+        AND c.id = #{commentId}
+    </select>
+
+    <select id="countExistComment" resultType="int">
+        SELECT COUNT(*)
+        FROM comment c
+        WHERE EXISTS (
+            SELECT 1 FROM post p
+            WHERE p.id = c.post_id AND p.status = 'PASS'
+        )
+        AND c.status = 'PASS'
+        AND c.post_id = #{postId}
+        <if test="parentId != null">AND c.parent_id = #{parentId}</if>
+    </select>
+
+    <select id="countDeleteComment" resultType="com.talkforum.talkforumserver.common.entity.Comment">
+        SELECT user_id FROM comment WHERE status = 'PASS' AND id = #{commentId}
+    </select>
+
+    <insert id="addComment" useGeneratedKeys="true" keyColumn="id">
+        <!--先检查帖子是否通过-->
+        <selectKey keyProperty="postExist" resultType="int" order="BEFORE">
+            SELECT COUNT(1) FROM post WHERE id = #{postId} AND status = 'PASS'
+        </selectKey>
+        INSERT INTO comment (
+            post_id, user_id, parent_id, content, status
+        ) VALUES (
+            #{postId}, #{userId}, #{parentId}, #{content}, #{status}
+        )
+    </insert>
+
+    <update id="auditComment">
+        UPDATE comment SET status = #{status} WHERE id = #{commentId}
+    </update>
 
 </mapper>

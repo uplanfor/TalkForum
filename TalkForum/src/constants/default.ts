@@ -10,3 +10,14 @@ export const UserType = {
     ADMIN: "ADMIN",
     MODERATOR: "MODERATOR"
 } as const;
+
+export const PostViewType = {
+    CONTENT: "content",
+    COMMENT: "comment",
+    EDIT: "edit"
+} as const;
+
+export const SpaceViewType = {
+    USER: "user",
+    CLUB: "club"
+} as const;
