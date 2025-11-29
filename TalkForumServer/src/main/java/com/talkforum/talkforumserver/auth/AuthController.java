@@ -1,11 +1,13 @@
 package com.talkforum.talkforumserver.auth;
 
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
+import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
 import com.talkforum.talkforumserver.common.dto.LoginDTO;
 import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.common.vo.UserVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
+import com.talkforum.talkforumserver.constant.UserConstant;
 import com.talkforum.talkforumserver.user.UserMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,20 @@ public class AuthController {
         long userId = ((Number)(information.get("id"))).longValue();
         UserVO result = authService.auth(userId, response);
         if (result == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return Result.error("Unknown user!", result);
+        }
+        return Result.success("Success to update information!", result);
+    }
+
+
+    @ModeratorRequired
+    @GetMapping("/admin")
+    public Result authAdmin(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, HttpServletResponse response) {
+        Map<String, Object> information = jwtHelper.parseJWTToken(token);
+        long userId = ((Number)(information.get("id"))).longValue();
+        UserVO result = authService.auth(userId, response);
+        if (result == null || result.role.equals(UserConstant.ROLE_USER)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return Result.error("Unknown user!", result);
         }

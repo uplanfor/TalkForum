@@ -5,6 +5,10 @@
         SELECT * FROM post WHERE id = #{postId}
     </select>
 
+    <select id="countPassPost" resultType="int">
+        SELECT COUNT(*) FROM post WHERE id = #{postId} AND status = 'PASS'
+    </select>
+
     <select id="getPostCheck" resultType="com.talkforum.talkforumserver.common.entity.Post">
         SELECT user_id FROM post WHERE id = #{postId}
     </select>

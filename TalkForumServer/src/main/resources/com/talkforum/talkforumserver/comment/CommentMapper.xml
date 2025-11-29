@@ -3,64 +3,78 @@
 <mapper namespace="com.talkforum.talkforumserver.comment.CommentMapper">
     <select id="getComments" resultType="com.talkforum.talkforumserver.common.entity.Comment">
         SELECT
-        c.id, c.post_id, c.user_id, c.parent_id, c.content,
+        c.id, c.post_id, c.user_id, c.root_id, c.parent_id, c.content,
         c.status, c.created_at, c.like_count, c.comment_count
-        FROM comment c
-        WHERE EXISTS (
-            SELECT 1 FROM post p  <!-- 仅查询存不存在，这是技巧-->
-            WHERE p.id = c.post_id AND p.status = 'PASS'
-        )
+        FROM `comment` c
+        INNER JOIN `post` p ON c.post_id = p.id
+        WHERE p.status = 'PASS'
         AND c.status = 'PASS'
         AND c.post_id = #{postId}
-        <if test="parentId != null">AND c.parent_id = #{parentId}</if>
+        AND c.root_id IS NULL
         <if test="cursor != null">AND c.id &lt; #{cursor}</if>
         ORDER BY c.id DESC
         LIMIT #{pageSize}
     </select>
 
-    <select id="getComment" resultType="com.talkforum.talkforumserver.common.entity.Comment">
+    <select id="getCommentReplies" resultType="com.talkforum.talkforumserver.common.entity.Comment">
         SELECT
-        c.id, c.post_id, c.user_id, c.parent_id, c.content,
+        c.id, c.post_id, c.user_id, c.root_id, c.parent_id, c.content,
         c.status, c.created_at, c.like_count, c.comment_count
-        FROM comment c
-        WHERE EXISTS (
-            SELECT 1 FROM post p
-            WHERE p.id = c.post_id AND p.status = 'PASS'
-        )
-        AND c.status = #{pass}
-        AND c.id = #{commentId}
+        FROM `comment` c
+        INNER JOIN `post` p ON c.post_id = p.id
+        WHERE p.status = 'PASS'
+        AND c.status = 'PASS'
+        AND c.post_id = #{postId}
+        AND c.root_id = #{rootId}
+        <if test="cursor != null">AND c.id &lt; #{cursor}</if>
+        <if test="parentId != null">AND c.parent_id = #{parentId}</if>
+        ORDER BY c.id DESC
+        LIMIT #{pageSize}
     </select>
 
-    <select id="countExistComment" resultType="int">
-        SELECT COUNT(*)
-        FROM comment c
+
+    <select id="getComment" resultType="com.talkforum.talkforumserver.common.entity.Comment">
+        SELECT
+        c.id, c.post_id, c.user_id, c.root_id, c.parent_id, c.content,
+        c.status, c.created_at, c.like_count, c.comment_count
+        FROM `comment` c
         WHERE EXISTS (
             SELECT 1 FROM post p
             WHERE p.id = c.post_id AND p.status = 'PASS'
         )
         AND c.status = 'PASS'
-        AND c.post_id = #{postId}
-        <if test="parentId != null">AND c.parent_id = #{parentId}</if>
+        AND c.id = #{commentId}
+    </select>
+
+    <select id="countExistComment" resultType="int">
+        SELECT COUNT(*)
+        FROM `comment` c
+        INNER JOIN post p ON c.post_id = p.id
+        <if test="parentId != null">INNER JOIN `comment` cp ON cp.id = #{rootId}</if>
+        WHERE
+        c.status = 'PASS'
+        AND c.id = #{rootId}
     </select>
 
     <select id="countDeleteComment" resultType="com.talkforum.talkforumserver.common.entity.Comment">
-        SELECT user_id FROM comment WHERE status = 'PASS' AND id = #{commentId}
+        SELECT user_id FROM `comment` WHERE status = 'PASS' AND id = #{commentId}
     </select>
 
-    <insert id="addComment" useGeneratedKeys="true" keyColumn="id">
-        <!--先检查帖子是否通过-->
-        <selectKey keyProperty="postExist" resultType="int" order="BEFORE">
-            SELECT COUNT(1) FROM post WHERE id = #{postId} AND status = 'PASS'
-        </selectKey>
-        INSERT INTO comment (
-            post_id, user_id, parent_id, content, status
+    <insert id="addCommentWithPostCommentCountIncreased" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        <!--无先检查帖子是否通过，调用者保证-->
+        INSERT INTO `comment` (
+            post_id, user_id, root_id, parent_id, content, status
         ) VALUES (
-            #{postId}, #{userId}, #{parentId}, #{content}, #{status}
-        )
+            #{postId}, #{userId}, #{rootId}, #{parentId}, #{content}, #{status}
+        );
+
+        UPDATE post SET comment_count = comment_count + 1 WHERE id = #{postId};
+        <if test="rootId != null">UPDATE `comment` SET comment_count = comment_count + 1 WHERE id = #{rootId};</if>
+        <if test="rootId != parentId and parentId != null">UPDATE `comment` SET comment_count = comment_count + 1 WHERE id = #{parentId};</if>
     </insert>
 
     <update id="auditComment">
-        UPDATE comment SET status = #{status} WHERE id = #{commentId}
+        UPDATE `comment` SET status = #{status} WHERE id = #{commentId}
     </update>
 
 </mapper>

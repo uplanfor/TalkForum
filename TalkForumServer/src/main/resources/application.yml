@@ -5,7 +5,7 @@ spring:
 
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://localhost:3306/TalkForum
+    url: jdbc:mysql://localhost:3306/TalkForum?allowMultiQueries=true # allowMultiQueries=true 允许执行多条SQL语句
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 16729438
@@ -36,6 +36,8 @@ spring:
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
+    # 打印驼峰映射过程
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 jwt:
   secret-key: "XyvhaihdoehEF+gaosfcotynyogmeltoehsshlrybghsbschsb="

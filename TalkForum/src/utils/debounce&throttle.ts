@@ -20,6 +20,7 @@ export function debounce<T extends (...args: any[]) => any>(
 
     // 延迟执行函数：绑定事件回调的this（比如scroll事件中this是window）
     timeout = window.setTimeout(() => {
+      timeout = null; // 已执行，清空定时器ID，避免残留导致误判
       func.apply(this, args); // 传递正确的this和事件参数（如Event对象）
     }, wait);
   } as T & { cancel: () => void };
@@ -46,19 +47,38 @@ export function throttle<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): T & { cancel: () => void } {
-  let timeout: number | null = null; // 浏览器定时器ID为number
+  let timeout: number | null = null;
+  let lastExecTime: number = 0;
 
   const throttled = function (this: ThisParameterType<T>, ...args: Parameters<T>) {
-    // 只有定时器为空时，才执行下一次（保证间隔wait毫秒）
-    if (timeout === null) {
-      timeout = window.setTimeout(() => {
-        func.apply(this, args); // 绑定this和事件参数
-        timeout = null; // 执行后清空定时器，允许下次触发
-      }, wait);
+    const now = Date.now();
+    const timeSinceLastExec = now - lastExecTime;
+    const timeToWait = wait - timeSinceLastExec;
+
+    const execute = () => {
+      lastExecTime = Date.now(); // 使用执行时刻作为最后执行时间，避免调度时使用过期的`now`
+      try {
+        func.apply(this, args);
+      } finally {
+        // 如果是由定时器触发的执行，确保清空 timeout 标识
+        timeout = null;
+      }
+    };
+
+    if (timeout !== null) {
+      window.clearTimeout(timeout);
+      timeout = null;
+    }
+
+    if (timeSinceLastExec >= wait) {
+      // 超过等待时间，立即执行
+      execute();
+    } else {
+      // 设置定时器，在剩余时间后执行
+      timeout = window.setTimeout(execute, timeToWait);
     }
   } as T & { cancel: () => void };
 
-  // 新增：取消未执行的节流函数
   throttled.cancel = function () {
     if (timeout !== null) {
       window.clearTimeout(timeout);

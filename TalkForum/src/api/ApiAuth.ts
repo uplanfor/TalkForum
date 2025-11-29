@@ -39,3 +39,10 @@ export const authSignOut = () : Promise<any> => {
 export const authGetLoginInfo = () : Promise<AuthResponse> => {
     return Request.get<AuthResponse>("/api/auth/");
 }
+
+/*
+ * to get admin info
+ */
+export const authGetAdminInfo = () : Promise<AuthResponse> => {
+    return Request.get<AuthResponse>("/api/auth/admin");
+}

@@ -1,6 +1,20 @@
 import type ApiResponse from "./ApiResponse";
 import Request from "../utils/Request";
 
+/*
+ * Post Type
+ * @param id: number
+ * @param title: string
+ * @param content: string
+ * @param userId: number
+ * @param clubId: number | null
+ * @param status: number
+ * @param isEssence: number
+ * @param createdAt: string
+ * @param updatedAt: string
+ * @param viewCount: number
+ * @param likeCount: number
+ */
 export interface PostType {
     id: number;
     title: string;

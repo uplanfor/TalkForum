@@ -6,6 +6,7 @@ import NotFound from "../pages/NotFound";
 interface SpaceViewProps {
     type: "club" | "user";
     id: number;
+    onClose?: () => void;
 }
 
 

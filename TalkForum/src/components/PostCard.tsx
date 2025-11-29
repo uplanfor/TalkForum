@@ -9,14 +9,13 @@ import { EllipsisHorizontalIcon } from "@heroicons/react/24/solid";
 import dayjs from "dayjs";
 import { SpaceViewType, UserType } from "../constants/default";
 import { PostViewType } from "../constants/default";
+import { getSingleSimpleUserInfo } from "../utils/simpleUserInfoCache";
 
 export interface PostCardProps {
-    avatarLink: string;
     title?: string;
     brief: string;
     coverLink?: string;
     userId: number;
-    authorName: string;
     id: number;
     clubId?: number;
     openPostView: (postId: number, target: string) => void;
@@ -32,8 +31,8 @@ export interface PostCardProps {
 
 
 const PostCard = (props: PostCardProps) => {
-    const { avatarLink, title, brief, coverLink,
-        userId, authorName, id, clubId, createdAt, isEssence,
+    const { title, brief, coverLink,
+        userId, id, clubId, createdAt, isEssence,
         viewCount, likeCount, commentCount,
         openPostView, openSpaceView, deletePost, reportPost
     } = props;
@@ -43,9 +42,9 @@ const PostCard = (props: PostCardProps) => {
     return <div className="post-card">
         <div onClick={()=>openPostView(id, PostViewType.CONTENT)}>
             <div className="author-info">
-                <img src={avatarLink} alt="Not Found" onClick={()=>openSpaceView(userId, SpaceViewType.USER)} />
+                <img src={getSingleSimpleUserInfo(userId).avatarLink} alt="Not Found" onClick={()=>openSpaceView(userId, SpaceViewType.USER)} />
                 <div className="author-info-text">
-                    <h4>{authorName}</h4>
+                    <h4>{getSingleSimpleUserInfo(userId).name}</h4>
                     <p>{dayjs(createdAt).format("HH:mm:ss MMM DD, YYYY")}</p>
                 </div>
             </div>

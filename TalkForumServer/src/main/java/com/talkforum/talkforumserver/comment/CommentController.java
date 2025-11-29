@@ -1,5 +1,6 @@
 package com.talkforum.talkforumserver.comment;
 
+import com.sun.istack.NotNull;
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
 import com.talkforum.talkforumserver.common.dto.AddCommentDTO;
 import com.talkforum.talkforumserver.common.entity.Comment;
@@ -7,6 +8,7 @@ import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -20,8 +22,17 @@ public class CommentController {
     JWTHelper jwtHelper;
 
     @GetMapping("/")
-    public Result getCommentList(long postId, int page, int pageSize, Long parentId) {
-        return Result.success("Successfully get comment list!", commentService.getComments(postId, page, pageSize, parentId));
+    @Validated
+    public Result getCommentList(@NotNull long postId, Integer cursor, @NotNull int pageSize) {
+        return Result.success("Successfully get comment list!",
+                commentService.getComments(postId, cursor, pageSize));
+    }
+
+    @GetMapping("/replies")
+    @Validated
+    public Result getCommentReplyList(@NotNull long postId, Integer cursor, @NotNull int pageSize, @NotNull Long rootId, Long parentId) {
+        return Result.success("Successfully get comment replies",
+                commentService.getCommentReplyList(postId, cursor, pageSize, rootId, parentId));
     }
 
     @LoginRequired
@@ -31,12 +42,13 @@ public class CommentController {
         long userId = ((Number)(information.get("id"))).longValue();
         String role = (String)(information.get("role"));
 
-        Comment comment = commentService.addComment(
+        Comment comment = commentService.addCommentWithPostCommentCountIncreased(
                 addCommentDTO.getPostId(),
                 addCommentDTO.getContent(),
+                addCommentDTO.getRootId(),
                 addCommentDTO.getParentId(),
                 userId, role);
-        if (comment != null) {
+        if (comment.id != null) {
             return Result.success("Successfully add comment!", comment);
         }
         return Result.error("Fail to add comment!");

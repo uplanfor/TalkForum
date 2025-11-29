@@ -27,7 +27,7 @@ CREATE TABLE `user` (
   KEY `fk_user_invite_code` (`used_invite_code`) COMMENT '关联邀请码表（后续添加外键）'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表（储存用户信息）';
 
--- 2. 令牌表（auth_token）- 按规范保留（标注暂时废弃）
+-- 2. 令牌表（auth_token）- 按规范保留（彻底弃用，存redis）
 CREATE TABLE `auth_token` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '令牌唯一标识',
   `user_id` bigint NOT NULL COMMENT '关联用户ID',
@@ -117,6 +117,7 @@ CREATE TABLE `comment` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '评论唯一标识',
   `post_id` bigint NOT NULL COMMENT '关联帖子ID',
   `user_id` bigint NOT NULL COMMENT '评论者用户ID',
+  `root_id` bigint NOT NULL COMMENT '根评论ID（顶级评论为null）',
   `parent_id` bigint DEFAULT NULL COMMENT '关联回复的评论ID（顶级评论为null）',
   `content` varchar(1024) NOT NULL COMMENT '评论内容',
   `status` varchar(16) NOT NULL DEFAULT 'PENDING' COMMENT '状态（PENDING/PASS/REJECT/DELETE）',
@@ -127,11 +128,13 @@ CREATE TABLE `comment` (
   UNIQUE KEY `idx_comment_post_status_created` (`post_id`, `status`, `created_at`) COMMENT '规范要求：复合唯一索引（帖子+状态+创建时间）',
   KEY `fk_comment_post` (`post_id`) COMMENT '关联帖子',
   KEY `fk_comment_user` (`user_id`) COMMENT '关联评论者',
+  KEY `fk_comment_root` (`root_id`) COMMENT '关联根评论',
   KEY `fk_comment_parent` (`parent_id`) COMMENT '关联父评论',
   KEY `idx_comment_status` (`status`) COMMENT '按状态筛选评论',
   KEY `idx_comment_created_at` (`created_at`) COMMENT '按创建时间排序',
   CONSTRAINT `fk_comment_post` FOREIGN KEY (`post_id`) REFERENCES `post` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_comment_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_comment_root` FOREIGN KEY (`root_id`) REFERENCES `comment` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_comment_parent` FOREIGN KEY (`parent_id`) REFERENCES `comment` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论表（储存所有评论，帖子删除时级联删除评论；评论者删除时级联删除评论；父评论删除时级联删除子评论）';
 

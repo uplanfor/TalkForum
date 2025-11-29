@@ -12,10 +12,11 @@ public class Comment {
     public Long id;
     public Long postId;
     public Long userId;
+    public Long rootId;
     public Long parentId;
     public String content;
     public String status;
-    public Date createAt;
+    public Date createdAt;
     public Integer likeCount;
     public Integer commentCount;
 
@@ -26,15 +27,16 @@ public class Comment {
         parentId = null;
         content = "";
         status = CommentConstant.PENDING;
-        createAt = new Date();
+        createdAt = new Date();
         likeCount = 0;
         commentCount = 0;
     }
 
-    public Comment(Long postId, Long userId, Long parentId, String content, String status) {
-        super();
+    public Comment(Long postId, Long userId, Long rootId, Long parentId, String content, String status) {
+        this();
         this.postId = postId;
         this.userId = userId;
+        this.rootId = rootId;
         this.parentId = parentId;
         this.content = content;
         this.status = status;

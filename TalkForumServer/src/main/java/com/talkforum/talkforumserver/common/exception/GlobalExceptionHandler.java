@@ -79,7 +79,7 @@ public class GlobalExceptionHandler {
                 clientIp, requestUri, exceptionType, exceptionMsg, e); // 输出完整堆栈
 
         // 3. 统一返回固定提示（避免泄露技术细节）
-        return Result.error("Server Error 500");
+        return Result.error("Server Error!");
     }
 
     /**

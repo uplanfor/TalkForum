@@ -2,7 +2,7 @@ import Nav from "../components/Nav";
 import BackgroundImg from "../components/BackgroundImg";
 import PostsContainer from "../components/PostsContainer";
 import { DefaultBackgroundUrl } from "../constants/default";
-import KeepAlive from "react-activation";
+// import KeepAlive from "react-activation";
 
 const Home = () => (
     <>

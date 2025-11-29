@@ -10,5 +10,6 @@ public class AddCommentDTO {
     @NotNull
     private String content;
 
+    private Long rootId;
     private Long parentId;
 }

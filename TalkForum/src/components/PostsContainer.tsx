@@ -1,17 +1,19 @@
 // import "../assets/normalize.css";
 import "./styles/style_postscontainer.css";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroller";
 import PostCard, { type PostCardProps } from "./PostCard";
 import PostCardPlaceholder from "./PostCardPlaceholder";
 import PostView from "./PostView";
 import { postsDeletePost, postsGetPostList } from "../api/ApiPosts";
-import { throttle } from "../utils/debounce&throttle";
+import { debounce } from "../utils/debounce&throttle";
 import SpaceView from "./SpaceView";
 import { createPortal } from "react-dom";
-import { getSingleSimpleUserInfo, requestSimpleUserInfoCache } from "../utils/simpleUserInfoCache";
+import { requestSimpleUserInfoCache } from "../utils/simpleUserInfoCache";
 import type ApiResponse from "../api/ApiResponse";
 import Msg from "../utils/Msg";
+import ReportDialog from "./ReportDialog";
 
 
 interface PostContainerProps {
@@ -25,15 +27,39 @@ const PostContainer = ({
   tabs = [],
   defaultTab = 0,
 }: PostContainerProps) => {
+  // 帖子容器相关状态
   const [posts, setPosts] = useState<PostCardProps[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [cursor, setCursor] = useState<number | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isError, setIsError] = useState(false);
+
   const [curTabIndex, setCurTabIndex] = useState((defaultTab > 0 && defaultTab < tabs.length) ? defaultTab : 0);
+
+  // 展示对话框相关状态
   const [showPostView, setShowPostView] = useState<boolean>(false);
   const [showSpaceView, setShowSpaceView] = useState<boolean>(false);
+  const [showReportDialog, setShowReportDialog] = useState<boolean>(false);
   const [curPostId, setCurPostId] = useState<number>(0);
+
+  // 监听参数
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    const postIdStr = searchParams.get("postId");
+    const clubIdStr = searchParams.get("clubId");
+    const userIdStr = searchParams.get("userId");
+    if (postIdStr) {
+      const postId = parseInt(postIdStr);
+      setCurPostId(postId);
+      setShowPostView(true);
+    } else if (clubIdStr) {
+
+    } else if (userIdStr) {
+    } else {
+      setShowPostView(false);
+      setShowSpaceView(false);
+    }
+  }, [searchParams]);
 
 
   // 处理刷新
@@ -61,8 +87,12 @@ const PostContainer = ({
 
   // 处理打开帖子（看内容/评论/修改）
   const openPostView = (postId: number, target: string) => {
-    setCurPostId(postId);
-    setShowPostView(true);
+    setSearchParams({ postId: postId.toString() }, { replace: true });
+  }
+
+  // 处理关闭帖子
+  const closePostView = () => {
+    setSearchParams({}, { replace: true });
   }
 
   // 处理打开用户的空间或者圈子空间
@@ -89,7 +119,7 @@ const PostContainer = ({
 
   // 处理举报帖子
   const reportPost = (postId: number) => {
-
+    setShowReportDialog(true);
   }
 
   // 处理加载更多帖子
@@ -97,7 +127,6 @@ const PostContainer = ({
     if (!hasMore || isError || isRefreshing) {
       return;
     }
-
 
     try {
       const result = await new Promise<ApiResponse>((resolve, reject) => {
@@ -116,15 +145,7 @@ const PostContainer = ({
             });
 
             // cache users' information
-            requestSimpleUserInfoCache(needCacheTarget);
-
-            // update authorName and avatarLink
-            let list = res.data.data;
-            list.forEach((item: PostCardProps) => {
-              const simpleUserInfo = getSingleSimpleUserInfo(item.userId);
-              item.authorName = simpleUserInfo.name;
-              item.avatarLink = simpleUserInfo.avatarLink;
-            });
+            await requestSimpleUserInfoCache(needCacheTarget);
             resolve(res);
           } catch (err) {
             reject(err)
@@ -133,6 +154,7 @@ const PostContainer = ({
         }, 1024);
       });
 
+      // 加载成功
       if (result.success && !isRefreshing) {
         setCursor(result.data.cursor);
         setPosts((prev) => [...prev, ...result.data.data]);
@@ -146,7 +168,7 @@ const PostContainer = ({
   };
 
   // 节流，防止恶意调用
-  const throttleLoadMore = throttle(loadMore, 1000);
+  const debounceLoadMore = debounce(loadMore, 1000);
 
   return (
     <div className="container">
@@ -160,7 +182,7 @@ const PostContainer = ({
           </div>
         )}
 
-        <InfiniteScroll loadMore={throttleLoadMore} hasMore={hasMore} threshold={512} loader={
+        <InfiniteScroll loadMore={debounceLoadMore} hasMore={hasMore} threshold={512} loader={
           (<div key={0}> {!isError &&
             <>
               <PostCardPlaceholder />
@@ -180,11 +202,15 @@ const PostContainer = ({
         </InfiniteScroll>
 
         {showPostView && createPortal(
-          <PostView postId={curPostId} onClose={() => setShowPostView(false)} />,
+          <PostView postId={curPostId} onClose={closePostView} />,
           document.body
         )}
         {showSpaceView && createPortal(
           <SpaceView onClose={() => setShowSpaceView(false)} />,
+          document.body
+        )}
+        {showReportDialog && createPortal(
+          <ReportDialog onClose={() => setShowReportDialog(false)} reportId={curPostId} />,
           document.body
         )}
       </div>

@@ -46,7 +46,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         if (value == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":401,\"success\":false,\"message\":\"Login Required!\"}");
+            response.getWriter().write("{\"code\":401,\"success\":false,\"message\":\"Please sign in so you can use the function!\"}");
             return false;
         } else {
             try {

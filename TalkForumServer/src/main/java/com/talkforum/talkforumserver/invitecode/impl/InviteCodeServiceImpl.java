@@ -20,7 +20,11 @@ public class InviteCodeServiceImpl implements InviteCodeService {
 
     @Override
     public List<InviteCode> getInviteCodes(Long userId) {
-        return inviteCodeMapper.selectByCreatorId(userId);
+        List<InviteCode> inviteCodes = inviteCodeMapper.selectByCreatorId(userId);
+        if (inviteCodes == null || inviteCodes.isEmpty()) {
+            inviteCodes = generateInviteCodes(userId, new InviteCodeDTO(1, 1, 7));
+        }
+        return inviteCodes;
     }
 
     @Override
