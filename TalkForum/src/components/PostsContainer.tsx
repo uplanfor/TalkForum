@@ -133,7 +133,7 @@ const PostContainer = ({
         setTimeout(async () => {
           try {
             // get next posts
-            let res = await postsGetPostList(10, cursor);
+            let res = await postsGetPostList({cursor: cursor, pageSize: 10});
 
             // to see if there are some users' information need to be cached
             let needCacheTarget: number[] = []

@@ -30,7 +30,7 @@ public class InviteCodeController {
     }
 
     @AdminRequired
-    @PostMapping("/")
+    @PostMapping("/admin")
     public Result generateInviteCodes(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, @RequestBody InviteCodeDTO inviteCodeDTO) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         Long userId = ((Number)(information.get("id"))).longValue();
@@ -38,7 +38,7 @@ public class InviteCodeController {
     }
 
     @AdminRequired
-    @DeleteMapping("/{code}")
+    @DeleteMapping("/admin/{code}")
     public Result deleteInviteCode(@PathVariable String code) {
         boolean success = inviteCodeService.deleteInviteCode(code);
         return success ? 

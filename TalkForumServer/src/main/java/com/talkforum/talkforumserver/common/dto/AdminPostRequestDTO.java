@@ -1,16 +1,17 @@
 package com.talkforum.talkforumserver.common.dto;
 
-import jakarta.validation.constraints.NotNull;
+import com.sun.istack.NotNull;
 import lombok.Data;
 
 @Data
-public class PostRequestDTO {
+public class AdminPostRequestDTO {
     String keyword;
+    String status;
     Long[] clubIds;
     Long[] userIds;
     int isEssence = 0;
 
-    Long cursor;
-    @NotNull(message = "Page size cannot be null!")
+    int page;
+    @NotNull
     int pageSize;
 }

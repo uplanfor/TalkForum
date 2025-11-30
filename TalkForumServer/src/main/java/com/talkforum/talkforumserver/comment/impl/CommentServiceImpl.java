@@ -2,9 +2,11 @@ package com.talkforum.talkforumserver.comment.impl;
 
 import com.talkforum.talkforumserver.comment.CommentMapper;
 import com.talkforum.talkforumserver.comment.CommentService;
+import com.talkforum.talkforumserver.common.dto.AdminGetCommentsDTO;
 import com.talkforum.talkforumserver.common.entity.Comment;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
 import com.talkforum.talkforumserver.common.vo.CommentListVO;
+import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.constant.CommentConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
 import com.talkforum.talkforumserver.post.PostMapper;
@@ -47,15 +49,9 @@ public class CommentServiceImpl implements CommentService {
         return ret;
     }
 
-
-    @Override
-    public void auditComment(Long commentId, String status) {
-        commentMapper.auditComment(commentId, status);
-    }
-
     @Override
     public Comment addCommentWithPostCommentCountIncreased(Long postId, String content, Long rootId, Long parentId, Long userId, String role) {
-        int count = postMapper.countPassPost(postId);
+        long count = postMapper.countPassPost(postId);
         if (count == 0) {
             throw new BusinessRuntimeException("The post did not exist!");
         }
@@ -87,5 +83,16 @@ public class CommentServiceImpl implements CommentService {
                 throw new BusinessRuntimeException("You cannot delete other's comments!");
             }
         }
+    }
+
+    @Override
+    public PageVO<Comment> adminGetCommentsByPage(AdminGetCommentsDTO adminGetCommentsDTO) {
+        List<Comment> comments = commentMapper.adminGetCommentsByPage(adminGetCommentsDTO);
+        return new PageVO<>(comments, commentMapper.adminCountComments(adminGetCommentsDTO));
+    }
+
+    @Override
+    public void auditComment(Long commentId, String status) {
+        commentMapper.auditComment(commentId, status);
     }
 }

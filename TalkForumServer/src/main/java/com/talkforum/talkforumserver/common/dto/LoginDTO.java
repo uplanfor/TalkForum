@@ -1,12 +1,12 @@
 package com.talkforum.talkforumserver.common.dto;
 
-import com.sun.istack.NotNull;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class LoginDTO {
-    @NotNull
+    @NotNull(message="Please commit your name or email!")
     public String nameOrEmail;
-    @NotNull
+    @NotNull(message="Please commit your password!")
     public String password;
 }

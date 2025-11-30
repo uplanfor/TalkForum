@@ -2,6 +2,7 @@ package com.talkforum.talkforumserver.post;
 
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
 import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
+import com.talkforum.talkforumserver.common.dto.AdminPostRequestDTO;
 import com.talkforum.talkforumserver.common.dto.PostCommitDTO;
 import com.talkforum.talkforumserver.common.dto.PostEditDTO;
 import com.talkforum.talkforumserver.common.dto.PostRequestDTO;
@@ -11,6 +12,7 @@ import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.common.vo.PostListVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,8 +32,9 @@ public class PostController {
     }
 
     @GetMapping("/")
+    @Validated
     public Result getPosts(PostRequestDTO postRequestDTO) {
-        PostListVO postListVO = postService.getPosts(postRequestDTO);
+//        PostListVO postListVO = postService.getPosts(postRequestDTO);
 //        if (postListVO.getData().isEmpty()) {
 //            return Result.error("No more posts!", postListVO);
 //        }
@@ -40,6 +43,7 @@ public class PostController {
 
     @LoginRequired
     @PostMapping("/")
+    @Validated
     public Result commitPost(@RequestBody PostCommitDTO postCommitDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         postCommitDTO.userId = ((Number)(information.get("id"))).longValue();
@@ -48,6 +52,7 @@ public class PostController {
 
     @LoginRequired
     @PutMapping("/")
+    @Validated
     public Result editPost(@RequestBody PostEditDTO postEditDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         postEditDTO.userId = ((Number)(information.get("id"))).longValue();
@@ -66,14 +71,21 @@ public class PostController {
     }
 
     @ModeratorRequired
-    @PutMapping("/{postId}/audit")
+    @GetMapping("/admin/")
+    @Validated
+    public Result getPostsWithAdminRight(AdminPostRequestDTO adminPostRequestDTO) {
+        return Result.success("Success to get post list!", postService.getPostsWithAdminRight(adminPostRequestDTO));
+    }
+
+    @ModeratorRequired
+    @PutMapping("/admin/{postId}/audit")
     public Result auditPost(@PathVariable Long postId) {
         postService.auditPost(postId);
         return Result.success("Success to audit post!");
     }
 
     @ModeratorRequired
-    @PutMapping("/{postId}/essence")
+    @PutMapping("/admin/{postId}/essence")
     public Result essencePost(@PathVariable Long postId, int isEssence) {
         postService.essencePost(postId, isEssence);
         return Result.success("Success to modify!");

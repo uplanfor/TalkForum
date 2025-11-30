@@ -31,6 +31,24 @@ export interface PostType {
 }
 interface PostResponse extends ApiResponse<PostType> {}
 
+interface PostListParams {
+    keyword?: string;
+    clubIds?: number[];
+    userIds?: number[];
+    isEssence?: number;
+    cursor?: number;
+    pageSize: number;
+}
+
+interface AdminPosstListParams {
+    keyword?: string;
+    status?: string;
+    clubIds?: number[];
+    userIds?: number[];
+    isEssence?: number;
+    page?: number;
+    pageSize: number;
+}
 
 
 /*
@@ -54,8 +72,8 @@ export const postsGetPostDetailInformation = async (postId: string | number) : P
 /*
  * to get a post list
  */
-export const postsGetPostList = async(pageSize: number, cursor?: number | null) : Promise<ApiResponse> => {
-    return Request.get<ApiResponse>('/api/posts/', {pageSize, cursor});
+export const postsGetPostList = async(params: PostListParams) : Promise<ApiResponse> => {
+    return Request.get<ApiResponse>('/api/posts/', params);
 };
 
 

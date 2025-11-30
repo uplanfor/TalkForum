@@ -1,11 +1,13 @@
 package com.talkforum.talkforumserver.post.impl;
 
+import com.talkforum.talkforumserver.common.dto.AdminPostRequestDTO;
 import com.talkforum.talkforumserver.common.dto.PostCommitDTO;
 import com.talkforum.talkforumserver.common.dto.PostEditDTO;
 import com.talkforum.talkforumserver.common.dto.PostRequestDTO;
 import com.talkforum.talkforumserver.common.entity.Post;
 import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.MarkdownIntroHelper;
+import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.common.vo.PostListVO;
 import com.talkforum.talkforumserver.common.vo.PostVO;
 import com.talkforum.talkforumserver.constant.PostConstant;
@@ -69,6 +71,13 @@ public class PostServiceImpl implements PostService {
             }
         }
     }
+
+    @Override
+    public PageVO<PostVO> getPostsWithAdminRight(AdminPostRequestDTO adminPostRequestDTO) {
+        List<PostVO> list = postMapper.adminGetPosts(adminPostRequestDTO);
+        return new PageVO<>(list, postMapper.adminCountPosts(adminPostRequestDTO));
+    }
+
 
     @Override
     public void auditPost(Long postId) {

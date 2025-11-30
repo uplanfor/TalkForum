@@ -1,5 +1,6 @@
 package com.talkforum.talkforumserver.post;
 
+import com.talkforum.talkforumserver.common.dto.AdminPostRequestDTO;
 import com.talkforum.talkforumserver.common.dto.PostCommitDTO;
 import com.talkforum.talkforumserver.common.dto.PostEditDTO;
 import com.talkforum.talkforumserver.common.dto.PostRequestDTO;
@@ -14,10 +15,13 @@ public interface PostMapper {
     Post getPost(Long postId);
     Post getPostCheck(Long postId);
     List<PostVO> getPosts(PostRequestDTO postRequestDTO);
-    int countPassPost(Long postId);
+    long countPassPost(Long postId);
     int addPost(PostCommitDTO postCommitDTO, String status, String brief);
     int updatePost(PostEditDTO postEditDTO, String status, String brief);
     int deletePost(Long postId);
+
+    List<PostVO> adminGetPosts(AdminPostRequestDTO adminPostRequestDTO);
+    long adminCountPosts(AdminPostRequestDTO adminPostRequestDTO);
     int auditPost(Long postId);
     int essencePost(Long postId, int isEssence);
 }

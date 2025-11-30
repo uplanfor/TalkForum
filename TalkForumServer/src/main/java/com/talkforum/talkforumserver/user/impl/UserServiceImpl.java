@@ -5,6 +5,7 @@ import com.talkforum.talkforumserver.common.dto.UserProfileDTO;
 import com.talkforum.talkforumserver.common.entity.User;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
 import com.talkforum.talkforumserver.common.util.PasswordHelper;
+import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.common.vo.SimpleUserVO;
 import com.talkforum.talkforumserver.common.vo.UserVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
@@ -98,26 +99,6 @@ public class UserServiceImpl implements UserService {
         userMapper.setUserProfile(user);
     }
 
-    @Override
-    public void updateStatus(long userId, String status) {
-        userMapper.updateUserStatus(userId, status);
-    }
-
-    @Override
-    public void resetUserPassword(long userId) {
-        userMapper.resetUserPassword(userId,
-                PasswordHelper.encryptPassword(PasswordHelper.encryptPassword(ServerConstant.DEFAULT_PASSWORD)));
-    }
-
-    @Override
-    public void deleteUser(long userId) {
-        userMapper.deleteUser(userId);
-    }
-
-    @Override
-    public void setUserRole(long userId, String role) {
-        userMapper.setUserRole(userId, role);
-    }
 
     @Override
     public void changePassword(long userId, String oldPassword, String newPassword) throws BusinessRuntimeException {
@@ -137,5 +118,33 @@ public class UserServiceImpl implements UserService {
             throw new BusinessRuntimeException("Your login password is wrong!");
         }
 
+    }
+
+    @Override
+    public void deleteUser(long userId) {
+        userMapper.deleteUser(userId);
+    }
+
+    @Override
+    public PageVO<UserVO> getUsersByPage(int page, int pageSize) {
+        int offset = (page - 1) * pageSize;
+        List<UserVO> list = userMapper.getUsersByPage(offset, pageSize);
+        return new PageVO<>(list, userMapper.countAllUsers());
+    }
+
+    @Override
+    public void setUserRole(long userId, String role) {
+        userMapper.setUserRole(userId, role);
+    }
+
+    @Override
+    public void updateStatus(long userId, String status) {
+        userMapper.updateUserStatus(userId, status);
+    }
+
+    @Override
+    public void resetUserPassword(long userId) {
+        userMapper.resetUserPassword(userId,
+                PasswordHelper.encryptPassword(PasswordHelper.encryptPassword(ServerConstant.DEFAULT_PASSWORD)));
     }
 }

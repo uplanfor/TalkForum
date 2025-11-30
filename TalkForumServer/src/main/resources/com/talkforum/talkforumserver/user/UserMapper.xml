@@ -11,14 +11,14 @@
     <select id="getUserVOById" resultType="com.talkforum.talkforumserver.common.vo.UserVO">
          SELECT id, email, name, role, fans_count, following_count,
                 intro, created_at, last_login_at, status,
-                avatar_link, background_link from user where id = #{userId}
+                avatar_link, background_link FROM user where id = #{userId}
     </select>
 
 
     <select id="getUserVOByEmail" resultType="com.talkforum.talkforumserver.common.vo.UserVO">
         SELECT id, email, name, role, fans_count, following_count,
                intro, created_at, last_login_at, status,
-               avatar_link, background_link from user where email = #{email}
+               avatar_link, background_link FROM user where email = #{email}
     </select>
 
     <select id="getUserLoginInfoByNameOrEmail" resultType="com.talkforum.talkforumserver.common.entity.User">
@@ -30,12 +30,12 @@
     </select>
 
     <select id="getSimpleUsersInfo" resultType="com.talkforum.talkforumserver.common.vo.SimpleUserVO">
-        SELECT id, name, avatar_link from user
+        SELECT id, name, avatar_link FROM user
         <where>
             <if test="userIds != null and userIds.length > 0">
                 id IN
                 <foreach collection="array" item="userId" open="("  separator="," close=")">
-                #{userId}  <!-- 占位符（MyBatis自动防SQL注入） -->
+                #{userId}
                 </foreach>
             </if>
             <!-- 若userIds为空，查询条件为1=0（返回空集合，避免全表查询） -->
@@ -57,9 +57,31 @@
     </update>
 
 
-    <select id="countUserByNameOrEmail" resultType="int">
+    <select id="countUserByNameOrEmail" resultType="long">
         SELECT COUNT(*) FROM user WHERE name = #{name} OR email = #{email}
     </select>
+
+    <delete id="deleteUser">
+        DELETE FROM user WHERE id = #{userId}
+    </delete>
+
+
+    <update id="updateLoginTime">
+        UPDATE user SET last_login_at = NOW() WHERE id = #{userId}
+    </update>
+
+    <select id="getUserByPage" resultType="com.talkforum.talkforumserver.common.entity.User">
+         <!--调用者计算 offset, limit-->
+
+         SELECT id, email, name, role, fans_count, following_count,
+                intro, created_at, last_login_at, status,
+                avatar_link, background_link FROM user LIMIT #{offset}, #{limit}
+    </select>
+
+    <update id="setUserRole">
+        UPDATE user SET role = #{role} WHERE id = #{userId}
+    </update>
+
 
     <update id="updateUserStatus">
         UPDATE user SET status = #{status} WHERE id = #{userId}
@@ -68,17 +90,8 @@
     <update id="resetUserPassword">
         UPDATE user SET password = #{hashPassword} WHERE id = #{userId}
     </update>
-
-    <delete id="deleteUser">
-        DELETE FROM user WHERE id = #{userId}
-    </delete>
-
-    <update id="setUserRole">
-        UPDATE user SET role = #{role} WHERE id = #{userId}
-    </update>
-
-
-    <update id="updateLoginTime">
-        UPDATE user SET last_login_at = NOW() WHERE id = #{userId}
-    </update>
+    
+    <select id="countAllUsers" resultType="long">
+        SELECT COUNT(*) FROM user
+    </select>
 </mapper>

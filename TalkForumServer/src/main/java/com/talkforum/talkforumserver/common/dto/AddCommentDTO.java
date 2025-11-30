@@ -1,13 +1,14 @@
 package com.talkforum.talkforumserver.common.dto;
 
-import com.sun.istack.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class AddCommentDTO {
-    @NotNull
+    @NotNull(message="postId cannot be null")
     private Long postId;
-    @NotNull
+    @NotBlank(message="content required!")
     private String content;
 
     private Long rootId;

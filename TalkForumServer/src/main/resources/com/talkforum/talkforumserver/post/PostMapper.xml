@@ -21,8 +21,19 @@
         FROM post
         <where>
             status = 'PASS'
-            <if test="clubId != null">AND club_id = #{clubId}</if>
             <if test="cursor != null">AND id &lt; #{cursor}</if>
+            <if test="clubIds != null and clubIds.length > 0">
+                AND club_id IN
+                <foreach collection="clubIds" item="clubId" open="(" separator="," close=")">
+                    #{clubId}
+                </foreach>
+            </if>
+            <if test="userIds != null and userIds.length > 0">
+                AND user_id IN
+                <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </if>
         </where>
         ORDER BY id DESC <!-- 按id降序，id越大越新 -->
         LIMIT #{pageSize}
@@ -60,4 +71,51 @@
     <update id="essencePost">
         UPDATE post SET is_essence = #{isEssence}, updated_at = NOW() WHERE id = #{postId}
     </update>
+
+    <select id="adminGetPosts" resultType="com.talkforum.talkforumserver.common.vo.PostVO">
+        <bind name="offset" value="(page - 1) * pageSize"></bind>
+        <!--这样就可以计算offset了-->
+
+        SELECT
+        id, title, brief, user_id,
+        club_id, status, is_essence, created_at,
+        view_count, like_count, comment_count
+        FROM post
+        <where>
+            <if test="status != null">AND status = #{status}</if>
+            <if test="clubIds != null and clubIds.length > 0">
+                AND club_id IN
+                <foreach collection="clubIds" item="clubId" open="(" separator="," close=")">
+                    #{clubId}
+                </foreach>
+            </if>
+            <if test="userIds != null and userIds.length > 0">
+                AND user_id IN
+                <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="adminCountPosts"  resultType="int">
+        SELECT COUNT(*) FROM post
+        <where>
+            <if test="status != null">AND status = #{status}</if>
+            <if test="clubIds != null and clubIds.length > 0">
+                AND club_id IN
+                <foreach collection="clubIds" item="clubId" open="(" separator="," close=")">
+                    #{clubId}
+                </foreach>
+            </if>
+            <if test="userIds != null and userIds.length > 0">
+                AND user_id IN
+                <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>

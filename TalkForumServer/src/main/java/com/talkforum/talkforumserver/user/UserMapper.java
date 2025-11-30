@@ -26,5 +26,7 @@ public interface UserMapper {
     void deleteUser(long userId);
     void setUserRole(long userId, String role);
     void updateLoginTime(long userId);
+    List<UserVO> getUsersByPage(int offset, int limit);
 
+    long countAllUsers();
 }

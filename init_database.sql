@@ -27,20 +27,7 @@ CREATE TABLE `user` (
   KEY `fk_user_invite_code` (`used_invite_code`) COMMENT '关联邀请码表（后续添加外键）'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表（储存用户信息）';
 
--- 2. 令牌表（auth_token）- 按规范保留（彻底弃用，存redis）
-CREATE TABLE `auth_token` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '令牌唯一标识',
-  `user_id` bigint NOT NULL COMMENT '关联用户ID',
-  `token` varchar(256) NOT NULL COMMENT '登录态令牌',
-  `expire_time` datetime NOT NULL COMMENT '过期时间',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `is_valid` tinyint NOT NULL DEFAULT 1 COMMENT '是否合法(1=是，0=否)',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_token` (`token`) COMMENT '令牌唯一，避免重复登录态',
-  KEY `fk_auth_token_user` (`user_id`) COMMENT '关联用户表',
-  KEY `idx_auth_token_expire` (`expire_time`) COMMENT '按过期时间筛选令牌',
-  CONSTRAINT `fk_auth_token_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='令牌表（储存所有登录令牌，暂时废弃；用户删除时级联删除令牌）';
+-- 2.令牌表 直接废弃
 
 -- 3. 邀请码表（invite_code）- 提前创建（依赖user表，此时user表已存在）
 CREATE TABLE `invite_code` (
@@ -244,10 +231,12 @@ CREATE TABLE `report` (
   `status` varchar(16) NOT NULL DEFAULT 'PENDING' COMMENT '举报处理状态（PENDING=待处理/PROCESSED=已处理）',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '举报时间',
   `handled_at` datetime DEFAULT NULL COMMENT '处理时间（可选）',
+  `handled_by` bigint DEFAULT NULL COMMENT '处理人用户ID（可选）',
   PRIMARY KEY (`id`),
   KEY `fk_report_user` (`user_id`) COMMENT '关联举报人',
   KEY `idx_report_type` (`report_type`) COMMENT '按举报类型筛选',
   KEY `idx_report_target` (`report_target_type`, `report_target`) COMMENT '规范要求：复合索引（查询对象举报记录）',
   KEY `idx_report_status` (`status`, `created_at`) COMMENT '按状态+时间查询举报',
+  KEY `idx_report_handled` (`handled_at`) COMMENT '按处理时间排序',
   CONSTRAINT `fk_report_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='举报表（记录举报记录，举报人删除时级联删除举报记录）';

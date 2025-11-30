@@ -13,6 +13,7 @@ public class Report {
     public Long reportTarget;
     public String reason;
     public String status;
-    public Date createAt;
-    public Date updateAt;
+    public Date createdAt;
+    public Date handledAt;
+    public Long handledBy;
 }

@@ -25,16 +25,18 @@ public class ReportController {
 
     @PostMapping("/")
     @LoginRequired
-    public Result addReport(@RequestBody AddReportDTO addReportDTO) {
-        reportService.addReport(addReportDTO.reportType, addReportDTO.reportTargetType, addReportDTO.reportTarget, addReportDTO.reason);
+    public Result addReport(@RequestBody AddReportDTO addReportDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+        Map<String, Object> information = jwtHelper.parseJWTToken(token);
+        long userId = ((Number)(information.get("id"))).longValue();
+        reportService.addReport(userId, addReportDTO.reportType, addReportDTO.reportTargetType, addReportDTO.reportTarget, addReportDTO.reason);
         return Result.success("Success to report it! Please wait for the administrators to check!");
     }
 
     @GetMapping("/admin")
     @ModeratorRequired
     @Validated
-    public Result getReports(@NotNull int page, @NotNull int pageSize, String target, String reportTargetType) {
-        return Result.success("Success to get reports!", reportService.getReports(page, pageSize, target, reportTargetType));
+    public Result getReports(@NotNull int page, @NotNull int pageSize, String reportTargetType, String status) {
+        return Result.success("Success to get reports!", reportService.getReports(page, pageSize, reportTargetType, status));
     }
 
 

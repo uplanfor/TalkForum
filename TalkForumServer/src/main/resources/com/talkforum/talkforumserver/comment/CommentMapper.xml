@@ -73,8 +73,29 @@
         <if test="rootId != parentId and parentId != null">UPDATE `comment` SET comment_count = comment_count + 1 WHERE id = #{parentId};</if>
     </insert>
 
+    <select id="adminGetCommentsByPage" resultType="com.talkforum.talkforumserver.common.entity.Comment">
+        <bind name="offset" value="(page - 1) * pageSize"></bind>
+
+        SELECT
+            c.id, c.post_id, c.user_id, c.root_id, c.parent_id, c.content,
+            c.status, c.created_at, c.like_count, c.comment_count
+        FROM `comment` c
+        <where>
+            <if test="status != null">status = #{status}</if>
+        </where>
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="adminCountComments" resultType="long">
+        SELECT COUNT(*) FROM `comment`
+        <where>
+            <if test="status != null">status = #{status}</if>
+        </where>
+    </select>
+
     <update id="auditComment">
         UPDATE `comment` SET status = #{status} WHERE id = #{commentId}
     </update>
+
 
 </mapper>

@@ -2,11 +2,14 @@ package com.talkforum.talkforumserver.comment;
 
 import com.sun.istack.NotNull;
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
+import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
 import com.talkforum.talkforumserver.common.dto.AddCommentDTO;
+import com.talkforum.talkforumserver.common.dto.AdminGetCommentsDTO;
 import com.talkforum.talkforumserver.common.entity.Comment;
 import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.constant.ServerConstant;
+import com.talkforum.talkforumserver.user.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +23,10 @@ public class CommentController {
     CommentService commentService;
     @Autowired
     JWTHelper jwtHelper;
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private CommentMapper commentMapper;
 
     @GetMapping("/")
     @Validated
@@ -37,6 +44,7 @@ public class CommentController {
 
     @LoginRequired
     @PostMapping("/")
+    @Validated
     public Result addComment(@RequestBody AddCommentDTO addCommentDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         long userId = ((Number)(information.get("id"))).longValue();
@@ -62,5 +70,11 @@ public class CommentController {
         String role = (String)(information.get("role"));
         commentService.deleteComment(commentId, userId, role);
         return Result.success("Successfully delete comment!");
+    }
+
+    @ModeratorRequired
+    @GetMapping("/admin/")
+    public Result adminGetCommentsByPage(AdminGetCommentsDTO adminGetCommentsDTO) {
+        return Result.success("Successfully get comments!", commentService.adminGetCommentsByPage(adminGetCommentsDTO));
     }
 }
