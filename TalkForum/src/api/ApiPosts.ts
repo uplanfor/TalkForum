@@ -29,7 +29,6 @@ export interface PostType {
     likeCount: number;
     commentCount: number;
 }
-interface PostResponse extends ApiResponse<PostType> {}
 
 interface PostListParams {
     keyword?: string;
@@ -50,6 +49,14 @@ interface AdminPosstListParams {
     pageSize: number;
 }
 
+interface PostTypePage {
+    data: PostType[];
+    total: number;
+}
+
+
+interface PostResponse extends ApiResponse<PostType> {}
+interface PostTypePageResponse extends ApiResponse<PostTypePage> {}
 
 /*
  * to post a new post
@@ -89,4 +96,26 @@ export const postsDeletePost = async (postId: string | number) : Promise<ApiResp
  */
 export const postsModifyPost = async (postId: string | number, content: string, title?: string, clubId?: number | null) : Promise<ApiResponse> => {
     return Request.put<ApiResponse>(`/api/posts/${postId}`, {content, title, clubId});
+};
+
+
+/*
+ * to get a post list for admin
+ */
+export const postsAdminGetPostList = async(params: AdminPosstListParams) : Promise<PostTypePageResponse> => {
+    return Request.get_auth<PostTypePageResponse>('/api/posts/admin', params);
+};
+
+/*
+ * to audit a post
+ */
+export const postsAdminAuditPost = async (postId: string | number, status: number) : Promise<ApiResponse> => {
+    return Request.put_auth<ApiResponse>(`/api/posts/admin/${postId}/audit`, {status});
+};
+
+/*
+ * to set a post as essence
+ */
+export const postsAdminSetPostAsEssence = async (postId: string | number, isEssence: number) : Promise<ApiResponse> => {
+    return Request.put_auth<ApiResponse>(`/api/posts/admin/${postId}/essence`, {isEssence});
 };

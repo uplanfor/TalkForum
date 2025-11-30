@@ -2,7 +2,9 @@ import "./styles/style_admininsights.css"
 
 const AdminInsights = () => {
   return (
-    <div>AdminInsights</div>
+    <div className="admin-insights">
+      Waiting for analized data...
+    </div>
   )
 }
 

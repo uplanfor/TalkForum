@@ -22,4 +22,7 @@ public interface InviteCodeMapper {
     int updateStatus(InviteCode inviteCode);
 
 
+    List<InviteCode> adminGetInviteCodes(int page, int pageSize);
+
+    long countInviteCodes();
 }

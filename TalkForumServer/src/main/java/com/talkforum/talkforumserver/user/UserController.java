@@ -70,7 +70,7 @@ public class UserController {
     }
 
    @ModeratorRequired
-   @GetMapping("/admin/")
+   @GetMapping("/admin")
    public Result getUsersByPage(int page, int pageSize) {
        return Result.success("Success to get users!", userService.getUsersByPage( page, pageSize));
    }

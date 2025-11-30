@@ -10,10 +10,14 @@ import ProfileDialog from "./ProfileDialog";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import Msg from "../utils/Msg";
+import Msg from "../utils/msg"
 import { authSignOut } from "../api/ApiAuth";
 
-const UserInfoSmall = () => {
+interface UserInfoSmallProps {
+  style?: React.CSSProperties;
+}
+
+const UserInfoSmall = ({style}: UserInfoSmallProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const { isLoggedIn, name, avatarLink } = useSelector((state: RootState) => state.user);
   const [settingDialogVisible, setSettingDialogVisible] = useState(false);
@@ -32,7 +36,7 @@ const UserInfoSmall = () => {
 
   return (
     <>
-      <div className={`user-info-small ${isLoggedIn ? "logged-in" : "logged-out"}`}>
+      <div className={`user-info-small ${isLoggedIn ? "logged-in" : "logged-out"}`} style={style}>
         {isLoggedIn ? (<span>{name}</span>) : (<button className="login-button" onClick={toLogin}>Login</button>)}
         <div className="img-t">
           <img src={avatarLink} alt="Failed" />

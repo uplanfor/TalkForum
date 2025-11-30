@@ -71,7 +71,7 @@ public class PostController {
     }
 
     @ModeratorRequired
-    @GetMapping("/admin/")
+    @GetMapping("/admin")
     @Validated
     public Result getPostsWithAdminRight(AdminPostRequestDTO adminPostRequestDTO) {
         return Result.success("Success to get post list!", postService.getPostsWithAdminRight(adminPostRequestDTO));

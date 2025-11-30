@@ -2,8 +2,10 @@ package com.talkforum.talkforumserver.invitecode.impl;
 
 import com.talkforum.talkforumserver.common.dto.InviteCodeDTO;
 import com.talkforum.talkforumserver.common.entity.InviteCode;
+import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.invitecode.InviteCodeMapper;
 import com.talkforum.talkforumserver.invitecode.InviteCodeService;
+import com.talkforum.talkforumserver.user.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +19,8 @@ public class InviteCodeServiceImpl implements InviteCodeService {
 
     @Autowired
     InviteCodeMapper inviteCodeMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
     public List<InviteCode> getInviteCodes(Long userId) {
@@ -50,6 +54,11 @@ public class InviteCodeServiceImpl implements InviteCodeService {
     }
 
     @Override
+    public PageVO<InviteCode> adminGetInviteCodes(int page, int pageSize) {
+        List<InviteCode> data = inviteCodeMapper.adminGetInviteCodes(page, pageSize);
+        return new PageVO<>(data, inviteCodeMapper.countInviteCodes());
+    }
+
     public boolean validateInviteCode(String code) {
         InviteCode inviteCode = inviteCodeMapper.selectByCode(code);
         return inviteCode != null && 
@@ -57,7 +66,6 @@ public class InviteCodeServiceImpl implements InviteCodeService {
                inviteCode.getExpiredAt().after(new Date());
     }
 
-    @Override
     public boolean useInviteCode(String code) {
         if (!validateInviteCode(code)) {
             return false;
@@ -66,12 +74,10 @@ public class InviteCodeServiceImpl implements InviteCodeService {
         return true;
     }
 
-    @Override
     public InviteCode getInviteCode(String code) {
         return inviteCodeMapper.selectByCode(code);
     }
 
-    @Override
     public boolean deleteInviteCode(String code) {
         return inviteCodeMapper.deleteByCode(code) > 0;
     }

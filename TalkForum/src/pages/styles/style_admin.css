@@ -5,13 +5,19 @@
 }
 
 .admin-container {
+  padding-top: 50px;
   width: 100%;
   height: 100vh;
 }
 
 
 .admin-container .admin-header {
+  position: fixed;
+  top: 0;
+  left: 0;
   display: flex;
+  width: 100%;
+  height: 50px;
   margin: 0;
   padding: 0 9px;
   height: 50px;
@@ -20,6 +26,7 @@
   background-color: var(--neutral-module);
   box-shadow: 0 1px 1px var(--neutral-shadow);
   user-select: none;
+  z-index: 666;
 }
 
 .admin-container .admin-header img {
@@ -29,16 +36,16 @@
   height: 30px;
 }
 
-.admin-container .admin-header svg{
+.admin-container .admin-header svg {
   display: block;
   width: 30px;
   height: 30px;
 }
 
 
-  .admin-container .admin-header .admin-menu-toggle svg.menu-toggle {
-    display: none;
-  }
+.admin-container .admin-header .admin-menu-toggle svg.menu-toggle {
+  display: none;
+}
 
 
 .admin-container .admin-view {
@@ -60,6 +67,12 @@
   user-select: none;
 }
 
+.admin-container .admin-view .admin-menu-cover {
+  position: static;
+  z-index: 66;
+}
+
+
 .admin-container .admin-view ul.admin-menu li {
   display: flex;
   padding: 9px;
@@ -68,6 +81,8 @@
   align-items: center;
   cursor: pointer;
 }
+
+
 
 .admin-container .admin-view ul.admin-menu li:hover {
   background-color: var(--secondary-cool);
@@ -86,6 +101,7 @@
 }
 
 .admin-container .admin-view .admin-content {
+  position: relative;
   padding: 9px;
   flex: 1;
   overflow-y: auto;
@@ -131,6 +147,7 @@
     opacity: 0;
     transform: translateX(-200px);
   }
+
   100% {
     opacity: 1;
     transform: translateX(0);

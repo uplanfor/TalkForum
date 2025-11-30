@@ -30,6 +30,12 @@ public class InviteCodeController {
     }
 
     @AdminRequired
+    @GetMapping("/admin")
+    public Result adminGetInviteCodes(int page, int pageSize) {
+        return Result.success("Success to get invite codes!", inviteCodeService.adminGetInviteCodes(page, pageSize));
+    }
+
+    @AdminRequired
     @PostMapping("/admin")
     public Result generateInviteCodes(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, @RequestBody InviteCodeDTO inviteCodeDTO) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);

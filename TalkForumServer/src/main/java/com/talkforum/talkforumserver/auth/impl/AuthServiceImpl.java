@@ -76,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             return userMapper.getUserVOById(userId);
         } catch (Exception e) {
-            CookieHelper.removeCookie(response, ServerConstant.LOGIN_COOKIE);
+            logout(userId, response);
             throw new BusinessRuntimeException("Timeout, please sign in again!");
         }
     }

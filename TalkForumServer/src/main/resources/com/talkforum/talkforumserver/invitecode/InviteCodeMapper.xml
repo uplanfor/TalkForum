@@ -12,7 +12,7 @@
 
     <select id="selectByCode" parameterType="String" resultType="com.talkforum.talkforumserver.common.entity.InviteCode">
         SELECT 
-            code, creator_id, created_at,
+            id, code, creator_id, created_at,
             expired_at, max_count, used_count
         FROM invite_code
         WHERE code = #{code}
@@ -44,5 +44,14 @@
           AND expired_at > NOW() 
           AND used_count < max_count
     ]]>
-</select>
+    </select>
+
+    <select id="adminGetInviteCodes" resultType="com.talkforum.talkforumserver.common.entity.InviteCode">
+        <bind name="offset" value="(page-1)*pageSize"></bind>
+        SELECT
+            id, code, creator_id, created_at,
+            expired_at, max_count, used_count
+        FROM invite_code
+        LIMIT #{offset}, #{pageSize}
+    </select>
 </mapper>

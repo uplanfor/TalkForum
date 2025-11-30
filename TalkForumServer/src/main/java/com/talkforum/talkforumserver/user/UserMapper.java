@@ -19,7 +19,7 @@ public interface UserMapper {
     User getUserLoginInfoById(long userId);
     List<SimpleUserVO> getSimpleUsersInfo(long[] userIds);
     void setUserProfile(UserProfileDTO userProfile);
-    int countUserByNameOrEmail(String name, String email);
+    long countUserByNameOrEmail(String name, String email);
 
     void updateUserStatus(long userId, String status);
     void resetUserPassword(long userId, String hashPassword);

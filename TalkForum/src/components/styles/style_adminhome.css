@@ -1,0 +1,42 @@
+.admin-home {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 70%;
+    max-width: 800px;
+    max-height: 640px;
+}
+
+.admin-home-greeting {
+
+}
+
+.admin-home-status {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 18px;
+    gap: 16px;
+}
+
+.admin-home-status-item {
+    height: 90px;
+    flex-basis: calc((100% - 16px) / 2);
+    flex-shrink: 0;
+    padding: 9px;
+    background-color: var(--secondary-warm-1);
+    border: 1px solid var(--neutral-border);
+    border-radius: 18px;
+}
+
+.admin-home-status-item:hover {
+    box-shadow: 0 4px 8px var(--neutral-shadow);
+    transform: translateY(-2px);
+}
+
+@media (min-width: 600px) {
+    .admin-home-status-item {
+        flex-basis: calc((100% - 2 * 16px) / 3);
+    }
+}

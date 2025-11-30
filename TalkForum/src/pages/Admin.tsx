@@ -17,6 +17,7 @@ import { authGetAdminInfo } from "../api/ApiAuth";
 import logoLink from "/logo.ico"
 import "./styles/style_admin.css";
 import NotFound from "./NotFound";
+import UserInfoSmall from "../components/UserInfoSmall";
 
 const AdminHome = lazy(() => import("../components/AdminHome"));
 const AdminInsights = lazy(() => import("../components/AdminInsights"));
@@ -72,14 +73,15 @@ const Admin = () => {
            });
     }, []);
 
-    return loading ? <div></div> : ( ok ? 
+    return loading ? <div></div> : ( ok && user.isLoggedIn ? 
         (<div className="admin-container">
             <h1 className="admin-header">
                 <div className="admin-menu-toggle">
                     {isMenuOpen ? <XMarkIcon className="menu-toggle" onClick={toggleMenu} /> : <Bars3Icon className="menu-toggle" onClick={toggleMenu} />}
                 </div>
                 <img src={logoLink} alt="logo" className="admin-logo" />
-                <div> TalkForum Administration</div>
+                <div> TalkForum Administration </div>
+                <UserInfoSmall style={{marginLeft: "auto"}} />
             </h1>
             <div className="admin-view">
                 <div className={`admin-menu-cover ${isMenuOpen ? "menu-open" : "menu-close"}`}>

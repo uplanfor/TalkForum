@@ -20,8 +20,14 @@ export interface CommentList {
     hasMore: boolean;
 }
 
+export interface CommentPage {
+    data: Comment[];
+    total: number;
+}
+
 export interface CommentResopne extends ApiResponse<Comment> {}
 export interface CommentListResponse extends ApiResponse<CommentList> {}
+export interface CommentPageResponse extends ApiResponse<CommentPage> {}
 
 /*
  * Get comment list
@@ -59,4 +65,14 @@ export const commentPostComment = (postId: number, content: string, rootId: numb
  */
 export const commentDeleteComment = (commentId: number): Promise<ApiResponse> => {
     return Request.delete<ApiResponse>(`/api/comments/${commentId}`);
+}
+
+
+/*
+ * admin to get comments
+ */
+export const commentAdminGetCommentsByPage = (page: number, pageSize: number, stauts: string | null): Promise<CommentPageResponse> => {
+    return Request.get_auth<CommentPageResponse>("/api/admin/comments", {
+        page, pageSize, stauts,
+    });
 }
