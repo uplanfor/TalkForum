@@ -108,7 +108,7 @@ const PostDocument = (props: PostDocumentProps) => {
             <div className="author-combo">
               <span className="author-name">{getSingleSimpleUserInfo(userId).name}</span>
               <span className="post-date">
-                {(isEssence !== 0) && <span className="badge">Essence</span>}
+                {(isEssence != 0) && <span className="badge">Essence</span>}
                 Last Edited at {dayjs(updatedAt).format("HH:mm:ss MM DD, YYYY")}
               </span>
             </div>

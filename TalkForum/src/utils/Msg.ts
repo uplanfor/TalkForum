@@ -36,7 +36,7 @@ interface BlockInstance {
   msgBox: HTMLDivElement;
   btnContainer?: HTMLDivElement;
   inputEl?: HTMLInputElement;
-  resolve?: (value: boolean | PromptResult) => void;
+  resolve?: (value: boolean | PromptResult | number) => void; // 扩展支持number（menu返回值）
 }
 
 interface TypeConfig {
@@ -55,20 +55,26 @@ const msgState: MsgState = {
 
 /**
  * 通用创建阻塞弹窗方法（内部复用）
- * @param type - confirm/prompt
- * @param text - 提示文本
+ * @param type - confirm/prompt/menu
+ * @param text - 提示文本（非menu类型用）
  * @param duration - 超时时间（ms），<=0 则不超时
  * @param leftBtnText - 左按钮文本
  * @param rightBtnText - 右按钮文本
+ * @param texts - 【新增】menu类型专用：菜单项数组
+ * @param title - 【新增】menu类型专用：弹窗标题（null/undefined则不显示）
+ * @param needComfirm - 【新增】menu类型专用：是否需要确认/取消按钮（默认false）
  * @returns Promise 封装结果
  */
 const createBlockDialog = (
-  type: 'confirm' | 'prompt',
+  type: 'confirm' | 'prompt' | 'menu', // 扩展type支持menu
   text: string,
   duration: number,
   leftBtnText: string,
-  rightBtnText: string
-): Promise<boolean | PromptResult> => {
+  rightBtnText: string,
+  texts?: string[], // 新增：menu菜单项数组
+  title?: string, // 【新增】menu标题
+  needComfirm: boolean = false // 【新增】是否需要确认按钮
+): Promise<boolean | PromptResult | number> => { // 扩展返回值类型支持number
   return new Promise((resolve) => {
     // 1. 创建遮罩层（阻塞页面交互 | z-index=4096 | 响应式）
     const mask = document.createElement('div');
@@ -106,16 +112,33 @@ const createBlockDialog = (
       boxSizing: 'border-box', // 盒模型适配
     });
 
-    // 3. 提示文本（使用CSS变量配色 | 响应式行高）
-    const textEl = document.createElement('div');
-    textEl.textContent = text || '请确认操作';
-    Object.assign(textEl.style, {
-      fontSize: '14px',
-      color: 'var(--neutral-text-main)', // 主文本色
-      lineHeight: '1.6', // 响应式行高，提升可读性
-      wordBreak: 'break-word', // 长文本换行
-    });
-    dialog.appendChild(textEl);
+    // 3. 提示文本（【修改】menu类型标题按需显示）
+    let textEl: HTMLDivElement | null = null;
+    if (type === 'menu') {
+      // 【核心修改】title为null/undefined则不创建标题元素
+      if (title != null) {
+        textEl = document.createElement('div');
+        Object.assign(textEl.style, {
+          fontSize: '14px',
+          color: 'var(--neutral-text-main)', // 主文本色
+          lineHeight: '1.6', // 响应式行高，提升可读性
+          wordBreak: 'break-word', // 长文本换行
+        });
+        textEl.textContent = title;
+        dialog.appendChild(textEl);
+      }
+    } else {
+      // 非menu类型保持原有逻辑
+      textEl = document.createElement('div');
+      textEl.textContent = text || 'Please confirm';
+      Object.assign(textEl.style, {
+        fontSize: '14px',
+        color: 'var(--neutral-text-main)', // 主文本色
+        lineHeight: '1.6', // 响应式行高，提升可读性
+        wordBreak: 'break-word', // 长文本换行
+      });
+      dialog.appendChild(textEl);
+    }
 
     // 4. Prompt 专属：输入框（使用CSS变量配色 | 响应式）
     let inputEl: HTMLInputElement | null = null;
@@ -142,107 +165,194 @@ const createBlockDialog = (
       dialog.appendChild(inputEl);
     }
 
-    // 5. 按钮容器（响应式布局）
-    const btnContainer = document.createElement('div');
-    Object.assign(btnContainer.style, {
-      display: 'flex',
-      justifyContent: 'flex-end',
-      gap: '12px',
-      marginTop: '8px',
-      width: '100%', // 响应式宽度
-      boxSizing: 'border-box', // 盒模型适配
-    });
-
-    // 6. 按钮通用样式（响应式）
-    const btnStyle = {
-      padding: '8px 16px',
-      borderRadius: '4px',
-      border: 'none',
-      fontSize: '14px',
-      cursor: 'pointer',
-      minWidth: '70px', // 响应式最小宽度（缩小适配小屏）
-      flex: '0 0 auto', // 不拉伸，保持按钮尺寸
-      transition: 'background-color 0.2s ease',
-      boxSizing: 'border-box', // 盒模型适配
-    };
-
-    // 7. 左按钮（取消）- 使用CSS变量配色
-    const leftBtn = document.createElement('button');
-    leftBtn.textContent = leftBtnText || 'Cancel';
-    Object.assign(leftBtn.style, btnStyle, {
-      backgroundColor: 'var(--secondary-warm-1)', // 取消按钮背景
-      color: 'var(--neutral-text-secondary)', // 取消按钮文本色
-      zIndex: '4097', // 按钮层级
-    });
-    leftBtn.addEventListener('mouseenter', () => {
-      leftBtn.style.backgroundColor = 'var(--secondary-warm-2)'; // hover背景
-    });
-    leftBtn.addEventListener('mouseleave', () => {
-      leftBtn.style.backgroundColor = 'var(--secondary-warm-1)'; // 恢复背景
-    });
-    leftBtn.addEventListener('click', () => {
-      if (type === 'confirm') {
-        resolve(false); // 取消返回 false
-      } else {
-        resolve({ value: inputEl?.value || '', response: 0 }); // 取消返回 response=0
+    // 【新增】5. Menu 专属：菜单项列表（响应式 + 单选交互）
+    let menuContainer: HTMLDivElement | null = null;
+    let selectedIndex = -1; // 记录选中的菜单项索引
+    if (type === 'menu') {
+      // 边界处理：无菜单项直接返回-1
+      if (!texts || texts.length === 0) {
+        resolve(-1);
+        mask.remove();
+        dialog.remove();
+        return;
       }
-      destroyDialog();
-    });
-    btnContainer.appendChild(leftBtn);
 
-    // 8. 右按钮（确认）- 使用CSS变量配色
-    const rightBtn = document.createElement('button');
-    rightBtn.textContent = rightBtnText || 'Confirm';
-    Object.assign(rightBtn.style, btnStyle, {
-      backgroundColor: 'var(--secondary-cool)', // 确认按钮背景
-      color: '#fff', // 白色文本（无对应变量，保留）
-      zIndex: '4097', // 按钮层级
-    });
-    rightBtn.addEventListener('mouseenter', () => {
-      rightBtn.style.backgroundColor = 'var(--primary)'; // hover背景
-    });
-    rightBtn.addEventListener('mouseleave', () => {
-      rightBtn.style.backgroundColor = 'var(--secondary-cool)'; // 恢复背景
-    });
-    rightBtn.addEventListener('click', () => {
-      if (type === 'confirm') {
-        resolve(true); // 确认返回 true
-      } else {
-        resolve({ value: inputEl?.value || '', response: 1 }); // 确认返回 response=1
-      }
-      destroyDialog();
-    });
-    btnContainer.appendChild(rightBtn);
+      menuContainer = document.createElement('div');
+      Object.assign(menuContainer.style, {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+        width: '100%',
+        maxHeight: '200px', // 限制最大高度，避免弹窗过高
+        overflowY: 'auto', // 超出滚动
+        boxSizing: 'border-box',
+      });
 
-    dialog.appendChild(btnContainer);
+      // 遍历生成菜单项
+      texts.forEach((menuText, index) => {
+        const menuItem = document.createElement('div');
+        // 初始样式
+        Object.assign(menuItem.style, {
+          padding: '8px 12px',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          fontSize: '14px',
+          color: 'var(--neutral-text-main)',
+          backgroundColor: 'var(--neutral-bg)',
+          border: `1px solid var(--neutral-border)`,
+          transition: 'all 0.2s ease',
+          boxSizing: 'border-box',
+        });
+
+        // 【核心修改】menu点击逻辑：根据needComfirm区分
+        menuItem.addEventListener('click', () => {
+          if (needComfirm) {
+            // 需要确认：仅标记选中状态，不直接返回
+            // 重置所有菜单项样式
+            Array.from(menuContainer!.children).forEach(item => {
+              Object.assign(item.style, {
+                backgroundColor: 'var(--neutral-bg)',
+                borderColor: 'var(--neutral-border)',
+                color: 'var(--neutral-text-main)',
+              });
+            });
+            // 设置当前选中项样式
+            Object.assign(menuItem.style, {
+              backgroundColor: 'var(--secondary-cool-light)', // 选中背景（浅蓝）
+              borderColor: 'var(--secondary-cool)', // 选中边框（主蓝）
+              color: 'var(--secondary-cool)', // 选中文本色（主蓝）
+            });
+            selectedIndex = index; // 更新选中索引
+          } else {
+            // 不需要确认：点击直接返回索引并销毁弹窗
+            resolve(index);
+            destroyDialog();
+          }
+        });
+
+        // 菜单项文本
+        const menuTextEl = document.createElement('span');
+        menuTextEl.textContent = menuText;
+        menuItem.appendChild(menuTextEl);
+        menuContainer.appendChild(menuItem);
+      });
+
+      dialog.appendChild(menuContainer);
+    }
+
+    // 6. 按钮容器（【修改】menu类型按需创建）
+    let btnContainer: HTMLDivElement | null = null;
+    // 非menu类型 或 menu类型且需要确认按钮 才创建按钮容器
+    if (type !== 'menu' || needComfirm) {
+      btnContainer = document.createElement('div');
+      Object.assign(btnContainer.style, {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        gap: '12px',
+        marginTop: '8px',
+        width: '100%', // 响应式宽度
+        boxSizing: 'border-box', // 盒模型适配
+      });
+
+      // 7. 按钮通用样式（响应式）
+      const btnStyle = {
+        padding: '8px 16px',
+        borderRadius: '4px',
+        border: 'none',
+        fontSize: '14px',
+        cursor: 'pointer',
+        minWidth: '70px', // 响应式最小宽度（缩小适配小屏）
+        flex: '0 0 auto', // 不拉伸，保持按钮尺寸
+        transition: 'background-color 0.2s ease',
+        boxSizing: 'border-box', // 盒模型适配
+      };
+
+      // 8. 左按钮（取消）- 使用CSS变量配色
+      const leftBtn = document.createElement('button');
+      leftBtn.textContent = leftBtnText || 'Cancel';
+      Object.assign(leftBtn.style, btnStyle, {
+        backgroundColor: 'var(--secondary-warm-1)', // 取消按钮背景
+        color: 'var(--neutral-text-secondary)', // 取消按钮文本色
+        zIndex: '4097', // 按钮层级
+      });
+      leftBtn.addEventListener('mouseenter', () => {
+        leftBtn.style.backgroundColor = 'var(--secondary-warm-2)'; // hover背景
+      });
+      leftBtn.addEventListener('mouseleave', () => {
+        leftBtn.style.backgroundColor = 'var(--secondary-warm-1)'; // 恢复背景
+      });
+      leftBtn.addEventListener('click', () => {
+        if (type === 'confirm') {
+          resolve(false); // 取消返回 false
+        } else if (type === 'prompt') {
+          resolve({ value: inputEl?.value || '', response: 0 }); // 取消返回 response=0
+        } else if (type === 'menu') {
+          resolve(-1); // 【新增】取消返回-1
+        }
+        destroyDialog();
+      });
+      btnContainer.appendChild(leftBtn);
+
+      // 9. 右按钮（确认）- 使用CSS变量配色
+      const rightBtn = document.createElement('button');
+      rightBtn.textContent = rightBtnText || 'Confirm';
+      Object.assign(rightBtn.style, btnStyle, {
+        backgroundColor: 'var(--secondary-cool)', // 确认按钮背景
+        color: '#fff', // 白色文本（无对应变量，保留）
+        zIndex: '4097', // 按钮层级
+      });
+      rightBtn.addEventListener('mouseenter', () => {
+        rightBtn.style.backgroundColor = 'var(--primary)'; // hover背景
+      });
+      rightBtn.addEventListener('mouseleave', () => {
+        rightBtn.style.backgroundColor = 'var(--secondary-cool)'; // 恢复背景
+      });
+      rightBtn.addEventListener('click', () => {
+        if (type === 'confirm') {
+          resolve(true); // 确认返回 true
+        } else if (type === 'prompt') {
+          resolve({ value: inputEl?.value || '', response: 1 }); // 确认返回 response=1
+        } else if (type === 'menu') {
+          resolve(selectedIndex); // 【新增】确认返回选中索引（未选中则-1）
+        }
+        destroyDialog();
+      });
+      btnContainer.appendChild(rightBtn);
+
+      dialog.appendChild(btnContainer);
+    }
+
     mask.appendChild(dialog);
     document.body.appendChild(mask);
 
-    // 9. 超时处理
+    // 10. 超时处理（【修改】duration<=0 不设置超时）
     let timeoutTimer: number | null = null;
-    if (duration > 0) {
+    if (duration > 0) { // 仅当duration>0时设置超时
       timeoutTimer = window.setTimeout(() => {
         if (type === 'confirm') {
           resolve(false); // 超时默认返回 false
-        } else {
+        } else if (type === 'prompt') {
           resolve({ value: inputEl?.value || '', response: 2 }); // 超时返回 response=2
+        } else if (type === 'menu') {
+          resolve(-1); // 【新增】超时返回-1
         }
         destroyDialog();
       }, duration);
     }
 
-    // 10. 销毁弹窗（通用方法）
+    // 11. 销毁弹窗（通用方法）
     function destroyDialog() {
       if (timeoutTimer) clearTimeout(timeoutTimer);
       mask.remove();
       dialog.remove();
     }
 
-    // 11. 点击遮罩层关闭（可选）
+    // 12. 点击遮罩层关闭（可选）
     mask.addEventListener('click', (e) => {
       if (e.target === mask) {
         if (type === 'confirm') resolve(false);
-        else resolve({ value: inputEl?.value || '', response: 0 });
+        else if (type === 'prompt') resolve({ value: inputEl?.value || '', response: 0 });
+        else if (type === 'menu') resolve(-1); // 【新增】点击遮罩返回-1
         destroyDialog();
       }
     });
@@ -343,6 +453,23 @@ const Msg = {
     rightBtnText = "Confirm"
   ): Promise<PromptResult> {
     return createBlockDialog('prompt', text, duration, leftBtnText, rightBtnText) as Promise<PromptResult>;
+  },
+
+  /**
+   * 【新增】菜单选择弹窗（阻塞式）
+   * @param texts 菜单项数组（必填，为空直接返回-1）
+   * @param title 弹窗标题（可选，null/undefined则不显示标题）
+   * @param duration 超时时间（ms），<=0 无限等待（默认0）
+   * @param needComfirm 是否需要确认/取消按钮（默认false，不显示按钮）
+   * @returns Promise<number> - 选中的菜单项索引（从0开始），取消/超时/未选中返回-1
+   */
+  menu(
+    texts: string[],
+    title?: string,
+    duration: number = 0,
+    needComfirm: boolean = false
+  ): Promise<number> {
+    return createBlockDialog('menu', '', duration, 'Cancel', 'Confirm', texts, title, needComfirm) as Promise<number>;
   },
 };
 

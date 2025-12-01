@@ -10,6 +10,8 @@ import dayjs from "dayjs";
 import { SpaceViewType, UserType } from "../constants/default";
 import { PostViewType } from "../constants/default";
 import { getSingleSimpleUserInfo } from "../utils/simpleUserInfoCache";
+import Msg from "../utils/msg";
+import { copyToClipboard } from "../utils/clipboard";
 
 export interface PostCardProps {
     title?: string;
@@ -65,12 +67,16 @@ const PostCard = (props: PostCardProps) => {
         <div className="menu">
             <EllipsisHorizontalIcon />
             <ul>
+                <li onClick={()=>{
+                    Msg.success("Already copy the link to clipboard! send to your friends to share!");
+                    copyToClipboard(`${window.location.origin}/?postId=${id}`)
+                }}>Share</li>
                 {(user.id === userId || user.role != UserType.USER) && (
                     <>
                         <li onClick={()=>openPostView(id, PostViewType.EDIT)}>Edit</li>
                         <li onClick={()=>deletePost(id)}>Delete</li>
                     </>)}
-                <li onClick={()=>reportPost(id)}>Report</li>
+                    <li onClick={()=>reportPost(id)}>Report</li>
             </ul>
         </div>
     </div>

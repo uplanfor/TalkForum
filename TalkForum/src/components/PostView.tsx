@@ -1,4 +1,7 @@
 import PostDocument from "./PostDocument";
+import ReportDialog from "./ReportDialog";
+import PostDialog from "./PostDialog";
+import { createPortal } from "react-dom";
 import BackgroundImg from "./BackgroundImg";
 import "./styles/style_postview.css"
 import { DefaultBackgroundUrl } from "../constants/default";
@@ -6,12 +9,13 @@ import { useEffect, useState, useRef } from "react";
 import { postsGetPostDetailInformation } from "../api/ApiPosts";
 import { parseMarkdown } from "../utils/MarkdownUtil";
 import { type PostType } from "../api/ApiPosts";
-import { ArrowLeftIcon } from "@heroicons/react/20/solid";
+import { ArrowLeftIcon, EllipsisHorizontalIcon } from "@heroicons/react/20/solid";
 import { useSelector } from "react-redux";
 import { commentPostComment } from "../api/ApiComment";
-import Msg from "../utils/Msg";
+import Msg from "../utils/msg";
 import { getSingleSimpleUserInfo } from "../utils/simpleUserInfoCache";
 import { XMarkIcon } from "@heroicons/react/20/solid";
+import { copyToClipboard } from "../utils/clipboard";
 
 
 export interface PostViewProps {
@@ -34,6 +38,8 @@ const PostView = ({ postId, onClose }: PostViewProps) => {
   const [renderContent, setRenderContent] = useState<string>("");
   const { isLoggedIn } = useSelector((state: any) => state.user);
   const [commentTarget, setCommentTarget] = useState<CommentTarget>({ parentId: null, rootId: null, userId: null, commentToContent: "" });
+  const [showPostDialog, setShowPostDialog] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
   const [post, setPost] = useState<PostType>({
     id: postId,
     title: "",
@@ -101,6 +107,38 @@ const PostView = ({ postId, onClose }: PostViewProps) => {
       <div className="title">
         Post Detail
         <ArrowLeftIcon onClick={onClose} />
+
+        <EllipsisHorizontalIcon onClick={async () => {
+          const menus = [
+            "Share Post",
+            "Report post",
+            "Edit post",
+            "Delete post",
+          ]
+          
+          await Msg.menu(menus, "What do you want to do with this post?").then(res => {
+            switch (res) {
+            case 0:
+              Msg.success("Already copy the link to clipboard! send to your friends to share!");
+              copyToClipboard(`${window.location.origin}/?postId=${postId}`);
+              break;
+            case 1:
+              setShowReportDialog(true);
+              break;
+            case 2:
+              setShowPostDialog(true);
+              break;
+            case 3:
+              Msg.confirm("Are you sure to delete this post?").then(res => {
+                if (res) {
+                  console.log("delete post");
+                }
+              });
+              break;
+            }
+          })
+        }} >
+        </EllipsisHorizontalIcon>
       </div>
       <BackgroundImg src={DefaultBackgroundUrl} style={{ height: 250 }} />
       <PostDocument {...post} renderContent={renderContent} setCommentTarget={setCommentTarget} />
@@ -123,6 +161,14 @@ const PostView = ({ postId, onClose }: PostViewProps) => {
         <textarea placeholder={isLoggedIn ? "Leave a comment" : "Please login to leave a comment"} ref={commentContentRef}></textarea>
         <button onClick={handleCommentSend}>Send</button>
       </div>
+
+      {showPostDialog && createPortal(
+        <PostDialog notification="Edit post" title={post.title} content={post.content} onClose={() => setShowPostDialog(false)} />,
+        document.body
+      )}
+      {showReportDialog && createPortal(
+        <ReportDialog onClose={() => setShowReportDialog(false)} reportId={postId} />,
+        document.body)}
     </div>
   );
 };

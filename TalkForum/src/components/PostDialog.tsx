@@ -12,7 +12,7 @@ interface PostDialogProps {
   onClose: () => void;
   notification: string;
   title: string;
-  clubInputId: number;
+  clubInputId?: number;
   content: string;
 }
 

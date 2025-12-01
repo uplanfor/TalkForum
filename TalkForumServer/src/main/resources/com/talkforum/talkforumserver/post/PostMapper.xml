@@ -5,7 +5,7 @@
         SELECT * FROM post WHERE id = #{postId}
     </select>
 
-    <select id="countPassPost" resultType="int">
+    <select id="countPassPost" resultType="long">
         SELECT COUNT(*) FROM post WHERE id = #{postId} AND status = 'PASS'
     </select>
 
@@ -100,7 +100,7 @@
         LIMIT #{offset}, #{pageSize}
     </select>
 
-    <select id="adminCountPosts"  resultType="int">
+    <select id="adminCountPosts"  resultType="long">
         SELECT COUNT(*) FROM post
         <where>
             <if test="status != null">AND status = #{status}</if>

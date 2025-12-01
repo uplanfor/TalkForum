@@ -113,7 +113,14 @@
   width: 24px;
   height: 24px;
   top: 50%;
-  left: 9px;
   transform: translateY(-50%);
   color: var(--neutral-text-secondary);
+}
+
+.post-view-cover .title svg:first-child {
+  left: 9px;
+}
+
+.post-view-cover .title svg:last-child {
+  right: 9px;
 }

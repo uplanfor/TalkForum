@@ -104,7 +104,7 @@ CREATE TABLE `comment` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '评论唯一标识',
   `post_id` bigint NOT NULL COMMENT '关联帖子ID',
   `user_id` bigint NOT NULL COMMENT '评论者用户ID',
-  `root_id` bigint NOT NULL COMMENT '根评论ID（顶级评论为null）',
+  `root_id` bigint DEFAULT NULL COMMENT '根评论ID（顶级评论为null）',
   `parent_id` bigint DEFAULT NULL COMMENT '关联回复的评论ID（顶级评论为null）',
   `content` varchar(1024) NOT NULL COMMENT '评论内容',
   `status` varchar(16) NOT NULL DEFAULT 'PENDING' COMMENT '状态（PENDING/PASS/REJECT/DELETE）',

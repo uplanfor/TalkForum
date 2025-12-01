@@ -6,12 +6,13 @@ import { useEffect, useRef, useState } from "react";
 import Msg from "../utils/Msg";
 import { postsCommitPostAuth } from "../api/ApiPosts";
 import { throttle } from "../utils/debounce&throttle";
+import { ReportTypeEnum } from "../constants/report_constant";
 
 
 interface ReportDialogProps {
   onClose: () => void;
-  notification: string;
-  content: string;
+  notification?: string;
+  content?: string;
   reportId: number;
 }
 
@@ -59,38 +60,25 @@ const ReportDialog = ({ onClose, notification = "Report", content = "" }: Report
           <p>Choose report type.</p>
         </div>
         <div className="report-reasons-grid">
-          <label htmlFor="IllegalContent_01">
-            <input type="radio" name="IllegalContent" id="IllegalContent_01" value="stateSecurity" />
-            <span>State security</span>
+          {ReportTypeEnum.map((item, index) => {
+        const radioId = `IllegalContent_0${index + 1}`;
+
+        return (
+          <label 
+            htmlFor={radioId} 
+            key={radioId} // React 列表必须加唯一 key
+            style={{ marginRight: '16px', cursor: 'pointer' }} // 基础样式分隔
+          >
+            <input
+              type="radio"
+              name="IllegalContent" // 同名保证互斥
+              id={radioId}
+              value={item.value}
+            />
+            <span style={{ marginLeft: '4px' }}>{item.label}</span>
           </label>
-          <label htmlFor="IllegalContent_02">
-            <input type="radio" name="IllegalContent" id="IllegalContent_02" value="pornOrVulgar" />
-            <span>Porn or vulgar</span>
-          </label>
-          <label htmlFor="IllegalContent_03">
-            <input type="radio" name="IllegalContent" id="IllegalContent_03" value="violentTerror" />
-            <span>Violent terror</span>
-          </label>
-          <label htmlFor="IllegalContent_04">
-            <input type="radio" name="IllegalContent" id="IllegalContent_04" value="falseRumorsSpam" />
-            <span>False rumors & spam</span>
-          </label>
-          <label htmlFor="IllegalContent_05">
-            <input type="radio" name="IllegalContent" id="IllegalContent_05" value="privacyBreach" />
-            <span>Privacy breach</span>
-          </label>
-          <label htmlFor="IllegalContent_06">
-            <input type="radio" name="IllegalContent" id="IllegalContent_06" value="illegalAdActivity" />
-            <span>Illegal ad activity</span>
-          </label>
-          <label htmlFor="IllegalContent_07">
-            <input type="radio" name="IllegalContent" id="IllegalContent_07" value="feudalSuperstition" />
-            <span>Feudal superstition</span>
-          </label>
-          <label htmlFor="IllegalContent_08">
-            <input type="radio" name="IllegalContent" id="IllegalContent_08" value="insultAndDiscrimination" />
-            <span>Insult and discrimination</span>
-          </label>
+        );
+      })}
         </div>
       </form>
       <div className="report-dialog-content-container">
