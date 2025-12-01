@@ -3,7 +3,7 @@ import "./styles/style_reportdialog.css"
 import PopUpDialogBase from "./PopUpDialogBase"
 import { type PopUpDialogButton } from "./PopUpDialogBase"
 import { useEffect, useRef, useState } from "react";
-import Msg from "../utils/Msg";
+import Msg from "../utils/msg";
 import { postsCommitPostAuth } from "../api/ApiPosts";
 import { throttle } from "../utils/debounce&throttle";
 import { ReportTypeEnum } from "../constants/report_constant";

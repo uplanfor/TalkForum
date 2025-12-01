@@ -80,8 +80,8 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public void auditPost(Long postId) {
-        postMapper.auditPost(postId);
+    public void auditPost(Long postId, String status) {
+        postMapper.auditPost(postId, status);
     }
 
     @Override

@@ -6,14 +6,15 @@ import InfiniteScroll from "react-infinite-scroller";
 import PostCard, { type PostCardProps } from "./PostCard";
 import PostCardPlaceholder from "./PostCardPlaceholder";
 import PostView from "./PostView";
-import { postsDeletePost, postsGetPostList } from "../api/ApiPosts";
+import { postsDeletePostAuth, postsGetPostList } from "../api/ApiPosts";
 import { debounce } from "../utils/debounce&throttle";
 import SpaceView from "./SpaceView";
 import { createPortal } from "react-dom";
 import { requestSimpleUserInfoCache } from "../utils/simpleUserInfoCache";
 import type ApiResponse from "../api/ApiResponse";
-import Msg from "../utils/Msg";
+import Msg from "../utils/msg";
 import ReportDialog from "./ReportDialog";
+import { PostViewType } from "../constants/default";
 
 
 interface PostContainerProps {
@@ -41,6 +42,7 @@ const PostContainer = ({
   const [showSpaceView, setShowSpaceView] = useState<boolean>(false);
   const [showReportDialog, setShowReportDialog] = useState<boolean>(false);
   const [curPostId, setCurPostId] = useState<number>(0);
+  const [target, setTarget] = useState<string>(PostViewType.CONTENT);
 
   // 监听参数
   const [searchParams, setSearchParams] = useSearchParams();
@@ -87,6 +89,7 @@ const PostContainer = ({
 
   // 处理打开帖子（看内容/评论/修改）
   const openPostView = (postId: number, target: string) => {
+    setTarget(target);
     setSearchParams({ postId: postId.toString() }, { replace: true });
   }
 
@@ -104,7 +107,7 @@ const PostContainer = ({
   const deletePost = async (postId: number) => {
     const sure = await Msg.confirm("Are you sure to delete this post?");
     if (sure) {
-      await postsDeletePost(postId).then((res) => {
+      await postsDeletePostAuth(postId).then((res) => {
         if (res.success) {
           Msg.success("Post deleted successfully!");
           setPosts(posts.filter((post) => post.id !== postId));
@@ -202,7 +205,7 @@ const PostContainer = ({
         </InfiniteScroll>
 
         {showPostView && createPortal(
-          <PostView postId={curPostId} onClose={closePostView} />,
+          <PostView postId={curPostId} onClose={closePostView} target={target}/>,
           document.body
         )}
         {showSpaceView && createPortal(
@@ -210,7 +213,7 @@ const PostContainer = ({
           document.body
         )}
         {showReportDialog && createPortal(
-          <ReportDialog onClose={() => setShowReportDialog(false)} reportId={curPostId} />,
+          <ReportDialog onClose={() => setShowReportDialog(false)} reportId={curPostId}/>,
           document.body
         )}
       </div>

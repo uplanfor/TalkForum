@@ -50,14 +50,13 @@
     <update id="updatePost">
         UPDATE post
         <set>
-            <if test="title != null">title = #{title},</if>
-            <if test="content != null">content = #{content},</if>
+            <if test="postEditDTO.title != null">title = #{postEditDTO.title},</if>
+            <if test="postEditDTO.content != null">content = #{postEditDTO.content},</if>
             <if test="status != null">status = #{status},</if>
-            <if test="isEssence != null">is_essence = #{isEssence},</if>
             updated_at = NOW(),
             brief = #{brief}
         </set>
-        WHERE id = #{id}
+        WHERE id = #{postEditDTO.id}
     </update>
 
     <update id="deletePost">
@@ -65,7 +64,7 @@
     </update>
 
     <update id="auditPost">
-        UPDATE post SET status = 'PASS', updated_at = NOW() WHERE id = #{postId}
+        UPDATE post SET status = #{status}, updated_at = NOW() WHERE id = #{postId}
     </update>
 
     <update id="essencePost">

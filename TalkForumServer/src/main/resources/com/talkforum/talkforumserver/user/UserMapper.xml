@@ -70,7 +70,7 @@
         UPDATE user SET last_login_at = NOW() WHERE id = #{userId}
     </update>
 
-    <select id="getUserByPage" resultType="com.talkforum.talkforumserver.common.entity.User">
+    <select id="getUsersByPage" resultType="com.talkforum.talkforumserver.common.entity.User">
          <!--调用者计算 offset, limit-->
 
          SELECT id, email, name, role, fans_count, following_count,

@@ -72,7 +72,7 @@ export const commentDeleteComment = (commentId: number): Promise<ApiResponse> =>
  * admin to get comments
  */
 export const commentAdminGetCommentsByPage = (page: number, pageSize: number, stauts: string | null): Promise<CommentPageResponse> => {
-    return Request.get_auth<CommentPageResponse>("/api/admin/comments", {
+    return Request.get_auth<CommentPageResponse>("/api/comments/admin", {
         page, pageSize, stauts,
     });
 }

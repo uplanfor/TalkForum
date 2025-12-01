@@ -21,6 +21,6 @@ public interface PostService {
     void deletePost(Long postId, long userId, String role);
 
     PageVO<PostVO> getPostsWithAdminRight(AdminPostRequestDTO adminPostRequestDTO);
-    void auditPost(Long postId);
+    void auditPost(Long postId, String status);
     void essencePost(Long postId, int isEssence);
 }

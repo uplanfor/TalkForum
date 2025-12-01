@@ -3,7 +3,7 @@ import React, { use, useEffect } from "react";
 import "./styles/style_login.css";
 import Request from "../utils/Request";
 import { useNavigate } from "react-router-dom";
-import Msg from '../utils/Msg.ts';
+import Msg from '../utils/msg.ts';
 
 // 在Login.tsx顶部添加导入
 import { useDispatch } from 'react-redux';

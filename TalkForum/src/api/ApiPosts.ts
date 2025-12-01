@@ -87,15 +87,15 @@ export const postsGetPostList = async(params: PostListParams) : Promise<ApiRespo
 /*
  * to delete a post
  */
-export const postsDeletePost = async (postId: string | number) : Promise<ApiResponse> => {
-    return Request.delete<ApiResponse>(`/api/posts/${postId}`);
+export const postsDeletePostAuth = async (postId: string | number) : Promise<ApiResponse> => {
+    return Request.delete_auth<ApiResponse>(`/api/posts/${postId}`);
 };
 
 /*
  * to modify a post
  */
-export const postsModifyPost = async (postId: string | number, content: string, title?: string, clubId?: number | null) : Promise<ApiResponse> => {
-    return Request.put<ApiResponse>(`/api/posts/${postId}`, {content, title, clubId});
+export const postsModifyPostAuth = async (postId: string | number, content: string, title?: string, clubId?: number | null) : Promise<ApiResponse> => {
+    return Request.put_auth<ApiResponse>(`/api/posts/${postId}`, {content, title, clubId});
 };
 
 

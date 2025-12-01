@@ -73,7 +73,7 @@ public class CommentController {
     }
 
     @ModeratorRequired
-    @GetMapping("/admin/")
+    @GetMapping("/admin")
     public Result adminGetCommentsByPage(AdminGetCommentsDTO adminGetCommentsDTO) {
         return Result.success("Successfully get comments!", commentService.adminGetCommentsByPage(adminGetCommentsDTO));
     }

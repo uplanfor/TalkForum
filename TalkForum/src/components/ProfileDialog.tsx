@@ -9,7 +9,7 @@ import { userLogout, userLogin } from "../store/slices/userSlice";
 import { Navigate, useNavigate } from "react-router-dom"
 import { UserType } from "../constants/default";
 import { debounce } from "../utils/debounce&throttle";
-import Msg from "../utils/Msg";
+import Msg from "../utils/msg";
 import { usersChangePasswordAuth, usersUpdateProfileAuth, type UserProfile } from "../api/ApiUsers";
 
 interface ProfileDialogProps {

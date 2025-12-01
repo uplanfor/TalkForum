@@ -4,9 +4,9 @@ import PostDialog from "./PostDialog";
 import { createPortal } from "react-dom";
 import BackgroundImg from "./BackgroundImg";
 import "./styles/style_postview.css"
-import { DefaultBackgroundUrl } from "../constants/default";
+import { DefaultBackgroundUrl, PostViewType } from "../constants/default";
 import { useEffect, useState, useRef } from "react";
-import { postsGetPostDetailInformation } from "../api/ApiPosts";
+import { postsDeletePostAuth, postsGetPostDetailInformation } from "../api/ApiPosts";
 import { parseMarkdown } from "../utils/MarkdownUtil";
 import { type PostType } from "../api/ApiPosts";
 import { ArrowLeftIcon, EllipsisHorizontalIcon } from "@heroicons/react/20/solid";
@@ -21,6 +21,7 @@ import { copyToClipboard } from "../utils/clipboard";
 export interface PostViewProps {
   postId: number;
   onClose: () => void;
+  target: string;
 }
 
 export interface CommentTarget {
@@ -33,7 +34,7 @@ export interface CommentTarget {
 export type CommentTargetCallback = (target: CommentTarget) => void;
 
 
-const PostView = ({ postId, onClose }: PostViewProps) => {
+const PostView = ({ postId, onClose, target }: PostViewProps) => {
   const [ok, setOk] = useState(true);
   const [renderContent, setRenderContent] = useState<string>("");
   const { isLoggedIn } = useSelector((state: any) => state.user);
@@ -89,6 +90,11 @@ const PostView = ({ postId, onClose }: PostViewProps) => {
           if (res.success) {
             const post_result: PostType = res.data;
             setPost({ ...post_result });
+
+            if (target === PostViewType.EDIT) {
+              await setShowPostDialog(true);
+            }
+
             const { html, tocNodeTree } = await parseMarkdown(post_result.content);
             setRenderContent(html);
           } else {
@@ -116,7 +122,7 @@ const PostView = ({ postId, onClose }: PostViewProps) => {
             "Delete post",
           ]
           
-          await Msg.menu(menus, "What do you want to do with this post?").then(res => {
+          await Msg.menu(menus, "What do you want to do with this post?").then(async res => {
             switch (res) {
             case 0:
               Msg.success("Already copy the link to clipboard! send to your friends to share!");
@@ -129,9 +135,19 @@ const PostView = ({ postId, onClose }: PostViewProps) => {
               setShowPostDialog(true);
               break;
             case 3:
-              Msg.confirm("Are you sure to delete this post?").then(res => {
+              Msg.confirm("Are you sure to delete this post?").then(async res => {
                 if (res) {
-                  console.log("delete post");
+                  await postsDeletePostAuth(postId).then(res => {
+                    if (res.success) {
+                      Msg.success(res.message);
+                      onClose();
+                    } else {
+                      Msg.error(res.message);
+                    }
+                  }).catch(err => {
+                    Msg.error(err.message);
+                    console.log(err);
+                  })
                 }
               });
               break;
@@ -163,7 +179,7 @@ const PostView = ({ postId, onClose }: PostViewProps) => {
       </div>
 
       {showPostDialog && createPortal(
-        <PostDialog notification="Edit post" title={post.title} content={post.content} onClose={() => setShowPostDialog(false)} />,
+        <PostDialog notification="Edit post" title={post.title} content={post.content} postId={postId} onClose={() => setShowPostDialog(false)} />,
         document.body
       )}
       {showReportDialog && createPortal(

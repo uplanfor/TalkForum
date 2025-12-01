@@ -2,20 +2,14 @@ package com.talkforum.talkforumserver.post;
 
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
 import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
-import com.talkforum.talkforumserver.common.dto.AdminPostRequestDTO;
-import com.talkforum.talkforumserver.common.dto.PostCommitDTO;
-import com.talkforum.talkforumserver.common.dto.PostEditDTO;
-import com.talkforum.talkforumserver.common.dto.PostRequestDTO;
-import com.talkforum.talkforumserver.common.entity.Post;
+import com.talkforum.talkforumserver.common.dto.*;
 import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
-import com.talkforum.talkforumserver.common.vo.PostListVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RequestMapping("/posts")
@@ -51,11 +45,12 @@ public class PostController {
     }
 
     @LoginRequired
-    @PutMapping("/")
+    @PutMapping("/{postId}")
     @Validated
-    public Result editPost(@RequestBody PostEditDTO postEditDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+    public Result editPost(@PathVariable Long postId, @RequestBody PostEditDTO postEditDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         postEditDTO.userId = ((Number)(information.get("id"))).longValue();
+        postEditDTO.id = postId;
         postService.editPost(postEditDTO, (String)(information.get("role")));
         return Result.success("Success to edit post!");
     }
@@ -79,8 +74,8 @@ public class PostController {
 
     @ModeratorRequired
     @PutMapping("/admin/{postId}/audit")
-    public Result auditPost(@PathVariable Long postId) {
-        postService.auditPost(postId);
+    public Result auditPost(@PathVariable Long postId, @RequestBody PostAuditDTO postAuditDTO) {
+        postService.auditPost(postId, postAuditDTO.getStatus());
         return Result.success("Success to audit post!");
     }
 

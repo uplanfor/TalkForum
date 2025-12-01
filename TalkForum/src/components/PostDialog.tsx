@@ -3,8 +3,8 @@ import "./styles/style_postdialog.css"
 import PopUpDialogBase from "./PopUpDialogBase"
 import { type PopUpDialogButton } from "./PopUpDialogBase"
 import { useEffect, useRef, useState } from "react";
-import  Msg  from "../utils/Msg";
-import { postsCommitPostAuth } from "../api/ApiPosts";
+import Msg from "../utils/msg";
+import { postsCommitPostAuth, postsModifyPostAuth } from "../api/ApiPosts";
 import { throttle } from "../utils/debounce&throttle";
 
 
@@ -14,28 +14,43 @@ interface PostDialogProps {
   title: string;
   clubInputId?: number;
   content: string;
+  postId?: number | null;
 }
 
-const PostDialog = ({ onClose, notification="Create New Post", title="", clubInputId=0, content="" }: PostDialogProps) => {
+const PostDialog = ({ onClose, notification = "Create New Post", title = "", clubInputId = 0, content = "", postId = null }: PostDialogProps) => {
   const titleRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const [clubId, setClubId] = useState<number>(clubInputId);
 
   const throttleCommitPost = throttle(async () => {
-        if(!contentRef.current) {return;}
-        await postsCommitPostAuth(contentRef.current.value, titleRef.current?.value, clubId == 0 ? null : clubId).then((res) => {
-          if (res.success) {
-            Msg.success(res.message);
-            onClose();
-          } else {
-            Msg.error(res.message);
-          }
-          console.log(res);
-        });
-      }, 500);
+    if (!contentRef.current) { return; }
+    // 判断是否是修改帖子还是发布帖子
+    if (postId == null) {
+      await postsCommitPostAuth(contentRef.current.value, titleRef.current?.value, clubId == 0 ? null : clubId).then((res) => {
+        if (res.success) {
+          Msg.success(res.message);
+          onClose();
+        } else {
+          Msg.error(res.message);
+        }
+        console.log(res);
+      });
+    } else {
+      await postsModifyPostAuth(postId, contentRef.current.value, titleRef.current?.value, clubId == 0 ? null : clubId).then((res) => {
+        if (res.success) {
+          Msg.success(res.message);
+          onClose();
+        } else {
+          Msg.error(res.message);
+        }
+        console.log(res);
+      });
+    }
+
+  }, 500);
 
   // 底部按钮配置
-  const bottomBtns : PopUpDialogButton[] = [
+  const bottomBtns: PopUpDialogButton[] = [
     {
       text: "Cancel",
       onClick: () => {
@@ -88,8 +103,8 @@ const PostDialog = ({ onClose, notification="Create New Post", title="", clubInp
     >
       {/* 主体内容容器 - 使用flex布局让textarea占满剩余空间 */}
       <div className="post-dialog-content-container">
-        <input 
-          type="text" 
+        <input
+          type="text"
           className="post-dialog-input"
           placeholder="Post title (optional)"
           ref={titleRef}
