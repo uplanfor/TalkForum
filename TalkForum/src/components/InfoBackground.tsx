@@ -11,13 +11,14 @@ import dayjs from "dayjs";
 interface InfoBackgroundProps {
   infoType: string;
   targetId?: number;
+  targetType?: "user" | "club";
 }
 
 
 const InfoBackground = (props: InfoBackgroundProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const { isLoggedIn, lastLoginAt, name, avatarLink, backgroundLink, role, email, id, intro, fansCount, followingCount } = useSelector((state: RootState) => state.user);
-  let { infoType, targetId } = props;
+  let { infoType, targetId, targetType = "user" } = props;
   let isSelf = (infoType === InfoBackgroundType.SELF) ||  (infoType === InfoBackgroundType.USER && targetId == id);
 
 

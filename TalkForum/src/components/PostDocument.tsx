@@ -10,7 +10,7 @@ import { debounce } from "../utils/debounce&throttle";
 import type ApiResponse from "../api/ApiResponse";
 import { type CommentItemProps } from "./CommentItem";
 import { commentGetCommentList, type Comment } from "../api/ApiComment";
-import { type CommentTargetCallback } from "./PostView";
+import { type CommentTargetCallback } from "../pages/PostView";
 
 export interface PostDocumentProps extends PostType {
   renderContent: string;

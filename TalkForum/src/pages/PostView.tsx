@@ -1,8 +1,8 @@
-import PostDocument from "./PostDocument";
-import ReportDialog from "./ReportDialog";
-import PostDialog from "./PostDialog";
+import PostDocument from "../components/PostDocument";
+import ReportDialog from "../components/ReportDialog";
+import PostDialog from "../components/PostDialog";
 import { createPortal } from "react-dom";
-import BackgroundImg from "./BackgroundImg";
+import BackgroundImg from "../components/BackgroundImg";
 import "./styles/style_postview.css"
 import { DefaultBackgroundUrl, PostViewType } from "../constants/default";
 import { useEffect, useState, useRef } from "react";
@@ -16,13 +16,8 @@ import Msg from "../utils/msg";
 import { getSingleSimpleUserInfo } from "../utils/simpleUserInfoCache";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { copyToClipboard } from "../utils/clipboard";
+import { useParams, useNavigate } from "react-router-dom";
 
-
-export interface PostViewProps {
-  postId: number;
-  onClose: () => void;
-  target: string;
-}
 
 export interface CommentTarget {
   parentId: number | null;
@@ -34,7 +29,9 @@ export interface CommentTarget {
 export type CommentTargetCallback = (target: CommentTarget) => void;
 
 
-const PostView = ({ postId, onClose, target }: PostViewProps) => {
+const PostView = () => {
+  const { postId } = useParams<{ postId: string }>();
+  const navigate = useNavigate();
   const [ok, setOk] = useState(true);
   const [renderContent, setRenderContent] = useState<string>("");
   const { isLoggedIn } = useSelector((state: any) => state.user);
@@ -42,7 +39,7 @@ const PostView = ({ postId, onClose, target }: PostViewProps) => {
   const [showPostDialog, setShowPostDialog] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [post, setPost] = useState<PostType>({
-    id: postId,
+    id: postId ? parseInt(postId) : 0,
     title: "",
     content: "",
     userId: 0,
@@ -66,7 +63,7 @@ const PostView = ({ postId, onClose, target }: PostViewProps) => {
         return;
       }
 
-      await commentPostComment(postId, content, commentTarget.rootId, commentTarget.parentId).then(res => {
+      await commentPostComment(post.id, content, commentTarget.rootId, commentTarget.parentId).then(res => {
         if (res.success) {
           Msg.success(res.message);
           commentContentRef.current!.value = "";
@@ -84,16 +81,11 @@ const PostView = ({ postId, onClose, target }: PostViewProps) => {
   useEffect(() => {
     (async () => {
       if (ok && postId) {
-        // const postIdNum = Number(postId);
-        await postsGetPostDetailInformation(postId).then(async res => {
-          // console.log(res);
+        const postIdNum = Number(postId);
+        await postsGetPostDetailInformation(postIdNum).then(async res => {
           if (res.success) {
             const post_result: PostType = res.data;
             setPost({ ...post_result });
-
-            if (target === PostViewType.EDIT) {
-              await setShowPostDialog(true);
-            }
 
             const { html, tocNodeTree } = await parseMarkdown(post_result.content);
             setRenderContent(html);
@@ -108,11 +100,15 @@ const PostView = ({ postId, onClose, target }: PostViewProps) => {
     })()
   }, [ok, postId]);
 
+  const handleClose = () => {
+    navigate(-1); // 返回上一页
+  };
+
   return (
     <div className="post-view-cover">
       <div className="title">
         Post Detail
-        <ArrowLeftIcon onClick={onClose} />
+        <ArrowLeftIcon onClick={handleClose} />
 
         <EllipsisHorizontalIcon onClick={async () => {
           const menus = [
@@ -126,7 +122,7 @@ const PostView = ({ postId, onClose, target }: PostViewProps) => {
             switch (res) {
             case 0:
               Msg.success("Already copy the link to clipboard! send to your friends to share!");
-              copyToClipboard(`${window.location.origin}/?postId=${postId}`);
+              copyToClipboard(`${window.location.origin}/post/${postId}`);
               break;
             case 1:
               setShowReportDialog(true);
@@ -137,10 +133,10 @@ const PostView = ({ postId, onClose, target }: PostViewProps) => {
             case 3:
               Msg.confirm("Are you sure to delete this post?").then(async res => {
                 if (res) {
-                  await postsDeletePostAuth(postId).then(res => {
+                  await postsDeletePostAuth(post.id).then(res => {
                     if (res.success) {
                       Msg.success(res.message);
-                      onClose();
+                      handleClose();
                     } else {
                       Msg.error(res.message);
                     }
@@ -179,11 +175,11 @@ const PostView = ({ postId, onClose, target }: PostViewProps) => {
       </div>
 
       {showPostDialog && createPortal(
-        <PostDialog notification="Edit post" title={post.title} content={post.content} postId={postId} onClose={() => setShowPostDialog(false)} />,
+        <PostDialog notification="Edit post" title={post.title} content={post.content} postId={post.id} onClose={() => setShowPostDialog(false)} />,
         document.body
       )}
       {showReportDialog && createPortal(
-        <ReportDialog onClose={() => setShowReportDialog(false)} reportId={postId} />,
+        <ReportDialog onClose={() => setShowReportDialog(false)} reportId={post.id} />,
         document.body)}
     </div>
   );

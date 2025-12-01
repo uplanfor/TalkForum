@@ -8,20 +8,28 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Web配置类
+ * 用于配置Spring MVC的拦截器，实现登录验证、管理员权限验证等功能
+ */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Autowired
-    private LoginInterceptor loginInterceptor;
+    private LoginInterceptor loginInterceptor; // 登录验证拦截器
     @Autowired
-    private AdministratorInterceptor administratorInterceptor;
+    private AdministratorInterceptor administratorInterceptor; // 管理员权限拦截器
     @Autowired
-    private ModeratorInterceptor moderatorInterceptor;
+    private ModeratorInterceptor moderatorInterceptor; // 版主权限拦截器
 
+    /**
+     * 注册拦截器
+     * @param registry 拦截器注册表
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(loginInterceptor).addPathPatterns("/**");
-        registry.addInterceptor(administratorInterceptor).addPathPatterns("/**");
-        registry.addInterceptor(moderatorInterceptor).addPathPatterns("/**");
+        registry.addInterceptor(loginInterceptor).addPathPatterns("/**"); // 对所有路径应用登录拦截器
+        registry.addInterceptor(administratorInterceptor).addPathPatterns("/**"); // 对所有路径应用管理员拦截器
+        registry.addInterceptor(moderatorInterceptor).addPathPatterns("/**"); // 对所有路径应用版主拦截器
     }
 
 }

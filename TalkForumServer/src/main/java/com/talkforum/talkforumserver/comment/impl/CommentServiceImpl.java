@@ -16,30 +16,65 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * 评论服务实现类
+ * 实现了CommentService接口，处理评论相关的业务逻辑
+ */
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class CommentServiceImpl implements CommentService {
+    /**
+     * 评论数据访问层接口
+     */
     @Autowired
     CommentMapper commentMapper;
+    
+    /**
+     * 帖子数据访问层接口
+     */
     @Autowired
     PostMapper postMapper;
 
+    /**
+     * 获取帖子的评论列表
+     * @param postId 帖子ID
+     * @param cursor 游标，用于分页查询
+     * @param pageSize 每页大小
+     * @return 评论列表VO，包含评论列表、是否有更多和游标信息
+     */
     @Override
     public CommentListVO getComments(Long postId, Integer cursor, int pageSize) {
+        // 查询评论列表
         List<Comment> comments = commentMapper.getComments(postId, cursor, pageSize);
         return new CommentListVO(
                 comments, comments.size() == pageSize,
                 comments.isEmpty() ? null : comments.get(comments.size() - 1).getId());
     }
 
+    /**
+     * 获取评论的回复列表
+     * @param postId 帖子ID
+     * @param cursor 游标，用于分页查询
+     * @param pageSize 每页大小
+     * @param rootId 根评论ID
+     * @param parentId 父评论ID
+     * @return 评论回复列表VO，包含回复列表、是否有更多和游标信息
+     */
     @Override
     public CommentListVO getCommentReplyList(Long postId, Integer cursor, int pageSize, Long rootId, Long parentId) {
+        // 查询评论回复列表
         List<Comment> comments = commentMapper.getCommentReplies(postId, cursor, pageSize, rootId, parentId);
         return new CommentListVO(
                 comments, comments.size() == pageSize,
                 comments.isEmpty() ? null : comments.get(comments.size() - 1).getId());
     }
 
+    /**
+     * 根据评论ID获取评论
+     * @param commentId 评论ID
+     * @return 评论实体对象
+     * @throws BusinessRuntimeException 当评论不存在时抛出
+     */
     @Override
     public Comment getComment(Long commentId) {
         Comment ret = commentMapper.getComment(commentId);
@@ -49,30 +84,58 @@ public class CommentServiceImpl implements CommentService {
         return ret;
     }
 
+    /**
+     * 添加评论并增加帖子评论数
+     * @param postId 帖子ID
+     * @param content 评论内容
+     * @param rootId 根评论ID
+     * @param parentId 父评论ID
+     * @param userId 评论用户ID
+     * @param role 用户角色
+     * @return 添加的评论实体对象
+     * @throws BusinessRuntimeException 当帖子不存在或回复的评论无效时抛出
+     */
     @Override
     public Comment addCommentWithPostCommentCountIncreased(Long postId, String content, Long rootId, Long parentId, Long userId, String role) {
+        // 检查帖子是否存在
         long count = postMapper.countPassPost(postId);
         if (count == 0) {
             throw new BusinessRuntimeException("The post did not exist!");
         }
+        
+        // 创建评论对象，根据用户角色设置审核状态
         Comment comment = new Comment(postId, userId, rootId, parentId, content,
                 role.equals(UserConstant.ROLE_USER) ? CommentConstant.PENDING : CommentConstant.PASS);
+        
+        // 如果是回复评论，检查回复的评论是否存在
         if (rootId != null || parentId != null) {
             int count2 = commentMapper.countExistComment(postId, rootId, parentId);
             if (count2 == 0) {
                 throw new BusinessRuntimeException("You cannot reply to the invalid comment!");
             }
         }
+        
+        // 添加评论并增加帖子评论数
         commentMapper.addCommentWithPostCommentCountIncreased(comment);
         return comment;
     }
 
+    /**
+     * 删除评论
+     * @param commentId 评论ID
+     * @param userId 用户ID
+     * @param role 用户角色
+     * @throws BusinessRuntimeException 当评论不存在或无权限删除时抛出
+     */
     @Override
     public void deleteComment(Long commentId, Long userId, String role) {
+        // 检查评论是否存在
         Comment commentCheck = commentMapper.checkDeleteComment(commentId);
         if (commentCheck == null) {
             throw new BusinessRuntimeException("Comment not found!");
         }
+        
+        // 如果是评论作者或管理员/版主，可以删除评论
         if (commentCheck.getUserId().equals(userId)) {
             commentMapper.auditComment(commentId, CommentConstant.DELETED);
         } else {
@@ -85,12 +148,24 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    /**
+     * 管理员分页获取评论列表
+     * @param adminGetCommentsDTO 管理员获取评论DTO，包含分页、筛选等参数
+     * @return 分页评论列表VO
+     */
     @Override
     public PageVO<Comment> adminGetCommentsByPage(AdminGetCommentsDTO adminGetCommentsDTO) {
+        // 查询评论列表
         List<Comment> comments = commentMapper.adminGetCommentsByPage(adminGetCommentsDTO);
+        // 构造并返回分页VO对象
         return new PageVO<>(comments, commentMapper.adminCountComments(adminGetCommentsDTO));
     }
 
+    /**
+     * 审核评论
+     * @param commentId 评论ID
+     * @param status 审核状态
+     */
     @Override
     public void auditComment(Long commentId, String status) {
         commentMapper.auditComment(commentId, status);

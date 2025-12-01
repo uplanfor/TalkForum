@@ -19,13 +19,25 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Map;
 
+/**
+ * 风纪权限拦截器
+ * 用于拦截需要版主权限的接口，验证用户是否具有风纪权限
+ */
 @Component
 public class ModeratorInterceptor implements HandlerInterceptor {
     @Autowired
-    private JWTHelper jwtHelper;
+    private JWTHelper jwtHelper; // JWT工具类，用于解析和验证JWT令牌
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private StringRedisTemplate stringRedisTemplate; // Redis操作模板，用于验证令牌是否有效
 
+    /**
+     * 处理请求前的拦截方法
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @param handler 处理请求的方法对象
+     * @return true表示放行，false表示拦截
+     * @throws Exception 处理过程中的异常
+     */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 静态资源直接放行
@@ -34,33 +46,39 @@ public class ModeratorInterceptor implements HandlerInterceptor {
         }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         AdminRequired adminRequired = handlerMethod.getMethodAnnotation(AdminRequired.class);
-        // 没有要求登录接口直接放行
+        // 不需要管理员权限的接口直接放行
         if(adminRequired == null){
             return true;
         }
         // 验证是否登录
         String value = CookieHelper.getCookieValue(request, ServerConstant.LOGIN_COOKIE);
         if (value == null) {
+            // 未登录，返回401状态码和错误信息
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().write("{\"code\":401,\"success\":false,\"message\":\"Please Login Required\"}");
             return false;
         } else {
             try {
+                // 解析JWT令牌
                 Map<String, Object> information = jwtHelper.parseJWTToken(value);
                 long userId = ((Number)(information.get("id"))).longValue();
+                // 获取用户角色并验证是否为管理员
                 String v = (String) information.get("role");
                 if (!v.equals(UserConstant.ROLE_ADMIN)) {
+                    // 不是管理员，返回403状态码和错误信息
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setContentType("application/json;charset=UTF-8");
-                    response.getWriter().write("{\"code\":401,\"success\":false,\"message\":\"Administrator Permission Required!\"}");
+                    response.getWriter().write("{\"code\":403,\"success\":false,\"message\":\"Administrator Permission Required!\"}");
                     return false;
                 }
+                // 验证令牌是否在Redis中存在
                 Object t =  stringRedisTemplate.opsForValue().get(RedisKeyConstant.TOKEN_USER + userId);
                 if (t == null) {
                     throw new BusinessRuntimeException("invalid token");
                 }
             } catch (JwtException e) {
+                // 令牌无效或已过期，返回401
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json;charset=UTF-8");
                 response.getWriter().write("{\"code\":401,\"success\":false,\"message\":\"Invalid token, please login again!\"}");

@@ -2,7 +2,7 @@ import "./styles/style_commentitem.css"
 import { type Comment } from "../api/ApiComment";
 import { getSingleSimpleUserInfo } from "../utils/simpleUserInfoCache";
 import dayjs from "dayjs";
-import { type CommentTargetCallback } from "./PostView";
+import { type CommentTargetCallback } from "../pages/PostView";
 import { HandThumbUpIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 import { commentGetCommentReplyList } from "../api/ApiComment";

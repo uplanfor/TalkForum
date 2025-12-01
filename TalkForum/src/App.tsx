@@ -11,6 +11,8 @@ import NotFound from "./pages/NotFound";
 import ThemeUtil from './utils/ThemeUtil';
 import Mail from './pages/Mail';
 import Club from './pages/Club';
+import PostView from './pages/PostView';
+import SpaceView from './pages/SpaceView';
 import { useDispatch } from 'react-redux';
 import { userLogout, userLogin } from './store/slices/userSlice';
 import { type AppDispatch } from './store';
@@ -87,8 +89,8 @@ const App = () => {
         <Route path="/me" element={<Me />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<Admin />} />
-        {/* <Route path="/post/:postId" element={<Post />} />
-        <Route path="/space/:spaceType/:id" element={<Space />} /> */}
+        <Route path="/post/:postId" element={<PostView />} />
+        <Route path="/:type/:id" element={<SpaceView />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Provider>

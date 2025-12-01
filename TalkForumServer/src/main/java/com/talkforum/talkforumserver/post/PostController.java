@@ -12,19 +12,33 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+/**
+ * 帖子控制器
+ * 处理帖子相关的HTTP请求，包括发布帖子、获取帖子列表、编辑帖子、删除帖子等
+ */
 @RequestMapping("/posts")
 @RestController
 public class PostController {
     @Autowired
-    PostService postService;
+    PostService postService; // 帖子服务层
     @Autowired
-    JWTHelper jwtHelper;
+    JWTHelper jwtHelper; // JWT工具类，用于解析和生成Token
 
+    /**
+     * 根据帖子ID获取帖子详情
+     * @param postId 帖子ID
+     * @return 帖子详情
+     */
     @GetMapping("/{postId}")
     public Result getPost(@PathVariable Long postId) {
         return Result.success("Success to get post information!", postService.getPost(postId));
     }
 
+    /**
+     * 获取帖子列表
+     * @param postRequestDTO 帖子列表请求DTO
+     * @return 帖子列表
+     */
     @GetMapping("/")
     @Validated
     public Result getPosts(PostRequestDTO postRequestDTO) {
@@ -35,36 +49,60 @@ public class PostController {
         return Result.success("Success to get post list!", postService.getPosts(postRequestDTO));
     }
 
+    /**
+     * 发布帖子
+     * @param postCommitDTO 帖子发布DTO
+     * @param token 登录凭证Token
+     * @return 发布结果
+     */
     @LoginRequired
     @PostMapping("/")
     @Validated
     public Result commitPost(@RequestBody PostCommitDTO postCommitDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token);
-        postCommitDTO.userId = ((Number)(information.get("id"))).longValue();
+        Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
+        postCommitDTO.userId = ((Number)(information.get("id"))).longValue(); // 设置用户ID
         return Result.success("Success to commit post!", postService.commitPost(postCommitDTO, (String)(information.get("role"))));
     }
 
+    /**
+     * 编辑帖子
+     * @param postId 帖子ID
+     * @param postEditDTO 帖子编辑DTO
+     * @param token 登录凭证Token
+     * @return 编辑结果
+     */
     @LoginRequired
     @PutMapping("/{postId}")
     @Validated
     public Result editPost(@PathVariable Long postId, @RequestBody PostEditDTO postEditDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token);
-        postEditDTO.userId = ((Number)(information.get("id"))).longValue();
-        postEditDTO.id = postId;
-        postService.editPost(postEditDTO, (String)(information.get("role")));
+        Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
+        postEditDTO.userId = ((Number)(information.get("id"))).longValue(); // 设置用户ID
+        postEditDTO.id = postId; // 设置帖子ID
+        postService.editPost(postEditDTO, (String)(information.get("role"))); // 调用服务层编辑帖子
         return Result.success("Success to edit post!");
     }
 
+    /**
+     * 删除帖子
+     * @param postId 帖子ID
+     * @param token 登录凭证Token
+     * @return 删除结果
+     */
     @LoginRequired
     @DeleteMapping("/{postId}")
     public Result deletePost(@PathVariable Long postId, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token);
-        long userId = ((Number)(information.get("id"))).longValue();
-        String role = (String)(information.get("role"));
-        postService.deletePost(postId, userId, role);
+        Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
+        long userId = ((Number)(information.get("id"))).longValue(); // 获取用户ID
+        String role = (String)(information.get("role")); // 获取用户角色
+        postService.deletePost(postId, userId, role); // 调用服务层删除帖子
         return Result.success("Success to delete post!");
     }
 
+    /**
+     * 管理员获取帖子列表
+     * @param adminPostRequestDTO 管理员帖子列表请求DTO
+     * @return 帖子列表
+     */
     @ModeratorRequired
     @GetMapping("/admin")
     @Validated
@@ -72,17 +110,30 @@ public class PostController {
         return Result.success("Success to get post list!", postService.getPostsWithAdminRight(adminPostRequestDTO));
     }
 
+    /**
+     * 审核帖子
+     * @param postId 帖子ID
+     * @param postAuditDTO 帖子审核DTO
+     * @return 审核结果
+     */
     @ModeratorRequired
     @PutMapping("/admin/{postId}/audit")
     public Result auditPost(@PathVariable Long postId, @RequestBody PostAuditDTO postAuditDTO) {
-        postService.auditPost(postId, postAuditDTO.getStatus());
+        postService.auditPost(postId, postAuditDTO.getStatus()); // 调用服务层审核帖子
         return Result.success("Success to audit post!");
     }
 
+    /**
+     * 设置帖子精华
+     * @param postId 帖子ID
+     * @param essenceDTO 精华设置DTO
+     * @return 设置结果
+     */
     @ModeratorRequired
     @PutMapping("/admin/{postId}/essence")
-    public Result essencePost(@PathVariable Long postId, int isEssence) {
-        postService.essencePost(postId, isEssence);
+    public Result essencePost(@PathVariable Long postId, @RequestBody EssenceDTO essenceDTO) {
+        System.out.println(essenceDTO.getIsEssence()); // 打印日志
+        postService.essencePost(postId, essenceDTO.getIsEssence()); // 调用服务层设置精华
         return Result.success("Success to modify!");
     }
 }

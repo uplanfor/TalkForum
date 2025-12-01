@@ -35,7 +35,7 @@ interface PostListParams {
     clubIds?: number[];
     userIds?: number[];
     isEssence?: number;
-    cursor?: number;
+    cursor?: number | null;
     pageSize: number;
 }
 

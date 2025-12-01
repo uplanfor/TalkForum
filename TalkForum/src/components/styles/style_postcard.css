@@ -42,7 +42,7 @@
 .post-card .menu ul {
     display: none;
     position: absolute;
-    top: 30px;
+    top: 20px;
     right: 0;
     padding: 5px;
     background-color: var(--neutral-module);
