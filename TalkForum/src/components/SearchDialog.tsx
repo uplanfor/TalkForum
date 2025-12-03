@@ -1,27 +1,55 @@
+/**
+ * 搜索对话框组件
+ * 提供搜索功能，包括搜索输入、热门话题和搜索历史
+ */
 import { useState, useEffect } from "react";
 // import "../assets/normalize.css"
 import "./styles/style_searchdialog.css"
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 
+/**
+ * 搜索对话框属性接口
+ */
 interface SearchDialogProps {
+    /**
+     * 关闭对话框的回调函数
+     */
     onClose: () => void;
 }
 
+/**
+ * 搜索对话框组件
+ * 提供搜索功能，包括搜索输入、热门话题和搜索历史
+ */
 const SearchDialog = (props : SearchDialogProps) => {
     const { onClose } = props;
+    
+    // 是否正在关闭状态，用于动画效果
     const [isClosing, setIsClosing] = useState(false);
+    
+    // 组件是否已挂载状态，用于防止内存泄漏
     const [isMounted, setIsMounted] = useState(false);
 
+    /**
+     * 组件挂载时设置isMounted为true，卸载时设置为false
+     */
     useEffect(() => {
         setIsMounted(true);
         return () => setIsMounted(false);
     }, []);
 
+    /**
+     * 关闭搜索对话框
+     * 添加关闭动画效果，延迟300ms后调用onClose回调
+     */
     const closeSearchDialog = () => {
         if (!isMounted) return;
         
+        // 设置关闭状态，触发关闭动画
         setIsClosing(true);
+        
+        // 延迟300ms后调用onClose回调
         const timer = setTimeout(() => {
             if (isMounted) {
                 onClose();
@@ -31,6 +59,9 @@ const SearchDialog = (props : SearchDialogProps) => {
         return () => clearTimeout(timer);
     }
 
+    /**
+     * 监听键盘事件，按下Escape键时关闭对话框
+     */
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
@@ -42,22 +73,39 @@ const SearchDialog = (props : SearchDialogProps) => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
-    return <div className={`cover ${isClosing ? 'closing' : ''}`}>
-        <div className="header">
-            <ArrowLeftIcon onClick={closeSearchDialog} style={{cursor: 'pointer'}}></ArrowLeftIcon>
-            <div className="combo">
-                <MagnifyingGlassIcon />
-                <input type="text" placeholder="search something..." />
+    return (
+        <div className={`cover ${isClosing ? 'closing' : ''}`}>
+            {/* 搜索对话框头部 */}
+            <div className="header">
+                {/* 返回按钮 */}
+                <ArrowLeftIcon onClick={closeSearchDialog} style={{cursor: 'pointer'}}></ArrowLeftIcon>
+                
+                {/* 搜索输入组合 */}
+                <div className="combo">
+                    <MagnifyingGlassIcon /> {/* 搜索图标 */}
+                    <input type="text" placeholder="search something..." /> {/* 搜索输入框 */}
+                </div>
+                
+                {/* 搜索按钮 */}
+                <button>Search</button>
             </div>
-            <button>Search</button>
+            
+            {/* 搜索对话框内容 */}
+            <div className="content">
+                {/* 热门话题 */}
+                <h2>Hot Topics</h2>
+                <p>
+                    <span>Computer Science</span> 
+                    <span>Caculors</span> 
+                    <span>Dishes</span> 
+                </p>
+                
+                {/* 搜索历史 */}
+                <h2>Search History</h2>
+                <p> <span>Cheat</span> </p>
+            </div>
         </div>
-        <div className="content">
-            <h2>Hot Topics</h2>
-            <p><span>Computer Science</span> <span>Caculors</span> <span>Dishes</span> </p>
-            <h2>Search History</h2>
-            <p> <span>Cheat</span> </p>
-        </div>
-    </div>
+    );
 };
 
 export default SearchDialog;

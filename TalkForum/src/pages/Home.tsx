@@ -1,16 +1,31 @@
+/**
+ * 首页组件
+ * 论坛的主页面，包含：
+ * - 导航栏
+ * - 背景图片
+ * - 帖子容器（支持最新和精华两个标签页）
+ */
 import Nav from "../components/Nav";
 import BackgroundImg from "../components/BackgroundImg";
-import PostsContainer from "../components/PostsContainer";
+import PostsContainer, { PostContainerTargetType } from "../components/PostsContainer";
 import { DefaultBackgroundUrl } from "../constants/default";
 // import KeepAlive from "react-activation";
 
+/**
+ * 首页组件
+ * 论坛的主页面，展示最新和精华帖子
+ */
 const Home = () => (
     <>
+        {/* 导航栏组件 */}
         <Nav></Nav>
+        
+        {/* 背景图片组件，使用默认背景图URL */}
         <BackgroundImg src={DefaultBackgroundUrl} />
         {/* <BackgroundImg src="https://bing.img.run/1366x768.php" /> */}
 
-        <PostsContainer tabs={["Latest", "Essence"]} />
+        {/* 帖子容器组件，首页模式，支持最新、精华和关注标签页 */}
+        <PostsContainer targetType={PostContainerTargetType.HOME} />
     </>
 );
 

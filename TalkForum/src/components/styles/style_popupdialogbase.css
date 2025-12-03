@@ -165,9 +165,9 @@
   border-color: var(--neutral-text-secondary);
 }
 
-/* .popup-dialog-base-submit:hover {
-  background-color: var(--primary-dark);
-} */
+.popup-dialog-base-submit:hover {
+  background-color: var(--secondary-warm-2);
+}
 
 @media screen and (max-width: 600px) {
   @keyframes slide-in {

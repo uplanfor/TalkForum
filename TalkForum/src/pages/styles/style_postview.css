@@ -124,3 +124,157 @@
 .post-view-cover .title svg:last-child {
   right: 9px;
 }
+
+/* 目录基础样式 */
+.toc-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: var(--neutral-text-main);
+}
+
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-item {
+  margin-bottom: 8px;
+}
+
+.toc-link {
+  text-decoration: none;
+  color: var(--neutral-text-secondary);
+  font-size: 14px;
+  display: block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.toc-link:hover {
+  color: var(--primary);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* 目录级别缩进 */
+.toc-item.level-1 .toc-list {
+  margin-left: 16px;
+}
+
+.toc-item.level-2 .toc-list {
+  margin-left: 32px;
+}
+
+.toc-item.level-3 .toc-list {
+  margin-left: 48px;
+}
+
+.toc-item.level-4 .toc-list {
+  margin-left: 64px;
+}
+
+.toc-item.level-5 .toc-list {
+  margin-left: 80px;
+}
+
+.toc-item.level-6 .toc-list {
+  margin-left: 96px;
+}
+
+/* 桌面端目录样式 */
+.toc-desktop {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  width: 250px;
+  max-height: calc(100vh - 80px);
+  background-color: var(--neutral-module);
+  border: 1px solid var(--neutral-border);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  z-index: 1024;
+}
+
+/* 移动端目录按钮样式 */
+.toc-mobile-button {
+  position: fixed;
+  top: 50px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  z-index: 1025;
+}
+
+.toc-mobile-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 移动端目录菜单样式 */
+.toc-mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: var(--neutral-bg);
+  z-index: 1026;
+  display: flex;
+  flex-direction: column;
+}
+
+.toc-mobile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--neutral-border);
+  background-color: var(--neutral-module);
+}
+
+.toc-mobile-close {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  color: var(--neutral-text-secondary);
+}
+
+.toc-mobile-content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+/* 响应式设计 */
+@media (max-width: 800px) {
+  .toc-desktop {
+    display: none;
+  }
+  
+  .toc-mobile-button {
+    display: flex;
+  }
+}
+
+@media (min-width: 801px) {
+  .toc-mobile-button {
+    display: none;
+  }
+  
+  .toc-mobile-menu {
+    display: none;
+  }
+}

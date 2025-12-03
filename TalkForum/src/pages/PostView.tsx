@@ -1,3 +1,12 @@
+/**
+ * 帖子详情页面组件
+ * 展示帖子详细内容和评论，包含：
+ * - 帖子内容展示
+ * - 评论列表和评论发布
+ * - 帖子操作（分享、举报、编辑、删除）
+ * - 回复评论功能
+ * - 自动跳转到404页面（如果帖子不存在）
+ */
 import PostDocument from "../components/PostDocument";
 import ReportDialog from "../components/ReportDialog";
 import PostDialog from "../components/PostDialog";
@@ -5,11 +14,12 @@ import { createPortal } from "react-dom";
 import BackgroundImg from "../components/BackgroundImg";
 import "./styles/style_postview.css"
 import { DefaultBackgroundUrl, PostViewType } from "../constants/default";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback, type JSX } from "react";
+import { debounce } from "../utils/debounce&throttle";
 import { postsDeletePostAuth, postsGetPostDetailInformation } from "../api/ApiPosts";
-import { parseMarkdown } from "../utils/MarkdownUtil";
+import { parseMarkdown, type TocNode } from "../utils/MarkdownUtil";
 import { type PostType } from "../api/ApiPosts";
-import { ArrowLeftIcon, EllipsisHorizontalIcon } from "@heroicons/react/20/solid";
+import { ArrowLeftIcon, EllipsisHorizontalIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { useSelector } from "react-redux";
 import { commentPostComment } from "../api/ApiComment";
 import Msg from "../utils/msg";
@@ -17,27 +27,49 @@ import { getSingleSimpleUserInfo } from "../utils/simpleUserInfoCache";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { copyToClipboard } from "../utils/clipboard";
 import { useParams, useNavigate } from "react-router-dom";
+import NotFound from "./NotFound";
 
 
+/**
+ * 评论目标接口
+ * 定义评论回复的目标信息
+ */
 export interface CommentTarget {
-  parentId: number | null;
-  rootId: number | null;
-  userId: number | null;
-  commentToContent: string;
+  parentId: number | null;  // 父评论ID
+  rootId: number | null;    // 根评论ID
+  userId: number | null;    // 回复的用户ID
+  commentToContent: string; // 回复的评论内容
 }
 
+/**
+ * 评论目标回调类型
+ * 用于设置评论回复目标的回调函数
+ */
 export type CommentTargetCallback = (target: CommentTarget) => void;
 
 
+/**
+ * 帖子详情页面组件
+ * 展示帖子详细内容和评论
+ */
 const PostView = () => {
+  // 从URL参数中获取帖子ID
   const { postId } = useParams<{ postId: string }>();
+  // 路由导航钩子
   const navigate = useNavigate();
+  // 帖子是否存在的状态
   const [ok, setOk] = useState(true);
+  // 渲染的帖子内容（Markdown转换后的HTML）
   const [renderContent, setRenderContent] = useState<string>("");
+  // 从Redux获取用户登录状态
   const { isLoggedIn } = useSelector((state: any) => state.user);
+  // 评论回复目标状态
   const [commentTarget, setCommentTarget] = useState<CommentTarget>({ parentId: null, rootId: null, userId: null, commentToContent: "" });
+  // 是否显示编辑帖子对话框
   const [showPostDialog, setShowPostDialog] = useState(false);
+  // 是否显示举报帖子对话框
   const [showReportDialog, setShowReportDialog] = useState(false);
+  // 帖子数据状态
   const [post, setPost] = useState<PostType>({
     id: postId ? parseInt(postId) : 0,
     title: "",
@@ -53,9 +85,21 @@ const PostView = () => {
     commentCount: 0,
   });
 
+  // 目录数据状态
+  const [tocNodeTree, setTocNodeTree] = useState<TocNode[]>([]);
+  // 目录显示状态（小屏幕下）
+  const [showTocMenu, setShowTocMenu] = useState(false);
+
+  // 评论内容输入框的引用
   const commentContentRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleCommentSend = async () => {
+  /**
+   * 发送评论的处理函数
+   * - 验证评论内容是否为空
+   * - 调用API发布评论
+   * - 处理评论发布结果
+   */
+  const handleCommentSend = useCallback(debounce(async () => {
     if (commentContentRef.current) {
       let content = commentContentRef.current.value.trim();
       if (content === "") {
@@ -76,36 +120,88 @@ const PostView = () => {
         console.log(err);
       })
     }
+  }, 500), [post.id, commentTarget.parentId, commentTarget.rootId]); // 500ms的防抖延迟，防止多次点击发送
+
+  /**
+   * 加载帖子详情的函数
+   * - 使用useCallback包装，避免不必要的重定义
+   * - 调用API获取帖子详情
+   * - 解析Markdown内容为HTML
+   * - 设置帖子数据状态
+   * - 解析目录结构
+   */
+  const loadPostDetail = useCallback(debounce(async (postId: string) => {
+    if (postId) {
+      const postIdNum = Number(postId);
+      await postsGetPostDetailInformation(postIdNum).then(async res => {
+        if (res.success) {
+          const post_result: PostType = res.data;
+          setPost({ ...post_result });
+
+          const { html, tocNodeTree } = await parseMarkdown(post_result.content);
+          setRenderContent(html);
+          setTocNodeTree(tocNodeTree); // 设置目录树数据
+          setOk(true); // 帖子存在，显示帖子内容
+        } else {
+          throw new Error(res.message);
+        }
+      }).catch(err => {
+        console.log(err);
+        setOk(false); // 加载失败，显示404
+      });
+    } else {
+      setOk(false); // 帖子不存在，显示404
+    }
+  }, 300), []); // 300ms的防抖延迟
+
+  /**
+   * 组件挂载或postId变化时加载帖子详情
+   */
+  useEffect(() => {
+    loadPostDetail(postId!);
+  }, [postId, loadPostDetail]);
+
+  /**
+   * 渲染目录树的递归函数
+   * @param nodes 目录节点数组
+   * @returns 渲染后的目录结构
+   */
+  const renderTocTree = (nodes: TocNode[]): JSX.Element => {
+    return (
+      <ul className="toc-list">
+        {nodes.map((node, index) => (
+          <li key={`${node.id}-${index}`} className={`toc-item level-${node.level}`}>
+            <a 
+              href={`#${node.id}`} 
+              className="toc-link"
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById(node.id);
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth' });
+                  setShowTocMenu(false); // 点击目录项后关闭菜单
+                }
+              }}
+            >
+              {node.name}
+            </a>
+            {node.children.length > 0 && renderTocTree(node.children)}
+          </li>
+        ))}
+      </ul>
+    );
   };
 
-  useEffect(() => {
-    (async () => {
-      if (ok && postId) {
-        const postIdNum = Number(postId);
-        await postsGetPostDetailInformation(postIdNum).then(async res => {
-          if (res.success) {
-            const post_result: PostType = res.data;
-            setPost({ ...post_result });
-
-            const { html, tocNodeTree } = await parseMarkdown(post_result.content);
-            setRenderContent(html);
-          } else {
-            setOk(false);
-          }
-        }).catch(err => {
-          console.log(err);
-          setOk(false);
-        });
-      }
-    })()
-  }, [ok, postId]);
-
+  /**
+   * 返回上一页的处理函数
+   */
   const handleClose = () => {
     navigate(-1); // 返回上一页
   };
 
   return (
-    <div className="post-view-cover">
+    ok ? 
+    (<div className="post-view-cover">
       <div className="title">
         Post Detail
         <ArrowLeftIcon onClick={handleClose} />
@@ -152,7 +248,43 @@ const PostView = () => {
         }} >
         </EllipsisHorizontalIcon>
       </div>
-      <BackgroundImg src={DefaultBackgroundUrl} style={{ height: 250 }} />
+      <BackgroundImg src={DefaultBackgroundUrl}/>
+      
+      {/* 目录结构 - 桌面端 */}
+      {tocNodeTree.length > 0 && (
+        <div className="toc-desktop">
+          <h3 className="toc-title">Contents</h3>
+          {renderTocTree(tocNodeTree)}
+        </div>
+      )}
+      
+      {/* 目录按钮 - 移动端 */}
+      {tocNodeTree.length > 0 && (
+        <button 
+          className="toc-mobile-button"
+          onClick={() => setShowTocMenu(!showTocMenu)}
+        >
+          <ChevronRightIcon />
+          Contents
+        </button>
+      )}
+      
+      {/* 目录菜单 - 移动端 */}
+      {showTocMenu && tocNodeTree.length > 0 && (
+        <div className="toc-mobile-menu">
+          <div className="toc-mobile-header">
+            <h3 className="toc-title">Contents</h3>
+            <XMarkIcon 
+              className="toc-mobile-close"
+              onClick={() => setShowTocMenu(false)}
+            />
+          </div>
+          <div className="toc-mobile-content">
+            {renderTocTree(tocNodeTree)}
+          </div>
+        </div>
+      )}
+      
       <PostDocument {...post} renderContent={renderContent} setCommentTarget={setCommentTarget} />
       <div className="comment-input">
         {
@@ -181,7 +313,7 @@ const PostView = () => {
       {showReportDialog && createPortal(
         <ReportDialog onClose={() => setShowReportDialog(false)} reportId={post.id} />,
         document.body)}
-    </div>
+    </div>) : <NotFound />
   );
 };
 

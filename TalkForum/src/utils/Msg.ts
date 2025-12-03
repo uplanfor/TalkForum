@@ -297,15 +297,15 @@ const createBlockDialog = (
       const rightBtn = document.createElement('button');
       rightBtn.textContent = rightBtnText || 'Confirm';
       Object.assign(rightBtn.style, btnStyle, {
-        backgroundColor: 'var(--secondary-cool)', // 确认按钮背景
-        color: '#fff', // 白色文本（无对应变量，保留）
-        zIndex: '4097', // 按钮层级
-      });
+          backgroundColor: 'var(--primary)', // 确认按钮背景使用主色调
+          color: 'var(--neutral-text-main)', // 主文本色（无对应变量，使用中性色）
+          zIndex: '4097', // 按钮层级
+        });
       rightBtn.addEventListener('mouseenter', () => {
         rightBtn.style.backgroundColor = 'var(--primary)'; // hover背景
       });
       rightBtn.addEventListener('mouseleave', () => {
-        rightBtn.style.backgroundColor = 'var(--secondary-cool)'; // 恢复背景
+        rightBtn.style.backgroundColor = 'var(--primary)'; // 恢复背景
       });
       rightBtn.addEventListener('click', () => {
         if (type === 'confirm') {
@@ -377,16 +377,16 @@ const createBlockDialog = (
 const Msg = {
   // 原有消息方法（完全保留，未做任何修改）
   success(text: string, duration = 2000, isBlock = false) {
-    this._showBasicMsg(text, duration, isBlock, { bgColor: "#0feda3ff", icon: "✓" });
+    this._showBasicMsg(text, duration, isBlock, { bgColor: "var(--secondary-warm-1)", icon: "✓" });
   },
   notice(text: string, duration = 2000, isBlock = false) {
-    this._showBasicMsg(text, duration, isBlock, { bgColor: "#75fdffff", icon: "i" });
+    this._showBasicMsg(text, duration, isBlock, { bgColor: "var(--secondary-cool)", icon: "i" });
   },
   warn(text: string, duration = 2000, isBlock = false) {
-    this._showBasicMsg(text, duration, isBlock, { bgColor: "#e8e508ff", icon: "!" });
+    this._showBasicMsg(text, duration, isBlock, { bgColor: "var(--primary)", icon: "!" });
   },
   error(text: string, duration = 2000, isBlock = false) {
-    this._showBasicMsg(text, duration, isBlock, { bgColor: "#f32525ff", icon: "×" });
+    this._showBasicMsg(text, duration, isBlock, { bgColor: "var(--secondary-warm-2)", icon: "×" });
   },
 
   // 基础消息弹窗（完全保留，未做任何修改）

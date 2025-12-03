@@ -1,9 +1,13 @@
-import InfoBackground from "../components/InfoBackground";
-import PostContainer from "../components/PostsContainer";
+
 import "./styles/style_spaceview.css"
+import InfoBackground from "../components/InfoBackground";
+import PostContainer, { PostContainerTargetType } from "../components/PostsContainer";
 import { InfoBackgroundType } from "../constants/default";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeftIcon } from "@heroicons/react/20/solid";
+import { ArrowLeftIcon, EllipsisHorizontalIcon } from "@heroicons/react/20/solid";
+import { useState, useEffect } from "react";
+import NotFound from "./NotFound";
+import { usersGetDetailedUserInfo } from "../api/ApiUsers";
 
 /**
  * SpaceView组件属性接口
@@ -16,9 +20,11 @@ interface SpaceViewProps {
 const SpaceView = ({}: SpaceViewProps) => {
   const { type, id } = useParams<{ type: string; id: string }>();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [ok, setOk] = useState(true);
 
-  // 验证type参数
-  const validType = type === "club" || type === "user" ? type : "user";
+  // 验证type参数并转换为PostContainerTargetType
+  const validType = type === "club" ? PostContainerTargetType.CLUB : PostContainerTargetType.USER;
   const spaceId = id ? parseInt(id) : 0;
 
   const handleClose = () => {
@@ -34,16 +40,46 @@ const SpaceView = ({}: SpaceViewProps) => {
     }
   };
 
+  // 调用API判断目标是否存在
+  useEffect(() => {
+    const checkTargetExists = async () => {
+      setLoading(true);
+      try {
+        if (validType === "club") {
+          // 俱乐部接口未实现，暂时忽略验证
+          setOk(false);
+        } else {
+          // 调用用户详情API，判断用户是否存在
+          // 使用现有的usersGetDetailedUserInfo方法来验证用户是否存在
+          const res = await usersGetDetailedUserInfo(spaceId);
+          if (res.success) {
+            setOk(true);
+          } else {
+            setOk(false);
+          }
+        }
+      } catch (error) {
+        console.error(`${validType} not found:`, error);
+        setOk(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkTargetExists();
+  }, [validType, spaceId]);
+
   return (
+    ok ? (
     <div className="space-view-cover">
       <div className="space-header">
         <ArrowLeftIcon onClick={handleClose} className="back-button" />
         <h2 className="space-title">
           {validType === "club" ? "Club Space" : "User Space"}
         </h2>
+        <EllipsisHorizontalIcon/>
       </div>
       <InfoBackground 
-        infoType={getInfoBackgroundType()} 
         targetId={spaceId}
         targetType={validType}
       />
@@ -52,7 +88,9 @@ const SpaceView = ({}: SpaceViewProps) => {
         targetId={spaceId}
       />
     </div>
-  );
+  ) : (
+    <NotFound />
+  ));
 }
 
 export default SpaceView;

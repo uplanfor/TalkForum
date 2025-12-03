@@ -198,6 +198,49 @@
     border-right: 1px solid var(--neutral-border); /* 表头右侧边框 */
 }
 
+/* 帖子互动区域样式 */
+.post-interaction {
+    display: flex;
+    justify-content: flex-start;
+    padding: 16px 0;
+    border-top: 1px solid var(--neutral-border);
+    border-bottom: 1px solid var(--neutral-border);
+}
+
+/* 点赞按钮样式 */
+.like-btn {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--neutral-text-main);
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+
+.like-btn:hover {
+    background-color: var(--neutral-hover);
+}
+
+.like-btn .svg-inline--fa {
+    width: 20px;
+    height: 20px;
+    margin-right: 6px;
+    transition: color 0.2s ease;
+}
+
+.like-btn.liked {
+    color: var(--primary);
+}
+
+.like-btn.liked .svg-inline--fa {
+    color: var(--primary);
+    fill: var(--primary);
+}
+
 /* .post-content table tr:nth-child(even) {
     background-color: var(--secondary-warm-1);
 } */
@@ -374,4 +417,91 @@
 @keyframes rotate360 {
   0% {transform: rotate(0deg);}
   100% {transform: rotate(360deg);}
+}
+
+/* 旋转动画 */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(360deg);}
+}
+
+/* 评论列表容器样式 */
+.post-document .comment-list-container {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+/* 滚动条样式优化 */
+.post-document .comment-list-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.post-document .comment-list-container::-webkit-scrollbar-track {
+  background: var(--neutral-bg);
+  border-radius: 3px;
+}
+
+.post-document .comment-list-container::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 3px;
+}
+
+.post-document .comment-list-container::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+  opacity: 0.8;
+}
+
+/* 评论加载状态样式 */
+.loading-indicator {
+    text-align: center;
+    padding: 15px;
+    color: #666;
+    font-size: 14px;
+    font-style: italic;
+}
+
+/* 评论空状态样式 */
+.empty-indicator {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+/* 评论错误状态样式 */
+.error-indicator {
+    text-align: center;
+    padding: 20px;
+    color: #d9534f;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+/* 重试按钮样式 */
+.retry-button {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.retry-button:hover {
+    background-color: #0056b3;
 }

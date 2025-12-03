@@ -1,33 +1,66 @@
-// src/config/ThemeConfig.ts
-/** 主题 key 联合类型 */
+/**
+ * 主题配置文件
+ * 定义了应用支持的所有主题，包括颜色变量和主题信息
+ */
+
+/**
+ * 主题 key 联合类型
+ * 定义了所有可用的主题标识符
+ */
 export type ThemeKey = 'default' | 'teal' | 'yellow' | 'pink' | 'dark' | 'grey' | 'purple' |'red';
 
-/** CSS 变量类型 */
+/**
+ * CSS 变量类型
+ * 定义了主题中使用的所有 CSS 变量
+ */
 export interface ThemeVariables {
+  /** 主色调 - 用于主要按钮、链接等 */
   '--primary': string;
+  /** 次要暖色调 1 - 用于辅助元素、高亮等 */
   '--secondary-warm-1': string;
+  /** 次要暖色调 2 - 用于更深层次的辅助元素 */
   '--secondary-warm-2': string;
+  /** 次要冷色调 - 用于对比元素、特殊标记等 */
   '--secondary-cool': string;
+  /** 中性背景色 - 用于页面背景 */
   '--neutral-bg': string;
+  /** 中性模块色 - 用于卡片、面板等模块背景 */
   '--neutral-module': string;
+  /** 中性主要文本色 - 用于主要内容文本 */
   '--neutral-text-main': string;
+  /** 中性次要文本色 - 用于次要内容、注释等 */
   '--neutral-text-secondary': string;
+  /** 中性边框色 - 用于分隔线、边框等 */
   '--neutral-border': string;
+  /** 中性阴影色 - 用于元素阴影效果 */
   '--neutral-shadow': string;
 }
 
-/** 单个主题配置类型 */
+/**
+ * 单个主题配置类型
+ * 定义了完整主题的结构
+ */
 export interface Theme {
+  /** 主题唯一标识符 */
   key: ThemeKey;
+  /** 主题显示名称 */
   name: string;
+  /** 主题 CSS 变量集合 */
   variables: ThemeVariables;
 }
 
-/** 主题变化回调函数类型 */
+/**
+ * 主题变化回调函数类型
+ * 用于主题切换时的通知
+ */
 export type ThemeChangeCallback = (theme: Theme) => void;
 
-/** 主题配置集合 */
+/**
+ * 主题配置集合
+ * 包含所有可用主题的具体配置
+ */
 export const THEMES: Record<ThemeKey, Theme> = {
+  /** 灰色主题 - Soft Ash */
   grey: {
     key: 'grey',
     name: 'Soft Ash',
@@ -44,13 +77,14 @@ export const THEMES: Record<ThemeKey, Theme> = {
       '--neutral-shadow': '#F2F2F2',
     },
   },
+  /** 深色主题 - Serene Noir */
   dark: {
     key: 'dark',
     name: 'Serene Noir',
     variables: {
       '--primary': '#2d2f33',
       '--secondary-warm-1': '#3d3f43',
-      '--secondary-warm-2': '#8b4513',
+      '--secondary-warm-2': '#1a1a1a',
       '--secondary-cool': '#4a5568',
       '--neutral-bg': '#121212',
       '--neutral-module': '#1e1e20',
@@ -60,6 +94,7 @@ export const THEMES: Record<ThemeKey, Theme> = {
       '--neutral-shadow': 'rgba(0, 0, 0, 0.3)',
     },
   },
+  /** 青色主题 - Lush Teal */
   teal: {
     key: 'teal',
     name: 'Lush Teal',
@@ -76,6 +111,7 @@ export const THEMES: Record<ThemeKey, Theme> = {
       '--neutral-shadow': '#e8f4f8',
     },
   },
+  /** 黄色主题 - Mellow Yellow */
   yellow: {
     key: 'yellow',
     name: 'Mellow Yellow',
@@ -92,6 +128,7 @@ export const THEMES: Record<ThemeKey, Theme> = {
       '--neutral-shadow': '#faf6ed',
     },
   },
+  /** 粉色主题 - Romantic Blush */
   pink: {
     key: 'pink',
     name: 'Romantic Blush',
@@ -108,6 +145,7 @@ export const THEMES: Record<ThemeKey, Theme> = {
       '--neutral-shadow': '#faf0f5',
     },
   },
+  /** 紫色主题 - Ethereal Violet */
   purple: {
     key: 'purple',
     name: 'Ethereal Violet',
@@ -124,6 +162,7 @@ export const THEMES: Record<ThemeKey, Theme> = {
       '--neutral-shadow': '#F3E8FF',
     },
   },
+  /** 红色主题 - Festive Vermilion */
   red: {
     key: 'red',
     name: 'Festive Vermilion',
@@ -142,5 +181,8 @@ export const THEMES: Record<ThemeKey, Theme> = {
   },
 };
 
-/** 默认主题 key */
+/**
+ * 默认主题 key
+ * 应用启动时使用的初始主题
+ */
 export const DEFAULT_THEME_KEY: ThemeKey = 'teal';
