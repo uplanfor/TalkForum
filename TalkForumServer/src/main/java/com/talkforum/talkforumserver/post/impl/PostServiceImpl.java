@@ -10,8 +10,10 @@ import com.talkforum.talkforumserver.common.util.MarkdownIntroHelper;
 import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.common.vo.PostListVO;
 import com.talkforum.talkforumserver.common.vo.PostVO;
+import com.talkforum.talkforumserver.constant.InteractionConstant;
 import com.talkforum.talkforumserver.constant.PostConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
+import com.talkforum.talkforumserver.interaction.InteractionMapper;
 import com.talkforum.talkforumserver.post.PostMapper;
 import com.talkforum.talkforumserver.post.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,15 +34,36 @@ public class PostServiceImpl implements PostService {
      */
     @Autowired
     private PostMapper postMapper;
+    
+    /**
+     * 互动数据访问层接口
+     */
+    @Autowired
+    private InteractionMapper interactionMapper;
 
     /**
      * 根据帖子ID获取帖子信息
      * @param postId 帖子ID
-     * @return 帖子实体对象
+     * @param userId 用户ID
+     * @return 帖子VO对象，包含互动内容
      */
     @Override
-    public Post getPost(Long postId) {
-        return postMapper.getPost(postId);
+    public PostVO getPost(Long postId, Long userId) {
+        // 查询帖子VO
+        PostVO postVO = postMapper.getPostVO(postId);
+        
+        // 为帖子设置互动内容
+        if (postVO != null) {
+            if (userId == null) {
+                postVO.setInteractContent(0);
+            } else {
+                // 查询用户对该帖子的互动内容
+                List<Integer> interactContents = interactionMapper.queryInteractContentByPostOrComment(InteractionConstant.INTERACTION_TYPE_POST, new Long[]{postId}, userId);
+                postVO.setInteractContent(interactContents != null && !interactContents.isEmpty() ? interactContents.get(0) : 0);
+            }
+        }
+        
+        return postVO;
     }
 
     /**
@@ -49,9 +72,12 @@ public class PostServiceImpl implements PostService {
      * @return 帖子列表VO，包含帖子列表、是否有更多和游标信息
      */
     @Override
-    public PostListVO getPosts(PostRequestDTO postRequestDTO) {
+    public PostListVO getPosts(PostRequestDTO postRequestDTO, Long userId) {
         // 查询帖子列表
         List<PostVO> posts = postMapper.getPosts(postRequestDTO);
+        
+        // 为每个帖子设置用户互动内容
+        setPostInteractionContent(posts, userId);
         
         // 判断是否有更多帖子
         boolean hasMore = posts.size() == postRequestDTO.getPageSize();
@@ -129,6 +155,9 @@ public class PostServiceImpl implements PostService {
         List<PostVO> list = postMapper.adminGetPosts(adminPostRequestDTO);
         // 计算总帖子数
         long total = postMapper.adminCountPosts(adminPostRequestDTO);
+        
+        // 管理员状态下直接忽略互动内容的赋值
+        
         return new PageVO<>(list, total);
     }
 
@@ -152,5 +181,31 @@ public class PostServiceImpl implements PostService {
     public void essencePost(Long postId, int isEssence) {
         // 调用Mapper更新帖子精华状态
         postMapper.essencePost(postId, isEssence);
+    }
+    
+    /**
+     * 为帖子列表设置用户互动内容
+     * @param posts 帖子列表
+     * @param userId 用户ID
+     */
+    private void setPostInteractionContent(List<PostVO> posts, Long userId) {
+        if (posts.isEmpty() || userId == null) {
+            // 如果帖子列表为空或用户未登录，设置互动内容为0
+            for (PostVO post : posts) {
+                post.setInteractContent(0);
+            }
+            return;
+        }
+        
+        // 提取帖子ID
+        Long[] postIds = posts.stream().map(PostVO::getId).toArray(Long[]::new);
+        
+        // 查询用户对这些帖子的互动内容
+        List<Integer> interactContents = interactionMapper.queryInteractContentByPostOrComment("post", postIds, userId);
+        
+        // 为每个帖子设置互动内容
+        for (int i = 0; i < posts.size(); i++) {
+            posts.get(i).setInteractContent(i < interactContents.size() ? interactContents.get(i) : 0);
+        }
     }
 }

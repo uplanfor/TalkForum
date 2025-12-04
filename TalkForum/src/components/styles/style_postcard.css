@@ -139,7 +139,7 @@
     justify-content: center;
     font-size: 14px;
     user-select: none;
-    color: var(--neutral-text-secondary);
+    color: var(--neutral-text-main);
     transition: color 0.2s ease;
 }
 
@@ -151,6 +151,16 @@
     width: 16px;
     height: 16px;
     margin-right: 4px;
+}
+
+/* 点赞按钮悬停效果 */
+.post-card .detail .like-btn:hover {
+    color: var(--primary);
+}
+
+/* 点赞按钮选中状态 */
+.post-card .detail .like-btn svg.liked {
+    color: var(--primary);
 }
 
 

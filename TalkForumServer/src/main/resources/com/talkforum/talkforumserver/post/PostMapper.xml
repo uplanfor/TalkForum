@@ -5,6 +5,15 @@
         SELECT * FROM post WHERE id = #{postId}
     </select>
 
+    <select id="getPostVO" resultType="com.talkforum.talkforumserver.common.vo.PostVO">
+        SELECT
+        id, title, brief, user_id, content,
+        club_id, status, is_essence, created_at, updated_at,
+        view_count, like_count, comment_count
+        FROM post
+        WHERE id = #{postId}
+    </select>
+
     <select id="countPassPost" resultType="long">
         SELECT COUNT(*) FROM post WHERE id = #{postId} AND status = 'PASS'
     </select>

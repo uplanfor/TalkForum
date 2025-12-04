@@ -20,6 +20,7 @@ export interface Comment {
   createdAt: string;        // 创建时间
   likeCount: number;        // 点赞数
   commentCount: number;     // 回复数
+  interactContent: number;  // 互动内容
 }
 
 /**

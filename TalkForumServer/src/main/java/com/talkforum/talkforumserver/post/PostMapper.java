@@ -13,6 +13,7 @@ import java.util.List;
 @Mapper
 public interface PostMapper {
     Post getPost(Long postId);
+    PostVO getPostVO(Long postId);
     Post getPostCheck(Long postId);
     List<PostVO> getPosts(PostRequestDTO postRequestDTO);
     long countPassPost(Long postId);

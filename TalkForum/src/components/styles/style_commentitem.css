@@ -51,6 +51,8 @@
     align-items: center;
     width: 70px;
     height: 100%;
+    cursor: pointer;
+    user-select: none;
 }
 
 .comment-item .comment-info .comment-footer span.comment-footer-like svg {
@@ -58,6 +60,30 @@
     margin-left: 3px;
     width: 18px;
     height: 18px;
+}
+
+.comment-item .comment-info .comment-footer span.comment-footer-like svg.liked {
+    color: var(--primary);
+}
+
+.comment-item .comment-info .comment-footer span.comment-footer-dislike {
+    display: flex;
+    align-items: center;
+    width: 30px;
+    height: 100%;
+    margin-left: 5px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.comment-item .comment-info .comment-footer span.comment-footer-dislike svg {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+}
+
+.comment-item .comment-info .comment-footer span.comment-footer-dislike svg.disliked {
+    color: var(--primary);
 }
 
 .comment-reply-item {

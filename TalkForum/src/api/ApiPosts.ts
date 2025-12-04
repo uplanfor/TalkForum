@@ -22,6 +22,7 @@ export interface PostType {
     viewCount: number;        // 浏览量
     likeCount: number;        // 点赞数
     commentCount: number;     // 评论数
+    interactContent: number;  // 互动内容(（参考interaction接口）
 }
 
 /**
@@ -141,7 +142,7 @@ export const postsAdminGetPostList = async(params: AdminPosstListParams) : Promi
  * @param status 审核状态
  * @returns 审核帖子的响应
  */
-export const postsAdminAuditPost = async (postId: string | number, status: number) : Promise<ApiResponse> => {
+export const postsAdminAuditPost = async (postId: string | number, status: string) : Promise<ApiResponse> => {
     return Request.put_auth<ApiResponse>(`/api/posts/admin/${postId}/audit`, {status});
 };
 

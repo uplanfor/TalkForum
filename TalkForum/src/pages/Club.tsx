@@ -6,7 +6,7 @@
  * - 关注的俱乐部列表
  * - 俱乐部最新帖子
  */
-import PostContainer from "../components/PostsContainer";
+import PostContainer, { PostContainerTargetType } from "../components/PostsContainer";
 import Nav from "../components/Nav";
 import "../assets/normalize.css"
 import "./styles/style_club.css"
@@ -46,7 +46,7 @@ const Club = () => {
         </div>
         
         {/* 帖子容器组件，展示俱乐部最新帖子 */}
-        <PostContainer />
+        <PostContainer targetType={PostContainerTargetType.CLUB}/>
     </>
 }
 

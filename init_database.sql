@@ -209,14 +209,14 @@ CREATE TABLE `notification` (
 CREATE TABLE `interaction` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '互动记录唯一标识',
   `user_id` bigint NOT NULL COMMENT '发起互动的用户ID（谁进行互动）',
-  `interact_type` varchar(16) NOT NULL COMMENT '互动类型（LIKE=点赞/DISLIKE=踩/FOLLOW=关注）',
+  `interact_content` tinyint NOT NULL COMMENT '互动内容',
   `interact_target_type` varchar(16) NOT NULL COMMENT '被互动的对象类型（COMMENT=评论/POST=帖子/USER=用户）',
   `interact_target` bigint NOT NULL COMMENT '被互动的对象ID（如帖子ID/评论ID/用户ID）',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '互动时间',
+  `interact_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '互动时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_user_interact` (`user_id`, `interact_target_type`, `interact_target`, `interact_type`) COMMENT '规范要求：复合唯一索引（避免重复互动）',
-  KEY `idx_interact_target` (`interact_target_type`, `interact_target`, `interact_type`) COMMENT '规范要求：复合索引（统计对象互动数量）',
-  KEY `idx_interaction_created` (`created_at`) COMMENT '按互动时间排序',
+  UNIQUE KEY `uk_user_interact` (`user_id`, `interact_target_type`, `interact_target`) COMMENT '规范要求：复合唯一索引（用户+互动类型+互动对象）',
+  KEY `idx_interact_target` (`interact_target_type`, `interact_target`, `interact_content`) COMMENT '规范要求：复合索引（统计对象互动数量）',
+  KEY `idx_interaction_created` (`interact_date`) COMMENT '按互动时间排序',
   CONSTRAINT `fk_interaction_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='互动表（记录互动记录，如点赞、踩，用户删除时级联删除互动记录）';
 

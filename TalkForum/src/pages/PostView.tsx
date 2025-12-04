@@ -21,12 +21,12 @@ import { parseMarkdown, type TocNode } from "../utils/MarkdownUtil";
 import { type PostType } from "../api/ApiPosts";
 import { ArrowLeftIcon, EllipsisHorizontalIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { useSelector } from "react-redux";
-import { commentPostComment } from "../api/ApiComment";
+import { commentPostComment } from "../api/ApiComments";
 import Msg from "../utils/msg";
 import { getSingleSimpleUserInfo } from "../utils/simpleUserInfoCache";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { copyToClipboard } from "../utils/clipboard";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import NotFound from "./NotFound";
 
 
@@ -57,6 +57,8 @@ const PostView = () => {
   const { postId } = useParams<{ postId: string }>();
   // 路由导航钩子
   const navigate = useNavigate();
+  // 获取当前路由位置
+  const location = useLocation();
   // 帖子是否存在的状态
   const [ok, setOk] = useState(true);
   // 渲染的帖子内容（Markdown转换后的HTML）
@@ -83,6 +85,7 @@ const PostView = () => {
     viewCount: 0,
     likeCount: 0,
     commentCount: 0,
+    interactContent: 0,
   });
 
   // 目录数据状态
@@ -136,6 +139,7 @@ const PostView = () => {
       await postsGetPostDetailInformation(postIdNum).then(async res => {
         if (res.success) {
           const post_result: PostType = res.data;
+          console.log(post_result);
           setPost({ ...post_result });
 
           const { html, tocNodeTree } = await parseMarkdown(post_result.content);
@@ -159,7 +163,28 @@ const PostView = () => {
    */
   useEffect(() => {
     loadPostDetail(postId!);
-  }, [postId, loadPostDetail]);
+    // 检测URL中的参数，如果存在则自动打开对应的对话框
+    const params = new URLSearchParams(location.search);
+    let hasParamToRemove = false;
+    
+    if (params.get('report') === 'true') {
+      setShowReportDialog(true);
+      // 移除URL中的report参数，避免刷新页面时再次触发
+      params.delete('report');
+      hasParamToRemove = true;
+    }
+    if (params.get('edit') === 'true') {
+      setShowPostDialog(true);
+      // 移除URL中的edit参数，避免刷新页面时再次触发
+      params.delete('edit');
+      hasParamToRemove = true;
+    }
+    // 如果有参数被移除，更新URL
+    // 使用replace: true来替换当前历史记录条目，避免回退时再次触发
+    if (hasParamToRemove) {
+      navigate({ search: params.toString() }, { replace: true });
+    }
+  }, [postId, loadPostDetail, location.search, navigate]);
 
   /**
    * 渲染目录树的递归函数

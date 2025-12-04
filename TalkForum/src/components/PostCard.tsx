@@ -7,35 +7,35 @@
 import { useSelector } from "react-redux";
 import { type RootState } from "../store";
 import "./styles/style_postcard.css"
-import { EyeIcon } from "@heroicons/react/20/solid";
-import { HandThumbUpIcon } from "@heroicons/react/24/solid";
-import { ChatBubbleBottomCenterIcon } from "@heroicons/react/24/solid";
+import { EyeIcon, HandThumbUpIcon, ChatBubbleBottomCenterIcon } from '@heroicons/react/24/outline';
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/solid";
 import dayjs from "dayjs";
 import { SpaceViewType, UserType } from "../constants/default";
 import { PostViewType } from "../constants/default";
 import { getSingleSimpleUserInfo } from "../utils/simpleUserInfoCache";
 import { copyToClipboard } from "../utils/clipboard";
-import { postsAdminSetPostAsEssence } from "../api/ApiPosts";
+import { postsAdminSetPostAsEssence, postsDeletePostAuth } from "../api/ApiPosts";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Msg from "../utils/msg";
+import { INTERACT_POST, interactionMakeInteractionWithPost } from "../api/ApiInteractions";
 
 /**
  * 帖子卡片组件属性接口
  */
 export interface PostCardProps {
     title?: string;          // 帖子标题（可选）
-    brief: string;          // 帖子简介
-    coverLink?: string;     // 封面图链接（可选）
-    userId: number;         // 发布者ID
-    id: number;             // 帖子ID
-    clubId?: number;        // 所属圈子ID（可选）
-    viewCount: number;      // 浏览量
-    likeCount: number;      // 点赞数
-    commentCount: number;   // 评论数
-    isEssence: number;      // 是否精华（0：非精华，1：精华）
-    createdAt: string;      // 发布时间
+    brief: string;           // 帖子简介
+    coverLink?: string;      // 封面图链接（可选）
+    userId: number;          // 发布者ID
+    id: number;              // 帖子ID
+    clubId?: number;         // 所属圈子ID（可选）
+    viewCount: number;       // 浏览量
+    likeCount: number;       // 点赞数
+    commentCount: number;    // 评论数
+    isEssence: number;       // 是否精华（0：非精华，1：精华）
+    createdAt: string;       // 发布时间
+    interactContent?: number;// 互动内容
 };
 
 /**
@@ -46,7 +46,7 @@ const PostCard = (props: PostCardProps) => {
     // 解构组件属性
     const { title, brief, coverLink,
         userId, id, clubId, createdAt, isEssence,
-        viewCount, likeCount, commentCount,
+        viewCount, likeCount, commentCount, interactContent
     } = props;
 
     // 路由导航钩子
@@ -63,17 +63,14 @@ const PostCard = (props: PostCardProps) => {
     // 当前点赞数的状态
     const [curLikeCount, setCurLikeCount] = useState(likeCount);
     
-    // 当前是否点赞的状态
-    const [isLiked, setIsLiked] = useState(false);
-    // 当前互动记录ID
-    const [interactionId, setInteractionId] = useState<number | null>(null);
+    // 点赞状态
+    const [isLiked, setIsLiked] = useState(interactContent === INTERACT_POST.LIKE);
 
     /**
      * 设置或取消帖子精华
      * @param {number} id - 帖子ID
      */
     const essencePost = async (id: number) => {
-        try {
             // 计算目标精华状态（取反当前状态）
             const targetEssence = curEssence != 0 ? 0 : 1;
             // 调用API设置精华状态
@@ -85,11 +82,9 @@ const PostCard = (props: PostCardProps) => {
                 } else {
                     throw new Error(res.message);
                 }
+            }).catch(err=>{
+                Msg.error(err.message);
             })
-        } catch (error) {
-            console.log(error);
-            Msg.error("Failed to set essence!");
-        }
     }
 
     /**
@@ -98,7 +93,12 @@ const PostCard = (props: PostCardProps) => {
      * @param {string} target - 目标视图类型
      */
     const openPost = (id: number, target: string) => {
-        navigate(`/post/${id}`);
+        if (target === PostViewType.EDIT) {
+            // 使用正常的push模式导航，保留历史记录
+            navigate(`/post/${id}?edit=true`);
+        } else {
+            navigate(`/post/${id}`);
+        }
     }
     
     /**
@@ -106,26 +106,53 @@ const PostCard = (props: PostCardProps) => {
      * @param {number} id - 帖子ID
      */
     const handleLike = async (id: number) => {
+        // 检查用户是否登录
+        if (!user.isLoggedIn) {
+            Msg.error("Please login first!");
+            return;
+        }
+
+        // 确定互动内容：如果已点赞则取消点赞，否则点赞
+        const targetInteractContent = isLiked ? INTERACT_POST.NONE : INTERACT_POST.LIKE;
+
         try {
-            if (isLiked) {
+            const res = await interactionMakeInteractionWithPost(id, targetInteractContent);
+            if (res.success) {
+                // 更新点赞状态
+                setIsLiked(!isLiked);
+                // 更新点赞数
+                setCurLikeCount(prev => isLiked ? prev - 1 : prev + 1);
+                Msg.success(isLiked ? "Like removed successfully!" : "Liked successfully!");
             } else {
+                throw new Error(res.message);
             }
-        } catch (error) {
-            console.error("互动操作失败:", error);
-            Msg.error("操作失败，请稍后重试");
+        } catch (err: any) {
+            Msg.error(err.message);
         }
     }
+
+
 
     /**
      * 删除帖子
      * @param {number} id - 帖子ID
      */
-    const deletePost = (id: number) => {
-        Msg.confirm("Are you sure to delete this post?").then(res => {
-            if (res) {
-                // TODO: 实现删除帖子功能
+    const deletePost = async (id: number) => {
+        try {
+            const result = await Msg.confirm("Are you sure to delete this post?");
+            if (result) {
+                postsDeletePostAuth(id).then(res => {
+                    if (res.success) {
+                        Msg.success("Delete post successfully!");
+                    } else {
+                        throw new Error(res.message);
+                    }
+                })
             }
-        })
+        } catch (error) {
+            console.log(error);
+            Msg.error("Failed to delete post!");
+        }
     }
 
     /**
@@ -133,11 +160,9 @@ const PostCard = (props: PostCardProps) => {
      * @param {number} id - 帖子ID
      */
     const reportPost = (id: number) => {
-        Msg.confirm("Are you sure to report this post?").then(res => {
-            if (res) {
-                // TODO: 实现举报帖子功能
-            }
-        })
+        // 跳转到帖子详情页并添加report参数，用于自动打开举报功能
+        // 使用正常的push模式导航，保留历史记录
+        navigate(`/post/${id}?report=true`);
     }
 
     /**
@@ -196,7 +221,7 @@ const PostCard = (props: PostCardProps) => {
             <span className="like-btn" onClick={(e) => {
                 e.stopPropagation();
                 handleLike(id);
-            }}> <HandThumbUpIcon className={isLiked ? "liked" : ""} /> {curLikeCount} </span> {/* 点赞数 */}
+            }}> <HandThumbUpIcon className={isLiked ? "liked" : ""} style={{color: isLiked ? "var(--primary)" : ""}}/> {curLikeCount} </span> {/* 点赞数 */}
             <span> <ChatBubbleBottomCenterIcon /> {commentCount}</span> {/* 评论数 */}
             {/* <span>{clubId}</span> */}
         </div>

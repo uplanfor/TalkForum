@@ -201,45 +201,38 @@
 /* 帖子互动区域样式 */
 .post-interaction {
     display: flex;
-    justify-content: flex-start;
-    padding: 16px 0;
-    border-top: 1px solid var(--neutral-border);
-    border-bottom: 1px solid var(--neutral-border);
+    width: fit-content;
+    margin: 9px auto;
+    background-color: var(--primary);
+    border-radius: 18px;
+    padding: 0 9px;
 }
 
-/* 点赞按钮样式 */
-.like-btn {
+.post-interaction div {
     display: flex;
+    width: 70px;
+    height: 35px;
     align-items: center;
-    background: none;
-    border: none;
-    cursor: pointer;
     color: var(--neutral-text-main);
-    font-size: 14px;
-    padding: 8px 16px;
-    border-radius: 20px;
-    transition: all 0.2s ease;
+    cursor: pointer;
+    user-select: none;
 }
 
-.like-btn:hover {
-    background-color: var(--neutral-hover);
+.post-interaction div svg {
+    width: 25px;
+    height: 25px;
 }
 
-.like-btn .svg-inline--fa {
-    width: 20px;
-    height: 20px;
-    margin-right: 6px;
-    transition: color 0.2s ease;
+/* 点赞状态样式 */
+.post-interaction div svg.liked {
+    color: var(--neutral-bg); /* 使用变量表示已点赞 */
 }
 
-.like-btn.liked {
-    color: var(--primary);
+/* 踩状态样式 */
+.post-interaction div svg.disliked {
+    color: var(--neutral-bg); /* 使用变量表示已点赞 */
 }
 
-.like-btn.liked .svg-inline--fa {
-    color: var(--primary);
-    fill: var(--primary);
-}
 
 /* .post-content table tr:nth-child(even) {
     background-color: var(--secondary-warm-1);

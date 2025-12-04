@@ -21,16 +21,17 @@ public interface PostService {
     /**
      * 根据帖子ID获取帖子信息
      * @param postId 帖子ID
-     * @return 帖子实体对象
+     * @param userId 用户ID
+     * @return 帖子VO对象，包含互动内容
      */
-    Post getPost(Long postId);
+    PostVO getPost(Long postId, Long userId);
     
     /**
      * 获取帖子列表
      * @param postRequestDTO 帖子请求DTO，包含分页、排序等参数
      * @return 帖子列表VO，包含帖子列表、是否有更多和游标信息
      */
-    PostListVO getPosts(PostRequestDTO postRequestDTO);
+    PostListVO getPosts(PostRequestDTO postRequestDTO, Long userId);
     
     /**
      * 发布帖子

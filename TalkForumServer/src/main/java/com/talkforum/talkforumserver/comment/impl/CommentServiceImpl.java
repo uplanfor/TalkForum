@@ -6,14 +6,18 @@ import com.talkforum.talkforumserver.common.dto.AdminGetCommentsDTO;
 import com.talkforum.talkforumserver.common.entity.Comment;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
 import com.talkforum.talkforumserver.common.vo.CommentListVO;
+import com.talkforum.talkforumserver.common.vo.CommentVO;
 import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.constant.CommentConstant;
+import com.talkforum.talkforumserver.constant.InteractionConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
+import com.talkforum.talkforumserver.interaction.InteractionMapper;
 import com.talkforum.talkforumserver.post.PostMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,20 +38,29 @@ public class CommentServiceImpl implements CommentService {
      */
     @Autowired
     PostMapper postMapper;
+    
+    /**
+     * 互动数据访问层接口
+     */
+    @Autowired
+    InteractionMapper interactionMapper;
 
     /**
      * 获取帖子的评论列表
      * @param postId 帖子ID
      * @param cursor 游标，用于分页查询
      * @param pageSize 每页大小
+     * @param userId 用户ID，可为null
      * @return 评论列表VO，包含评论列表、是否有更多和游标信息
      */
     @Override
-    public CommentListVO getComments(Long postId, Integer cursor, int pageSize) {
+    public CommentListVO getComments(Long postId, Integer cursor, int pageSize, Long userId) {
         // 查询评论列表
         List<Comment> comments = commentMapper.getComments(postId, cursor, pageSize);
+        // 转换为CommentVO并添加互动信息
+        List<CommentVO> commentVOs = convertToCommentVOList(comments, userId);
         return new CommentListVO(
-                comments, comments.size() == pageSize,
+                commentVOs, comments.size() == pageSize,
                 comments.isEmpty() ? null : comments.get(comments.size() - 1).getId());
     }
 
@@ -58,14 +71,17 @@ public class CommentServiceImpl implements CommentService {
      * @param pageSize 每页大小
      * @param rootId 根评论ID
      * @param parentId 父评论ID
+     * @param userId 用户ID，可为null
      * @return 评论回复列表VO，包含回复列表、是否有更多和游标信息
      */
     @Override
-    public CommentListVO getCommentReplyList(Long postId, Integer cursor, int pageSize, Long rootId, Long parentId) {
+    public CommentListVO getCommentReplyList(Long postId, Integer cursor, int pageSize, Long rootId, Long parentId, Long userId) {
         // 查询评论回复列表
         List<Comment> comments = commentMapper.getCommentReplies(postId, cursor, pageSize, rootId, parentId);
+        // 转换为CommentVO并添加互动信息
+        List<CommentVO> commentVOs = convertToCommentVOList(comments, userId);
         return new CommentListVO(
-                comments, comments.size() == pageSize,
+                commentVOs, comments.size() == pageSize,
                 comments.isEmpty() ? null : comments.get(comments.size() - 1).getId());
     }
 
@@ -169,5 +185,68 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void auditComment(Long commentId, String status) {
         commentMapper.auditComment(commentId, status);
+    }
+    
+    /**
+     * 将Comment转换为CommentVO
+     * @param comment Comment对象
+     * @return CommentVO对象
+     */
+    private CommentVO convertToCommentVO(Comment comment) {
+        CommentVO commentVO = new CommentVO();
+        commentVO.setId(comment.getId());
+        commentVO.setPostId(comment.getPostId());
+        commentVO.setUserId(comment.getUserId());
+        commentVO.setRootId(comment.getRootId());
+        commentVO.setParentId(comment.getParentId());
+        commentVO.setContent(comment.getContent());
+        commentVO.setStatus(comment.getStatus());
+        commentVO.setCreatedAt(comment.getCreatedAt());
+        commentVO.setLikeCount(comment.getLikeCount());
+        commentVO.setCommentCount(comment.getCommentCount());
+        return commentVO;
+    }
+    
+    /**
+     * 将Comment列表转换为CommentVO列表，并添加互动信息
+     * @param comments Comment列表
+     * @param userId 用户ID，可为null
+     * @return CommentVO列表
+     */
+    private List<CommentVO> convertToCommentVOList(List<Comment> comments, Long userId) {
+        List<CommentVO> commentVOs = new ArrayList<>();
+        if (comments.isEmpty()) {
+            return commentVOs;
+        }
+        
+        // 获取所有评论ID
+        Long[] commentIds = comments.stream().map(Comment::getId).toArray(Long[]::new);
+        
+        // 查询互动信息
+        List<Integer> interactContents = null;
+        if (userId != null) {
+            interactContents = interactionMapper.queryInteractContentByPostOrComment(InteractionConstant.INTERACTION_TYPE_COMMENT, commentIds, userId);
+            // 确保返回的互动信息数量与评论数量一致
+            if (interactContents == null || interactContents.size() != commentIds.length) {
+                interactContents = new ArrayList<>();
+                for (int i = 0; i < commentIds.length; i++) {
+                    interactContents.add(0);
+                }
+            }
+        }
+        
+        // 转换并添加互动信息
+        for (int i = 0; i < comments.size(); i++) {
+            CommentVO commentVO = convertToCommentVO(comments.get(i));
+            // 设置互动内容，如果没有互动信息则为0
+            if (userId != null && interactContents != null && i < interactContents.size()) {
+                commentVO.setInteractContent(interactContents.get(i));
+            } else {
+                commentVO.setInteractContent(0);
+            }
+            commentVOs.add(commentVO);
+        }
+        
+        return commentVOs;
     }
 }

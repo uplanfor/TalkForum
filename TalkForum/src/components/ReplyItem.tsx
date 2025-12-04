@@ -1,7 +1,6 @@
 /**
- * 评论项组件
- * 用于展示单个评论及其回复列表
- * 支持展开/折叠回复、加载更多回复、回复评论等功能
+ * 回复项组件
+ * 用于展示单个回复及其点赞/踩功能
  */
 import "./styles/style_commentitem.css"
 import { type Comment } from "../api/ApiComments";
@@ -10,43 +9,29 @@ import dayjs from "dayjs";
 import { type CommentTargetCallback } from "../pages/PostView";
 import { HandThumbUpIcon, HandThumbDownIcon } from "@heroicons/react/24/solid";
 import { useState, useEffect } from "react";
-import { commentGetCommentReplyList } from "../api/ApiComments";
 import { interactionMakeInteractionWithComment, INTERACT_COMMENT } from "../api/ApiInteractions";
 import Msg from "../utils/msg";
-import { throttle } from "../utils/debounce&throttle";
 import { useNavigate, useLocation } from "react-router-dom";
 import { SpaceViewType } from "../constants/default";
-import ReplyItem from "./ReplyItem";
 
 /**
- * 评论项组件属性接口
+ * 回复项组件属性接口
  * 继承自Comment接口，并添加了设置评论目标的回调函数
  */
-export interface CommentItemProps extends Comment {
+export interface ReplyItemProps extends Comment {
     setCommentTarget: CommentTargetCallback; // 设置评论目标的回调函数，用于回复评论
-    onInteractionChange?: (commentId: number, newInteractContent: number, newLikeCount: number) => void; // 互动状态变化回调
+    rootId: number; // 根评论ID
 }
 
 /**
- * 评论项组件
- * @param {CommentItemProps} props - 组件属性
+ * 回复项组件
+ * @param {ReplyItemProps} props - 组件属性
  */
-const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount, commentCount, postId, interactContent, onInteractionChange }: CommentItemProps) => {
+const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount, interactContent, rootId }: ReplyItemProps) => {
     // 路由导航钩子
     const navigate = useNavigate();
     // 当前路由信息钩子
     const location = useLocation();
-    // 回复列表状态
-    const [replyList, setReplyList] = useState<Comment[]>([]);
-    
-    // 是否展开回复列表状态
-    const [notFoldReplyList, setNotFoldReplyList] = useState(true);
-    
-    // 是否还有更多回复状态
-    const [hasMore, setHasMore] = useState(true);
-    
-    // 分页游标状态
-    const [cursor, setCursor] = useState<number | null>(null);
     
     // 当前点赞数的状态
     const [curLikeCount, setCurLikeCount] = useState(likeCount);
@@ -69,36 +54,6 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
     }, [likeCount]);
 
     /**
-     * 加载更多回复
-     * 通过API请求获取当前评论的更多回复，并更新回复列表
-     */
-    const loadMoreReplies = async () => {
-        try {
-            // 调用API获取回复列表
-            const res = await commentGetCommentReplyList(postId, cursor, id, null, 10);
-            if (res.success) {
-                // 更新回复列表
-                setReplyList(prev => [...prev,...res.data.data]);
-                // 更新是否还有更多回复
-                setHasMore(res.data.hasMore);
-                // 更新游标
-                setCursor(res.data.cursor);
-            } else {
-                throw new Error(res.message);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    /**
-     * 切换回复列表的展开/折叠状态
-     */
-    const changeFoldReplyList = () => {
-        setNotFoldReplyList(prev => !prev);
-    }
-
-    /**
      * 打开用户空间
      * @param {number} userId - 用户ID
      */
@@ -119,8 +74,8 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
     }
 
     /**
-     * 处理主评论点赞操作
-     * @param {number} id - 评论ID
+     * 处理点赞操作
+     * @param {number} id - 回复ID
      */
     const handleLike = async (id: number) => {
         try {
@@ -141,22 +96,14 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
                 // 更新点赞状态
                 setIsLiked(!isLiked);
                 
-                // 计算新的点赞数
-                let newLikeCount;
+                // 更新点赞数
                 if (isDisliked) {
                     // 如果之前是踩，现在是点赞，点赞数+2
                     setIsDisliked(false);
-                    newLikeCount = curLikeCount + 2;
-                    setCurLikeCount(newLikeCount);
+                    setCurLikeCount(prev => prev + 2);
                 } else {
                     // 正常点赞/取消点赞
-                    newLikeCount = isLiked ? curLikeCount - 1 : curLikeCount + 1;
-                    setCurLikeCount(newLikeCount);
-                }
-                
-                // 通知父组件更新评论列表中的互动状态
-                if (onInteractionChange) {
-                    onInteractionChange(id, newInteractContent, newLikeCount);
+                    setCurLikeCount(prev => isLiked ? prev - 1 : prev + 1);
                 }
             } else {
                 Msg.error(res.message);
@@ -167,8 +114,8 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
     }
     
     /**
-     * 处理主评论踩操作
-     * @param {number} id - 评论ID
+     * 处理踩操作
+     * @param {number} id - 回复ID
      */
     const handleDislike = async (id: number) => {
         try {
@@ -189,22 +136,14 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
                 // 更新踩状态
                 setIsDisliked(!isDisliked);
                 
-                // 计算新的点赞数
-                let newLikeCount;
+                // 更新点赞数
                 if (isLiked) {
                     // 如果之前是点赞，现在是踩，点赞数-2
                     setIsLiked(false);
-                    newLikeCount = curLikeCount - 2;
-                    setCurLikeCount(newLikeCount);
+                    setCurLikeCount(prev => prev - 2);
                 } else {
                     // 正常踩/取消踩
-                    newLikeCount = isDisliked ? curLikeCount + 1 : curLikeCount - 1;
-                    setCurLikeCount(newLikeCount);
-                }
-                
-                // 通知父组件更新评论列表中的互动状态
-                if (onInteractionChange) {
-                    onInteractionChange(id, newInteractContent, newLikeCount);
+                    setCurLikeCount(prev => isDisliked ? prev + 1 : prev - 1);
                 }
             } else {
                 Msg.error(res.message);
@@ -213,35 +152,21 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
             console.error(error);
         }
     }
-    
-    /**
-     * 节流处理的加载更多回复方法
-     * 限制调用频率，防止频繁请求API
-     */
-    const throttleLoadMoreReplies = throttle(loadMoreReplies, 1000);
 
     return (
-        <div className="comment-item">
-            {/* 用户头像 */}
+        <div className="comment-item comment-reply-item">
             <div className="comment-user-avatar">
                 <img src={getSingleSimpleUserInfo(userId).avatarLink} alt="user-avatar" onClick={() => openSpaceView(userId)} />
             </div>
-            
-            {/* 评论信息 */}
             <div className="comment-info">
-                {/* 用户名 */}
                 <h4 className="comment-user-name">{getSingleSimpleUserInfo(userId).name}</h4>
-                
-                {/* 评论内容 */}
                 <p className="comment-content">{content}</p>
-                
-                {/* 评论底部信息：时间、回复按钮、点赞数、踩数 */}
                 <p className="comment-footer">
                     <span className="comment-footer-time">{dayjs(createdAt).format("HH:mm, MMM DD, YYYY")} </span>
                     <span className="comment-footer-reply"
                         onClick={() => { 
-                            // 设置评论目标，用于回复当前评论
-                            setCommentTarget({ parentId: id, rootId: id, userId, commentToContent: content }) 
+                            // 设置评论目标，用于回复当前回复
+                            setCommentTarget({ parentId: id, rootId: rootId, userId, commentToContent: content }) 
                         }}> Reply</span>
                     <span className="comment-footer-like" onClick={() => handleLike(id)}>
                         <HandThumbUpIcon className={isLiked ? "liked" : ""}/> {curLikeCount}
@@ -250,32 +175,9 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
                         <HandThumbDownIcon className={isDisliked ? "disliked" : ""} />
                     </span>
                 </p>
-                
-                {/* 回复列表（如果有回复） */}
-                {commentCount > 0 &&
-                    (<div className="comment-reply-list">
-                        {/* 展开时显示回复列表 */}
-                        {notFoldReplyList && (
-                            replyList.map((comment) => (
-                                <ReplyItem
-                                    key={comment.id}
-                                    {...comment}
-                                    setCommentTarget={setCommentTarget}
-                                    rootId={id}
-                                />
-                            ))
-                        )}
-                        
-                        {/* 回复总数和操作按钮 */}
-                        <p className="reply-total">{commentCount} Replies
-                            {/* 展开/折叠按钮 */}
-                            {<span onClick={changeFoldReplyList}>{notFoldReplyList ? "Fold" : "Unfold"}</span>}
-                            {/* 加载更多按钮（如果还有更多回复） */}
-                            {hasMore && <span onClick={throttleLoadMoreReplies}>See More</span>} </p>
-                    </div>)}
             </div>
         </div>
     )
 }
 
-export default CommentItem;
+export default ReplyItem;

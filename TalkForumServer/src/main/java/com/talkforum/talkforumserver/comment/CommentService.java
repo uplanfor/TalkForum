@@ -16,9 +16,10 @@ public interface CommentService {
      * @param postId 帖子ID
      * @param cursor 游标，用于分页查询
      * @param pageSize 每页大小
+     * @param userId 用户ID，可为null
      * @return 评论列表VO，包含评论列表、是否有更多和游标信息
      */
-    public CommentListVO getComments(Long postId, Integer cursor, int pageSize);
+    public CommentListVO getComments(Long postId, Integer cursor, int pageSize, Long userId);
     
     /**
      * 获取评论的回复列表
@@ -27,9 +28,10 @@ public interface CommentService {
      * @param pageSize 每页大小
      * @param rootId 根评论ID
      * @param parentId 父评论ID
+     * @param userId 用户ID，可为null
      * @return 评论回复列表VO，包含回复列表、是否有更多和游标信息
      */
-    public CommentListVO getCommentReplyList(Long postId, Integer cursor, int pageSize, Long rootId, Long parentId);
+    public CommentListVO getCommentReplyList(Long postId, Integer cursor, int pageSize, Long rootId, Long parentId, Long userId);
     
     /**
      * 根据评论ID获取评论

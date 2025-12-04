@@ -5,6 +5,7 @@ import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
 import com.talkforum.talkforumserver.common.dto.*;
 import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
+import com.talkforum.talkforumserver.common.vo.PostListVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -27,26 +28,39 @@ public class PostController {
     /**
      * 根据帖子ID获取帖子详情
      * @param postId 帖子ID
+     * @param token 登录凭证Token（可选）
      * @return 帖子详情
      */
     @GetMapping("/{postId}")
-    public Result getPost(@PathVariable Long postId) {
-        return Result.success("Success to get post information!", postService.getPost(postId));
+    public Result getPost(@PathVariable Long postId, @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false) String token) {
+        // 解析Token获取用户ID，未登录则为null
+        Long userId = null;
+        if (token != null) {
+            Map<String, Object> information = jwtHelper.parseJWTToken(token);
+            userId = ((Number)information.get("id")).longValue();
+        }
+        
+        return Result.success("Success to get post information!", postService.getPost(postId, userId));
     }
 
     /**
      * 获取帖子列表
      * @param postRequestDTO 帖子列表请求DTO
+     * @param token 登录凭证Token（可选）
      * @return 帖子列表
      */
     @GetMapping("/")
     @Validated
-    public Result getPosts(PostRequestDTO postRequestDTO) {
-//        PostListVO postListVO = postService.getPosts(postRequestDTO);
-//        if (postListVO.getData().isEmpty()) {
-//            return Result.error("No more posts!", postListVO);
-//        }
-        return Result.success("Success to get post list!", postService.getPosts(postRequestDTO));
+    public Result getPosts(PostRequestDTO postRequestDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false) String token) {
+        // 解析Token获取用户ID，未登录则为null
+        Long userId = null;
+        if (token != null) {
+            Map<String, Object> information = jwtHelper.parseJWTToken(token);
+            userId = ((Number)information.get("id")).longValue();
+        }
+        
+        PostListVO postListVO = postService.getPosts(postRequestDTO, userId);
+        return Result.success("Success to get post list!", postListVO);
     }
 
     /**
@@ -101,12 +115,14 @@ public class PostController {
     /**
      * 管理员获取帖子列表
      * @param adminPostRequestDTO 管理员帖子列表请求DTO
+     * @param token 登录凭证Token
      * @return 帖子列表
      */
     @ModeratorRequired
     @GetMapping("/admin")
     @Validated
-    public Result getPostsWithAdminRight(AdminPostRequestDTO adminPostRequestDTO) {
+    public Result getPostsWithAdminRight(AdminPostRequestDTO adminPostRequestDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+        // 管理员状态下不传递userId，不进行互动内容赋值
         return Result.success("Success to get post list!", postService.getPostsWithAdminRight(adminPostRequestDTO));
     }
 

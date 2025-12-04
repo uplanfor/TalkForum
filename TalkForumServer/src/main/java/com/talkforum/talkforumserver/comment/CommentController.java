@@ -37,13 +37,19 @@ public class CommentController {
      * @param postId 帖子ID
      * @param cursor 游标，用于分页
      * @param pageSize 每页大小
+     * @param token 登录凭证Token
      * @return 评论列表
      */
     @GetMapping("/")
     @Validated
-    public Result getCommentList(@NotNull long postId, Integer cursor, @NotNull int pageSize) {
+    public Result getCommentList(@NotNull long postId, Integer cursor, @NotNull int pageSize, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+        Long userId = null;
+        if (token != null) {
+            Map<String, Object> information = jwtHelper.parseJWTToken(token);
+            userId = ((Number) information.get("id")).longValue();
+        }
         return Result.success("Successfully get comment list!",
-                commentService.getComments(postId, cursor, pageSize));
+                commentService.getComments(postId, cursor, pageSize, userId));
     }
 
     /**
@@ -53,13 +59,19 @@ public class CommentController {
      * @param pageSize 每页大小
      * @param rootId 根评论ID
      * @param parentId 父评论ID
+     * @param token 登录凭证Token
      * @return 评论回复列表
      */
     @GetMapping("/replies")
     @Validated
-    public Result getCommentReplyList(@NotNull long postId, Integer cursor, @NotNull int pageSize, @NotNull Long rootId, Long parentId) {
+    public Result getCommentReplyList(@NotNull long postId, Integer cursor, @NotNull int pageSize, @NotNull Long rootId, Long parentId, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+        Long userId = null;
+        if (token != null) {
+            Map<String, Object> information = jwtHelper.parseJWTToken(token);
+            userId = ((Number) information.get("id")).longValue();
+        }
         return Result.success("Successfully get comment replies",
-                commentService.getCommentReplyList(postId, cursor, pageSize, rootId, parentId));
+                commentService.getCommentReplyList(postId, cursor, pageSize, rootId, parentId, userId));
     }
 
     /**

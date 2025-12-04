@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./styles/style_admincomments.css";
-import { commentAdminGetCommentsByPage } from "../api/ApiComment";
-import type { Comment, CommentPageResponse } from "../api/ApiComment";
+import { commentAdminGetCommentsByPage } from "../api/ApiComments";
+import type { Comment, CommentPageResponse } from "../api/ApiComments";
 import type ApiResponse from "../api/ApiResponse";
 
 const AdminComments = () => {
