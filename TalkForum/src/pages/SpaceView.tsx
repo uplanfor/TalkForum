@@ -33,8 +33,10 @@ const SpaceView = ({}: SpaceViewProps) => {
 
   // 根据type设置InfoBackground的类型
   const getInfoBackgroundType = () => {
-    if (validType === "club") {
+    if (validType === PostContainerTargetType.CLUB) {
       return InfoBackgroundType.CLUB;
+    } else if (validType === PostContainerTargetType.USER) {
+      return InfoBackgroundType.USER;
     } else {
       return InfoBackgroundType.SELF;
     }
@@ -81,7 +83,7 @@ const SpaceView = ({}: SpaceViewProps) => {
       </div>
       <InfoBackground 
         targetId={spaceId}
-        targetType={validType}
+        targetType={getInfoBackgroundType()}
       />
       <PostContainer 
         targetType={validType} 

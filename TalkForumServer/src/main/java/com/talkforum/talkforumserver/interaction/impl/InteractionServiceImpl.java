@@ -28,8 +28,14 @@ public class InteractionServiceImpl implements InteractionService {
                 break;
             }
             case InteractionConstant.INTERACTION_TYPE_USER: {
+                System.out.println(interactionRequestDTO);
                 interactionMapper.makeInteractionWithUser(interactionRequestDTO);
-                break;
+                if (interactionRequestDTO.getInteractContent() == InteractionConstant.USER_FOLLOWING) {
+                    return Result.success("Success to follow!");
+                } else {
+                    return Result.success("Success to unfollow!");
+                }
+//                break;
             }
             default: {
                 return Result.error("Unknown interaction type!");

@@ -61,3 +61,15 @@ export const interactionMakeInteractionWithComment = (interactId: number, intera
     return Request.post_auth<ApiResponse>(`/api/interactions/`, 
         { interactId, interactContent, interactType: INTERACT_TYPE.COMMENT });
 };
+
+/**
+ * 关注或取消关注用户
+ * @param interactId 对象id
+ * @param follow 关注或取消关注
+ * @returns 
+ */
+export const interactionsFollowOrUnfollowUser = (interactId: number, follow: boolean): Promise<ApiResponse> => {
+    return Request.post_auth<ApiResponse>(`/api/interactions/`, 
+        { interactId, interactContent: follow ? INTERACT_USER.FOLLOW : INTERACT_USER.UNFOLLOW, 
+            interactType: INTERACT_TYPE.USER });
+};

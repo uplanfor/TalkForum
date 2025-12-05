@@ -43,7 +43,7 @@
                     #{userId}
                 </foreach>
             </if>
-            <if test="isEssence == 1">AND is_essence = 1</if>
+            <if test="isEssence != null">AND is_essence = #{isEssence}</if>
         </where>
         ORDER BY id DESC <!-- 按id降序，id越大越新 -->
         LIMIT #{pageSize}

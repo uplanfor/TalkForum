@@ -10,10 +10,12 @@ import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.CookieHelper;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.common.util.PasswordHelper;
+import com.talkforum.talkforumserver.common.vo.AuthVO;
 import com.talkforum.talkforumserver.common.vo.UserVO;
 import com.talkforum.talkforumserver.constant.RedisKeyConstant;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
+import com.talkforum.talkforumserver.interaction.InteractionMapper;
 import com.talkforum.talkforumserver.user.UserMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,23 +26,26 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class AuthServiceImpl implements AuthService {
-    @Autowired
-    private AuthMapper authMapper;
+//    @Autowired
+//    private AuthMapper authMapper;
     @Autowired
     private UserMapper userMapper;
     @Autowired
     private JWTHelper jwtHelper;
     @Autowired
+    private InteractionMapper interactionMapper;
+    @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
-    public UserVO login(LoginDTO loginDTO, HttpServletResponse response) throws BusinessRuntimeException {
+    public AuthVO login(LoginDTO loginDTO, HttpServletResponse response) throws BusinessRuntimeException {
         User loginCheck = userMapper.getUserLoginInfoByNameOrEmail(loginDTO.nameOrEmail);
         if (loginCheck == null) {
             throw new BusinessRuntimeException("Wrong username or password!");
@@ -57,7 +62,9 @@ public class AuthServiceImpl implements AuthService {
             CookieHelper.setCookie(response, ServerConstant.LOGIN_COOKIE, jwtToken);
             loginCheck.lastLoginAt = new Date();
             stringRedisTemplate.opsForValue().set(RedisKeyConstant.TOKEN_USER + loginCheck.id, jwtToken, jwtHelper.getExpire(), TimeUnit.MILLISECONDS);
-            return new UserVO(loginCheck);
+            // 生成认证信息
+            return new AuthVO(new UserVO(loginCheck),
+                    interactionMapper.queryInteractFollowingByUserId(loginCheck.id));
         }  else {
             throw new BusinessRuntimeException("Wrong username or password!");
         }
@@ -71,10 +78,12 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public UserVO auth(long userId, HttpServletResponse response)
+    public AuthVO auth(long userId, HttpServletResponse response)
     {
         try {
-            return userMapper.getUserVOById(userId);
+            List<Long> arr= interactionMapper.queryInteractFollowingByUserId(userId);
+            return new AuthVO(userMapper.getUserVOById(userId),
+                    interactionMapper.queryInteractFollowingByUserId(userId));
         } catch (Exception e) {
             logout(userId, response);
             throw new BusinessRuntimeException("Timeout, please sign in again!");

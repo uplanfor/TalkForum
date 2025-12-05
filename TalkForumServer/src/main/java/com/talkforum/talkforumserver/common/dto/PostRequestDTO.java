@@ -8,7 +8,7 @@ public class PostRequestDTO {
     String keyword;
     Long[] clubIds;
     Long[] userIds;
-    int isEssence = 0;
+    Integer isEssence;
 
     Long cursor;
     @NotNull(message = "Page size cannot be null!")

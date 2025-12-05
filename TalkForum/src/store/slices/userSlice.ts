@@ -1,8 +1,8 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { DefaultBackgroundUrl, DefaultAvatarUrl } from '../../constants/default';
-import type { UserInfo } from '../../api/ApiAuth';
+import type { AuthInfo } from '../../api/ApiAuth';
 
-interface UserState extends UserInfo {
+interface UserState extends AuthInfo {
     isLoggedIn: boolean;
 }
 
@@ -18,6 +18,7 @@ const initialState: UserState = {
     isLoggedIn: false,
     fansCount: 0,
     followingCount: 0,
+    following: [],
 };
 
 const userSlice = createSlice({
@@ -48,12 +49,28 @@ const userSlice = createSlice({
             // state = {...initialState };
             // 正确的写法
             return {...initialState }
+        },
+        changeUserFollowing: (state, action: PayloadAction<number>) => {
+            const targetId = action.payload;
+            const index = state.following.indexOf(targetId);
+            if (index === -1) {
+                state.following.push(targetId);
+                state.followingCount += 1;
+                if (targetId == state.id) {
+                    state.fansCount += 1;
+                }
+            } else {
+                state.following.splice(index, 1);   
+                state.followingCount -= 1;
+                if (targetId == state.id) {
+                    state.fansCount -= 1;
+                }
+            }
         }
-        ,
     },
 });
 
 
-export const { userLogin, userLogout } = userSlice.actions;
+export const { userLogin, userLogout, changeUserFollowing } = userSlice.actions;
 
 export default userSlice.reducer;

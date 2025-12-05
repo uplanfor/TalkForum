@@ -20,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 帖子服务实现类
@@ -203,9 +205,15 @@ public class PostServiceImpl implements PostService {
         // 查询用户对这些帖子的互动内容
         List<Integer> interactContents = interactionMapper.queryInteractContentByPostOrComment("post", postIds, userId);
         
-        // 为每个帖子设置互动内容
-        for (int i = 0; i < posts.size(); i++) {
-            posts.get(i).setInteractContent(i < interactContents.size() ? interactContents.get(i) : 0);
+        // 创建帖子ID到互动内容的映射
+        Map<Long, Integer> interactContentMap = new HashMap<>();
+        for (int i = 0; i < postIds.length && i < interactContents.size(); i++) {
+            interactContentMap.put(postIds[i], interactContents.get(i));
+        }
+        
+        // 为每个帖子设置对应的互动内容
+        for (PostVO post : posts) {
+            post.setInteractContent(interactContentMap.getOrDefault(post.getId(), 0));
         }
     }
 }

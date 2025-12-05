@@ -13,6 +13,8 @@ import { debounce } from "../utils/debounce&throttle";
 import { requestSimpleUserInfoCache } from "../utils/simpleUserInfoCache";
 import { getCache, setCache } from "../utils/postsContainerCache";
 import type ApiResponse from "../api/ApiResponse";
+import { useDispatch, useSelector } from "react-redux";
+import { type RootState, type AppDispatch } from "../store";
 
 /**
  * 帖子容器组件的目标类型常量
@@ -44,7 +46,13 @@ const PostContainer = ({
   targetType,
   targetId,
   defaultTab = 0,
-}: PostContainerProps) => {
+}: PostContainerProps) => {  
+  // Redux dispatch钩子
+  const dispatch = useDispatch<AppDispatch>();
+  
+  // 从Redux获取用户信息
+  const {following} = useSelector((state: RootState) => state.user);
+
   // 帖子数据状态
   const [posts, setPosts] = useState<PostCardProps[]>([]);
   
@@ -75,6 +83,9 @@ const PostContainer = ({
   const curTabIndexRef = useRef(curTabIndex);
   const tabsRef = useRef(tabs);
   
+  // 使用useRef来跟踪是否已经执行过初始加载，解决React StrictMode下重复加载的问题
+  const hasInitialLoaded = useRef(false);
+  
   // 同步ref和state
   useEffect(() => {
     curTabIndexRef.current = curTabIndex;
@@ -84,8 +95,9 @@ const PostContainer = ({
     tabsRef.current = tabs;
   }, [tabs]);
 
-  // 根据targetType动态生成tabs
+  // 统一处理缓存检查、tabs生成和初始加载的useEffect
   useEffect(() => {
+    // 根据targetType动态生成tabs
     let newTabs: string[] = [];
     
     switch (targetType) {
@@ -93,12 +105,7 @@ const PostContainer = ({
         newTabs = ["All", "Essence", "Likes"];
         break;
       case PostContainerTargetType.HOME:
-        newTabs = ["Latest", "Essence"];
-        // 如果用户登录了，添加Following标签
-        // TODO: 检查用户登录状态
-        // if (isLoggedIn) {
-        //   newTabs.push("Following");
-        // }
+          newTabs = ["Latest", "Essence", "Following"];
         break;
       case PostContainerTargetType.USER:
         newTabs = ["All", "Essence"];
@@ -114,19 +121,6 @@ const PostContainer = ({
     
     // 检查是否有缓存数据
     const cacheItem = getCache(targetType, targetId);
-    if (cacheItem) {
-      // 使用缓存的标签索引，确保不超出新生成的tabs长度
-      setCurTabIndex(Math.min(cacheItem.curTabIndex, newTabs.length - 1));
-    } else {
-      // 设置默认标签索引，确保不超出新生成的tabs长度
-      setCurTabIndex(Math.min(defaultTab, newTabs.length - 1));
-    }
-  }, [targetType, targetId, defaultTab]);
-
-  // 组件挂载后检查缓存或初始化状态
-  useEffect(() => {
-    // 检查是否有缓存数据
-    const cacheItem = getCache(targetType, targetId);
     
     if (cacheItem) {
       // 使用缓存的数据
@@ -135,7 +129,9 @@ const PostContainer = ({
       setHasMore(cacheItem.hasMore);
       setIsError(false);
       setIsRefreshing(false);
-      setCurTabIndex(cacheItem.curTabIndex);
+      // 使用缓存的标签索引，确保不超出新生成的tabs长度
+      setCurTabIndex(Math.min(cacheItem.curTabIndex, newTabs.length - 1));
+      hasInitialLoaded.current = true; // 标记已加载，避免后续重复加载
     } else {
       // 没有缓存，重置状态
       setCursor(null);
@@ -143,27 +139,19 @@ const PostContainer = ({
       setIsError(false);
       setHasMore(true);
       setIsRefreshing(false);
-      hasInitialLoaded.current = false;
+      // 设置默认标签索引，确保不超出新生成的tabs长度
+      setCurTabIndex(Math.min(defaultTab, newTabs.length - 1));
+      
+      // 只有在未加载过的情况下才执行初始加载
+      if (!hasInitialLoaded.current) {
+        hasInitialLoaded.current = true;
+        // 使用setTimeout确保在下一个事件循环中调用loadMore，避免在当前渲染周期内调用
+        setTimeout(() => {
+          loadMore();
+        }, 0);
+      }
     }
-  }, [targetType, targetId]);
-
-  // 使用useRef来跟踪是否已经执行过初始加载，解决React StrictMode下重复加载的问题
-  const hasInitialLoaded = useRef(false);
-
-  // 使用另一个useEffect来执行实际的初始加载，确保在StrictMode下只执行一次
-  useEffect(() => {
-    // 检查是否有缓存数据，如果有则不执行初始加载
-    const cacheItem = getCache(targetType, targetId);
-    if (cacheItem || hasInitialLoaded.current || isRefreshing || isLoadingRef.current) {
-      return;
-    }
-    
-    // 标记已经执行过初始加载
-    hasInitialLoaded.current = true;
-    
-    // 触发loadMore来加载初始帖子
-    loadMore();
-  }, []); // 只在组件首次挂载时执行，不在curTabIndex变化时执行
+  }, [targetType, targetId, defaultTab, following]); // 只依赖following，而不是整个user对象
 
   /**
    * 处理刷新操作
@@ -180,8 +168,7 @@ const PostContainer = ({
     setPosts([]);
     setIsError(false);
     setHasMore(true);
-    // 重置初始加载标记，允许重新加载
-    hasInitialLoaded.current = false;
+    // 不重置hasInitialLoaded，避免影响初始加载逻辑
     
     // 触发loadMore来加载新的帖子
     await loadMore();
@@ -195,8 +182,7 @@ const PostContainer = ({
   const handleReload = async () => {
     setIsError(false);
     setHasMore(true);
-    // 重置初始加载标记，允许重新加载
-    hasInitialLoaded.current = false;
+    // 不重置hasInitialLoaded，避免影响初始加载逻辑
     // 触发loadMore来重新加载帖子
     await loadMore();
   };
@@ -218,12 +204,18 @@ const PostContainer = ({
     setPosts([]);
     setIsError(false);
     setHasMore(true);
-    hasInitialLoaded.current = false;
+    // 不重置hasInitialLoaded，避免影响初始加载逻辑
     
     // 等待状态更新后再调用loadMore
-    setTimeout(() => {
+    // 使用flushSync确保状态同步更新
+    await new Promise(resolve => {
+      setTimeout(resolve, 0);
+    });
+    
+    // 再次检查是否仍然需要加载（防止用户快速切换标签）
+    if (index === curTabIndexRef.current) {
       loadMore();
-    }, 0);
+    }
   };
 
   /**
@@ -270,6 +262,10 @@ const PostContainer = ({
         // 设置API请求锁为true（使用ref立即更新）
         isLoadingRef.current = true;
         setIsLoading(true);
+
+        if (currentTab == undefined) {
+          return;
+        }
         
         // 根据当前标签和targetType确定查询参数
         const queryParams: any = { cursor, pageSize: 10 };
@@ -291,7 +287,8 @@ const PostContainer = ({
           case PostContainerTargetType.HOME:
             // HOME类型：查询首页帖子，可能需要根据标签过滤
             if (currentTab === "Following") {
-              // TODO: 实现关注用户的帖子查询
+              // 添加关注用户的ID到查询参数
+              queryParams.userIds = [0, ...following];
             }
             break;
           case PostContainerTargetType.USER:
@@ -317,11 +314,11 @@ const PostContainer = ({
             try {
               // 获取帖子列表
               const res = await postsGetPostList(queryParams);
-              console.log("API响应:", {
-                dataCount: res.data?.data?.length || 0,
-                nextCursor: res.data?.nextCursor,
-                isEssenceParam: queryParams.isEssence
-              });
+              // console.log("API响应:", {
+              //   dataCount: res.data?.data?.length || 0,
+              //   nextCursor: res.data?.nextCursor,
+              //   isEssenceParam: queryParams.isEssence
+              // });
 
               // 收集需要缓存的用户ID
               let needCacheTarget: number[] = [];
@@ -340,7 +337,7 @@ const PostContainer = ({
               }
               resolve(res);
             } catch (err) {
-              console.error("API调用失败:", err);
+              // console.error("API调用失败:", err);
               reject(err)
             }
           }, 1024);
@@ -378,7 +375,7 @@ const PostContainer = ({
       } catch (error) {
         // 加载失败，设置错误状态
         setIsError(true);
-        console.error("加载帖子失败:", error);
+        // console.error("加载帖子失败:", error);
         
         // 发生错误时不更新缓存，保持之前的数据
       } finally {
@@ -387,13 +384,13 @@ const PostContainer = ({
         setIsLoading(false);
         setIsRefreshing(false);
       }
-  }, [targetType, targetId, cursor, hasMore, isError, isRefreshing]);
+  }, [targetType, targetId, following]); // 减少依赖项，只依赖必要的props
 
   /**
    * 防抖处理的加载更多方法
    * 限制调用频率，防止频繁请求API
    */
-  const debounceLoadMore = useRef(debounce(loadMore, 1000)).current;
+  const debounceLoadMore = useRef(debounce(() => loadMore(), 1000)).current;
 
   return (
     <div className="container">
@@ -415,7 +412,7 @@ const PostContainer = ({
 
         {/* 无限滚动组件 */}
         <InfiniteScroll 
-          initialLoad={false}
+          initialLoad={true}
           loadMore={debounceLoadMore} 
           hasMore={hasMore} 
           threshold={512} 

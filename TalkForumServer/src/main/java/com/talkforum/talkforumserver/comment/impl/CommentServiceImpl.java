@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 评论服务实现类
@@ -224,23 +226,24 @@ public class CommentServiceImpl implements CommentService {
         
         // 查询互动信息
         List<Integer> interactContents = null;
+        Map<Long, Integer> interactContentMap = new HashMap<>();
         if (userId != null) {
             interactContents = interactionMapper.queryInteractContentByPostOrComment(InteractionConstant.INTERACTION_TYPE_COMMENT, commentIds, userId);
-            // 确保返回的互动信息数量与评论数量一致
-            if (interactContents == null || interactContents.size() != commentIds.length) {
-                interactContents = new ArrayList<>();
-                for (int i = 0; i < commentIds.length; i++) {
-                    interactContents.add(0);
+            
+            // 创建评论ID到互动内容的映射
+            if (interactContents != null) {
+                for (int i = 0; i < commentIds.length && i < interactContents.size(); i++) {
+                    interactContentMap.put(commentIds[i], interactContents.get(i));
                 }
             }
         }
         
         // 转换并添加互动信息
-        for (int i = 0; i < comments.size(); i++) {
-            CommentVO commentVO = convertToCommentVO(comments.get(i));
+        for (Comment comment : comments) {
+            CommentVO commentVO = convertToCommentVO(comment);
             // 设置互动内容，如果没有互动信息则为0
-            if (userId != null && interactContents != null && i < interactContents.size()) {
-                commentVO.setInteractContent(interactContents.get(i));
+            if (userId != null) {
+                commentVO.setInteractContent(interactContentMap.getOrDefault(comment.getId(), 0));
             } else {
                 commentVO.setInteractContent(0);
             }

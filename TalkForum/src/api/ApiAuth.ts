@@ -23,11 +23,16 @@ export interface UserInfo {
     followingCount: number;        // 关注数量
 }
 
+
+export interface AuthInfo extends UserInfo {
+    following: number[];          // 关注列表
+}
+
 /**
  * 认证响应接口
  * 扩展了ApiResponse接口，包含UserInfo类型的数据
  */
-export interface AuthResponse extends ApiResponse<UserInfo> {}
+export interface AuthResponse extends ApiResponse<AuthInfo> {}
 
 /**
  * 用户登录

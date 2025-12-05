@@ -42,7 +42,9 @@ public class CommentController {
      */
     @GetMapping("/")
     @Validated
-    public Result getCommentList(@NotNull long postId, Integer cursor, @NotNull int pageSize, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+    public Result getCommentList(
+            @NotNull long postId, Integer cursor, @NotNull int pageSize,
+            @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false) String token) {
         Long userId = null;
         if (token != null) {
             Map<String, Object> information = jwtHelper.parseJWTToken(token);
@@ -64,7 +66,10 @@ public class CommentController {
      */
     @GetMapping("/replies")
     @Validated
-    public Result getCommentReplyList(@NotNull long postId, Integer cursor, @NotNull int pageSize, @NotNull Long rootId, Long parentId, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+    public Result getCommentReplyList(
+            @NotNull long postId, Integer cursor,
+            @NotNull int pageSize, @NotNull Long rootId,
+            Long parentId, @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false) String token) {
         Long userId = null;
         if (token != null) {
             Map<String, Object> information = jwtHelper.parseJWTToken(token);

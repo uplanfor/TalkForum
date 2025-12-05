@@ -200,19 +200,19 @@
     <select id="queryInteractContentByPostOrComment" resultType="java.lang.Integer">
         SELECT COALESCE(i.interact_content, 0) as interact_content
         FROM (
-            <foreach collection="interactTargets" item="targetId" separator="UNION ALL">
-                SELECT #{targetId} as target_id
+            <foreach collection="interactTargets" item="targetId" separator="UNION ALL" index="index">
+                SELECT #{targetId} as target_id, #{index} as sort_index
             </foreach>
         ) t
         LEFT JOIN interaction i ON t.target_id = i.interact_target 
         AND i.interact_target_type = #{interactTargetType}
         AND i.user_id = #{userId}
-        ORDER BY t.target_id
+        ORDER BY t.sort_index
     </select>
 
     <!-- 根据用户ID查询关注记录 -->
-    <select id="queryInteractFollowingByUserId" resultType="java.lang.Integer">
-        SELECT interact_content
+    <select id="queryInteractFollowingByUserId" resultType="java.lang.Long">
+        SELECT interact_target
         FROM interaction
         WHERE user_id = #{userId}
         AND interact_target_type = 'USER'

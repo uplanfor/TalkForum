@@ -11,6 +11,6 @@ public interface InteractionMapper {
     public int makeInteractionWithPost(InteractionRequestDTO interactionRequestDTO);
     public int makeInteractionWithComment(InteractionRequestDTO interactionRequestDTO);
     public List<Integer> queryInteractContentByPostOrComment(String interactTargetType, Long[] interactTargets, Long userId);
-    public List<Integer> queryInteractFollowingByUserId(Long userId);
+    public List<Long> queryInteractFollowingByUserId(Long userId);
 
 }

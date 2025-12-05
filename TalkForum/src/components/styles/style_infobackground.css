@@ -20,6 +20,25 @@
     height: 90px;
 }
 
+.info button.info-interact-button {
+    position: absolute;
+    display: block;
+    top: 5px;
+    right: 5px;
+    width: 65px;
+    height: 32px;
+    line-height: 32px;
+    border: 0;
+    border-radius: 18px;
+    background-color: var(--primary);
+    color: var(--neutral-bg);
+}
+
+.info button.info-interact-button.followed {
+    background-color: var(--neutral-bg);
+    color: var(--primary);
+}
+
 .info img {
     display: block;
     margin: 0;

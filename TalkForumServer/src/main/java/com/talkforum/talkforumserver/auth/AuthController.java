@@ -5,6 +5,7 @@ import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
 import com.talkforum.talkforumserver.common.dto.LoginDTO;
 import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
+import com.talkforum.talkforumserver.common.vo.AuthVO;
 import com.talkforum.talkforumserver.common.vo.UserVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
@@ -43,7 +44,7 @@ public class AuthController {
     public Result auth(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, HttpServletResponse response) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         long userId = ((Number)(information.get("id"))).longValue();
-        UserVO result = authService.auth(userId, response);
+        AuthVO result = authService.auth(userId, response);
         if (result == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return Result.error("Unknown user!", result);
@@ -57,7 +58,7 @@ public class AuthController {
     public Result authAdmin(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, HttpServletResponse response) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         long userId = ((Number)(information.get("id"))).longValue();
-        UserVO result = authService.auth(userId, response);
+        AuthVO result = authService.auth(userId, response);
         if (result == null || result.role.equals(UserConstant.ROLE_USER)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return Result.error("Unknown user!", result);
