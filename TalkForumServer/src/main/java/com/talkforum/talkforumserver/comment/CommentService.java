@@ -1,5 +1,6 @@
 package com.talkforum.talkforumserver.comment;
 
+import com.talkforum.talkforumserver.common.dto.AdminAuditCommentsDTO;
 import com.talkforum.talkforumserver.common.dto.AdminGetCommentsDTO;
 import com.talkforum.talkforumserver.common.entity.Comment;
 import com.talkforum.talkforumserver.common.vo.CommentListVO;
@@ -73,4 +74,11 @@ public interface CommentService {
      * @param status 审核状态
      */
     public void auditComment(Long commentId, String status);
+
+
+    /**
+     * 管理员批量审核评论
+     * @param adminAuditCommentsDTO 审核请求对象
+     */
+    public int adminAuditComments(AdminAuditCommentsDTO adminAuditCommentsDTO);
 }

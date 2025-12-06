@@ -97,5 +97,11 @@
         UPDATE `comment` SET status = #{status} WHERE id = #{commentId}
     </update>
 
-
+    <update id="auditComments">
+        UPDATE `comment` SET status = #{status}
+        WHERE id IN
+        <foreach collection="commentIds" open="(" close=")" separator="," item="commentId">
+            #{commentId}
+        </foreach>
+    </update>
 </mapper>

@@ -211,8 +211,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void resetUserPassword(long userId) {
-        // 重置密码为默认密码，并进行双重加密
+        // 重置密码为默认密码
         userMapper.resetUserPassword(userId,
-                PasswordHelper.encryptPassword(PasswordHelper.encryptPassword(ServerConstant.DEFAULT_PASSWORD)));
+                PasswordHelper.encryptPassword((ServerConstant.DEFAULT_PASSWORD)));
     }
 }

@@ -1,5 +1,6 @@
 package com.talkforum.talkforumserver.comment;
 
+import com.talkforum.talkforumserver.common.dto.AdminAuditCommentsDTO;
 import com.talkforum.talkforumserver.common.dto.AdminGetCommentsDTO;
 import com.talkforum.talkforumserver.common.entity.Comment;
 import com.talkforum.talkforumserver.common.vo.PageVO;
@@ -19,4 +20,6 @@ public interface CommentMapper {
     List<Comment> adminGetCommentsByPage(AdminGetCommentsDTO adminGetCommentsDTO);
     long adminCountComments(AdminGetCommentsDTO adminGetCommentsDTO);
     public void auditComment(Long commentId, String status);
+
+    int auditComments(AdminAuditCommentsDTO adminAuditCommentsDTO);
 }

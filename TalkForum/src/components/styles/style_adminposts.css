@@ -7,21 +7,138 @@
   background-color: var(--neutral-bg);
 }
 
+/* 查询条件区域样式 */
+.search-filters {
+  background-color: var(--neutral-surface);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: flex-end;
+}
+
+.filter-row:last-child {
+  margin-bottom: 0;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+}
+
+.filter-item label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--neutral-text-main);
+}
+
+.filter-item input,
+.filter-item select {
+  padding: 8px 12px;
+  border: 1px solid var(--neutral-border);
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: var(--neutral-background);
+  color: var(--neutral-text-main);
+  transition: border-color 0.2s;
+}
+
+.filter-item input:focus,
+.filter-item select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+}
+
+.filter-actions {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  margin-left: auto;
+}
+
+.search-button,
+.reset-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.search-button {
+  background-color: var(--primary);
+  color: var(--neutral-text-inverse);
+}
+
+.search-button:hover {
+  box-shadow: 0 4px 8px var(--neutral-shadow);
+}
+
+.reset-button {
+  background-color: var(--secondary-cool);
+  color: var(--neutral-text-main);
+}
+
+.reset-button:hover {
+  box-shadow: 0 4px 8px var(--neutral-shadow);
+}
+
 /* 操作按钮区域样式 */
 .action-buttons {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px 15px;
   background-color: var(--neutral-module);
-  padding: 15px;
   border-radius: 8px;
+  box-shadow: 0 2px 4px var(--neutral-shadow);
   border: 1px solid var(--neutral-border);
 }
 
-/* 选中数量显示 */
-.selected-count {
-  font-weight: 500;
-  color: var(--primary-color);
+/* 批量审核按钮样式 */
+.batch-audit-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  position: relative;
+}
+
+.batch-audit-btn::before {
+  content: "✓";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  font-size: 12px;
+  margin-right: 5px;
+}
+
+.batch-audit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--secondary-warm-2);
+}
+
+.batch-audit-btn:disabled::before {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* 按钮基础样式 */
@@ -29,28 +146,18 @@
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
-  cursor: pointer;
   font-size: 14px;
-  transition: all 0.2s;
+  cursor: pointer;
+  transition: box-shadow 0.3s;
   font-weight: 500;
-  box-shadow: 0 2px 4px var(--neutral-shadow);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  box-shadow: none;
 }
 
 .btn-primary {
-  background-color: var(--primary);
-  color: var(--neutral-text-main);
-  border: 1px solid var(--neutral-border);
+  background-color: var(--secondary-cool);
+  color: white;
 }
 
-.btn-primary:hover:not(:disabled) {
-  background-color: var(--secondary-warm-1);
-  transform: translateY(-1px);
+.btn-primary:hover {
   box-shadow: 0 4px 8px var(--neutral-shadow);
 }
 
@@ -61,8 +168,6 @@
 }
 
 .btn-danger:hover:not(:disabled) {
-  background-color: var(--secondary-warm-1);
-  transform: translateY(-1px);
   box-shadow: 0 4px 8px var(--neutral-shadow);
 }
 
@@ -73,8 +178,6 @@
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: var(--secondary-warm-1);
-  transform: translateY(-1px);
   box-shadow: 0 4px 8px var(--neutral-shadow);
 }
 
@@ -187,6 +290,29 @@ input[type="checkbox"] {
 }
 
 .audit-button:hover {
+  box-shadow: 0 4px 8px var(--neutral-shadow);
   background-color: var(--primary);
   transform: translateY(-1px);
+}
+
+/* 互动统计样式 */
+.interaction-stats {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--neutral-text-main);
+}
+
+.stat-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--secondary-cool);
 }

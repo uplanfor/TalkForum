@@ -1,0 +1,333 @@
+/* 管理员用户管理页面样式 */
+.admin-users-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: var(--neutral-text-main);
+  background-color: var(--neutral-bg);
+}
+
+/* 页面头部样式 */
+.admin-users-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.admin-users-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--neutral-text-main);
+  margin: 0;
+}
+
+/* 查询条件区域样式 */
+.search-filters {
+  background-color: var(--neutral-module);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--neutral-border);
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: flex-end;
+}
+
+.filter-row:last-child {
+  margin-bottom: 0;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+  flex: 1;
+}
+
+.filter-item label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--neutral-text-main);
+}
+
+.filter-item input,
+.filter-item select {
+  padding: 8px 12px;
+  border: 1px solid var(--neutral-border);
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: var(--neutral-background);
+  color: var(--neutral-text-main);
+  transition: border-color 0.2s;
+}
+
+.filter-item input:focus,
+.filter-item select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+}
+
+.filter-actions {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  margin-left: auto;
+}
+
+.filter-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: var(--primary);
+  color: var(--neutral-text-inverse);
+}
+
+.filter-button:hover {
+  box-shadow: 0 4px 8px var(--neutral-shadow);
+}
+
+/* 表格容器样式 */
+.table-container {
+  background-color: var(--neutral-module);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px var(--neutral-shadow);
+  margin-bottom: 20px;
+}
+
+/* 分页容器样式 */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* 刷新按钮样式 */
+.refresh-button {
+  padding: 6px 12px;
+  border: 1px solid var(--neutral-border);
+  border-radius: 4px;
+  background-color: var(--secondary-cool);
+  color: var(--neutral-text-main);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.refresh-button:hover {
+  background-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.refresh-button:active {
+  transform: translateY(0);
+}
+
+/* 复选框样式 */
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--secondary-cool);
+}
+
+/* 表格样式增强 */
+.admin-users-container table {
+  border-collapse: collapse;
+  width: 100%;
+  background-color: var(--neutral-module);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px var(--neutral-shadow);
+}
+
+.admin-users-container th {
+  background-color: var(--secondary-warm-1);
+  color: var(--neutral-text-main);
+  font-weight: 600;
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--neutral-border);
+}
+
+.admin-users-container td {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--neutral-border);
+  color: var(--neutral-text-main);
+}
+
+.admin-users-container tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-users-container tr:hover {
+  background-color: var(--secondary-warm-1);
+}
+
+/* 角色按钮样式 */
+.role-button {
+  padding: 4px 8px;
+  border: 1px solid var(--neutral-border);
+  border-radius: 4px;
+  background-color: var(--secondary-warm-2);
+  color: var(--neutral-text-main);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.role-button:hover {
+  background-color: var(--secondary-warm-1);
+  transform: translateY(-1px);
+}
+
+/* 状态按钮样式 */
+.status-button {
+  padding: 4px 8px;
+  border: 1px solid var(--neutral-border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.status-button.normal {
+  background-color: var(--secondary-cool);
+  color: var(--neutral-text-main);
+}
+
+.status-button.normal:hover {
+  box-shadow: 0 4px 8px var(--neutral-shadow);
+  background-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.status-button.disabled {
+  background-color: var(--secondary-warm-2);
+  color: var(--neutral-text-main);
+}
+
+.status-button.disabled:hover {
+  background-color: var(--secondary-warm-1);
+  transform: translateY(-1px);
+}
+
+/* 操作按钮样式 */
+.action-button {
+  padding: 4px 8px;
+  border: 1px solid var(--neutral-border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.action-button.reset-password {
+  background-color: var(--primary);
+  color: var(--neutral-text-main);
+}
+
+.action-button.reset-password:hover {
+  box-shadow: 0 4px 8px var(--neutral-shadow);
+  background-color: var(--secondary-cool);
+  transform: translateY(-1px);
+}
+
+/* 搜索输入框样式 */
+.search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--neutral-border);
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: var(--neutral-background);
+  color: var(--neutral-text-main);
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .admin-users-container {
+    padding: 16px;
+  }
+  
+  .admin-users-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .filter-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .filter-item {
+    min-width: 100%;
+  }
+  
+  .filter-actions {
+    justify-content: center;
+    margin-left: 0;
+  }
+  
+  .admin-users-container table {
+    font-size: 14px;
+  }
+  
+  .admin-users-container th,
+  .admin-users-container td {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-users-container {
+    padding: 12px;
+  }
+  
+  .admin-users-header h2 {
+    font-size: 20px;
+  }
+  
+  .admin-users-container table {
+    font-size: 12px;
+  }
+  
+  .admin-users-container th,
+  .admin-users-container td {
+    padding: 6px;
+  }
+  
+  .role-button,
+  .status-button,
+  .action-button {
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+}

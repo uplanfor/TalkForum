@@ -4,6 +4,7 @@
  */
 import type ApiResponse from "./ApiResponse";
 import Request from "../utils/Request";
+import { type CommentStatus } from "../constants/post_comment_status";
 
 /**
  * 评论接口
@@ -117,8 +118,21 @@ export const commentDeleteComment = (commentId: number): Promise<ApiResponse> =>
  * @param {string | null} stauts - 评论状态（可选，用于筛选）
  * @returns {Promise<CommentPageResponse>} 评论分页响应
  */
-export const commentAdminGetCommentsByPage = (page: number, pageSize: number, stauts: string | null): Promise<CommentPageResponse> => {
+export const commentAdminGetCommentsByPage = (page: number, pageSize: number, stauts: CommentStatus | null): Promise<CommentPageResponse> => {
     return Request.get_auth<CommentPageResponse>("/api/comments/admin", {
         page, pageSize, stauts,
+    });
+}
+
+
+/**
+ * 管理员审核评论
+ * @param {number[]} commentIds - 评论ID数组
+ * @param {string} status - 审核状态
+ * @returns {Promise<ApiResponse>} 审核结果响应
+ */
+export const commentAdminAuditComments = (commentIds: number[], status: CommentStatus): Promise<ApiResponse> => {
+    return Request.put_auth<ApiResponse>("/api/comments/admin/audit", {
+        commentIds, status,
     });
 }

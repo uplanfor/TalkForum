@@ -43,7 +43,7 @@ interface PostListParams {
  * 管理员帖子列表请求参数接口
  * 定义了管理员获取帖子列表时的查询参数
  */
-interface AdminPosstListParams {
+interface AdminPostListParams {
     keyword?: string;         // 关键词
     status?: string;          // 帖子状态
     clubIds?: number[];       // 俱乐部ID列表
@@ -134,7 +134,7 @@ export const postsModifyPostAuth = async (postId: string | number, content: stri
  * @param params 管理员帖子列表请求参数
  * @returns 管理员帖子列表响应
  */
-export const postsAdminGetPostList = async(params: AdminPosstListParams) : Promise<PostTypePageResponse> => {
+export const postsAdminGetPostList = async(params: AdminPostListParams) : Promise<PostTypePageResponse> => {
     return Request.get_auth<PostTypePageResponse>('/api/posts/admin', params);
 };
 

@@ -1,48 +1,93 @@
 /* 基本管理评论样式 */
 .admin-comments-container {
   padding: 20px;
+  background-color: var(--neutral-bg);
+  color: var(--neutral-text-main);
 }
 
 .admin-comments-container h1 {
   margin-bottom: 20px;
+  color: var(--neutral-text-main);
 }
 
-.filter-section {
+/* 查询条件区域样式 */
+.search-filters {
+  background-color: var(--neutral-module);
+  border-radius: 8px;
+  padding: 20px;
   margin-bottom: 20px;
-  padding: 15px;
-  background: #f5f5f5;
-  border-radius: 5px;
+  box-shadow: 0 2px 4px var(--neutral-shadow);
+  border: 1px solid var(--neutral-border);
 }
 
 .filter-row {
   display: flex;
-  flex-wrap: wrap;
   gap: 15px;
   margin-bottom: 15px;
+  flex-wrap: wrap;
+  align-items: flex-end;
 }
 
 .filter-item {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
   min-width: 200px;
+  flex: 1;
 }
 
 .filter-item label {
-  display: block;
   margin-bottom: 5px;
-  font-weight: bold;
+  font-weight: 500;
+  color: var(--neutral-text-main);
 }
 
 .filter-item input,
 .filter-item select {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
+  padding: 8px 12px;
+  border: 1px solid var(--neutral-border);
   border-radius: 4px;
+  font-size: 14px;
+  background-color: var(--neutral-module);
+  color: var(--neutral-text-main);
+  transition: border-color 0.3s;
+}
+
+.filter-item input:focus,
+.filter-item select:focus {
+  outline: none;
+  border-color: var(--secondary-cool);
 }
 
 .filter-actions {
   display: flex;
   gap: 10px;
+}
+
+/* 按钮样式 */
+.search-button,
+.reset-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: box-shadow 0.3s;
+  font-weight: 500;
+}
+
+.search-button {
+  background-color: var(--secondary-cool);
+  color: white;
+}
+
+.reset-button {
+  background-color: var(--secondary-warm-2);
+  color: var(--neutral-text-main);
+}
+
+.search-button:hover,
+.reset-button:hover {
+  box-shadow: 0 4px 8px var(--neutral-shadow);
 }
 
 .btn-search,
@@ -54,13 +99,13 @@
 }
 
 .btn-search {
-  background: #007bff;
+  background: var(--secondary-cool);
   color: white;
 }
 
 .btn-reset {
-  background: #6c757d;
-  color: white;
+  background: var(--secondary-warm-2);
+  color: var(--neutral-text-main);
 }
 
 .comments-table-container {
@@ -77,12 +122,13 @@
 .comments-table td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--neutral-border);
 }
 
 .comments-table th {
-  background: #f8f9fa;
+  background: var(--secondary-warm-1);
   font-weight: bold;
+  color: var(--neutral-text-main);
 }
 
 .comment-content {
@@ -111,8 +157,9 @@
 
 .pagination button {
   padding: 8px 16px;
-  border: 1px solid #ddd;
-  background: white;
+  border: 1px solid var(--neutral-border);
+  background: var(--neutral-module);
+  color: var(--neutral-text-main);
   cursor: pointer;
 }
 
@@ -125,5 +172,126 @@
 .no-data {
   text-align: center;
   padding: 40px;
-  color: #666;
+  color: var(--neutral-text-secondary);
+}
+
+/* 操作面板样式 */
+.action-buttons {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background-color: var(--neutral-module);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--neutral-shadow);
+  border: 1px solid var(--neutral-border);
+}
+
+/* 批量审核按钮样式 */
+.batch-audit-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  position: relative;
+}
+
+.batch-audit-btn::before {
+  content: "✓";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  font-size: 12px;
+  margin-right: 5px;
+}
+
+.batch-audit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--secondary-warm-2);
+}
+
+.batch-audit-btn:disabled::before {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 按钮样式 */
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: box-shadow 0.3s;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: var(--secondary-cool);
+  color: white;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 4px 8px var(--neutral-shadow);
+}
+
+/* 审核按钮样式 */
+.audit-button {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: box-shadow 0.3s;
+  color: white;
+}
+
+.audit-button:hover {
+  box-shadow: 0 4px 8px var(--neutral-shadow);
+}
+
+/* 状态颜色 */
+.audit-button.pass {
+  background-color: #10B981; /* 绿色，表示通过 */
+}
+
+.audit-button.reject {
+  background-color: #EF4444; /* 红色，表示拒绝 */
+}
+
+.audit-button.pending {
+  background-color: #F59E0B; /* 黄色，表示待审核 */
+}
+
+.audit-button.delete {
+  background-color: #6B7280; /* 灰色，表示删除 */
+}
+
+/* 互动统计样式 */
+.interaction-stats {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--neutral-text-main);
+}
+
+.stat-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--secondary-cool);
 }

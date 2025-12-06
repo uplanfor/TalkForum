@@ -7,7 +7,7 @@ import ShowTable from "./ShowTable";
 import Pagination from "./Pagination";
 import Msg from "../utils/msg";
 import dayjs from "dayjs";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   adminGetInvitecodeByPage,
   adminUpdateInviteCodes,
@@ -64,9 +64,10 @@ const AdminInviteCodes = () => {
   }, [page, pageSize]);
 
   // 创建节流刷新函数，每5秒最多执行一次
-  const throttledRefresh = throttle(() => {
+  const throttledRefresh = useCallback(throttle(() => {
+    Msg.success("Refreshing data...(5s)");
     loadInviteCodes(page, pageSize);
-  }, 5000);
+  }, 5000), [page, pageSize]);
 
   // 处理单个选择
   const handleSelectCode = (code: string) => {

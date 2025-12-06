@@ -4,6 +4,7 @@
  */
 import type ApiResponse from "./ApiResponse";
 import Request from "../utils/Request";
+import type { UserRole, UserStatus } from "../constants/user_constant";
 
 /**
  * 简单用户信息接口
@@ -124,7 +125,7 @@ export const usersChangePasswordAuth = async (oldPassword: string, newPassword: 
  * @returns {Promise<UserVOPageResponse>} 用户分页响应
  */
 export const usersAdminGetUsersByPage = async (page: number, pageSize: number): Promise<UserVOPageResponse> => {
-    return Request.get_auth<UserVOPageResponse>("/api/users/admin/all", {page, pageSize});
+    return Request.get_auth<UserVOPageResponse>("/api/users/admin", {page, pageSize});
 }
 
 /**
@@ -133,7 +134,7 @@ export const usersAdminGetUsersByPage = async (page: number, pageSize: number): 
  * @param {string} role - 角色名称
  * @returns {Promise<ApiResponse>} 设置结果响应
  */
-export const usersAdminSetUserRole = async (userId: number, role: string): Promise<ApiResponse> => {
+export const usersAdminSetUserRole = async (userId: number, role: UserRole): Promise<ApiResponse> => {
     return Request.put<ApiResponse>(`/api/users/admin/${userId}/role`, {userId, role});
 }
 
@@ -143,7 +144,7 @@ export const usersAdminSetUserRole = async (userId: number, role: string): Promi
  * @param {string} status - 状态名称
  * @returns {Promise<ApiResponse>} 设置结果响应
  */
-export const usersAdminSetUserStatus = async (userId: number, status: string): Promise<ApiResponse> => {
+export const usersAdminSetUserStatus = async (userId: number, status: UserStatus): Promise<ApiResponse> => {
     return Request.put<ApiResponse>(`/api/users/admin/${userId}/status`, {userId, status});
 }
 

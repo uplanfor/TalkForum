@@ -2,6 +2,7 @@ package com.talkforum.talkforumserver.comment.impl;
 
 import com.talkforum.talkforumserver.comment.CommentMapper;
 import com.talkforum.talkforumserver.comment.CommentService;
+import com.talkforum.talkforumserver.common.dto.AdminAuditCommentsDTO;
 import com.talkforum.talkforumserver.common.dto.AdminGetCommentsDTO;
 import com.talkforum.talkforumserver.common.entity.Comment;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
@@ -252,4 +253,20 @@ public class CommentServiceImpl implements CommentService {
         
         return commentVOs;
     }
+
+
+    /**
+     * 批量审核评论
+     */
+    public int adminAuditComments(AdminAuditCommentsDTO adminAuditCommentsDTO) {
+        if (adminAuditCommentsDTO == null) {
+            return 0;
+        }
+        List<Long> list = adminAuditCommentsDTO.getCommentIds();
+        if (list == null || list.isEmpty()) {
+            return 0;
+        }
+        return commentMapper.auditComments(adminAuditCommentsDTO);
+    }
+
 }

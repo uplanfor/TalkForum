@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
 import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
 import com.talkforum.talkforumserver.common.dto.AddCommentDTO;
+import com.talkforum.talkforumserver.common.dto.AdminAuditCommentsDTO;
 import com.talkforum.talkforumserver.common.dto.AdminGetCommentsDTO;
 import com.talkforum.talkforumserver.common.entity.Comment;
 import com.talkforum.talkforumserver.common.result.Result;
@@ -131,5 +132,16 @@ public class CommentController {
     @GetMapping("/admin")
     public Result adminGetCommentsByPage(AdminGetCommentsDTO adminGetCommentsDTO) {
         return Result.success("Successfully get comments!", commentService.adminGetCommentsByPage(adminGetCommentsDTO));
+    }
+
+    /**
+     * 管理员审核评论
+     * @param adminAuditCommentsDTO 管理员审核评论请求DTO
+     * @return
+     */
+    @ModeratorRequired
+    @PutMapping("/admin/audit")
+    public Result adminAduitComments(@RequestBody AdminAuditCommentsDTO adminAuditCommentsDTO) {
+        return Result.success("Successfully audit comments!", commentService.adminAuditComments(adminAuditCommentsDTO));
     }
 }
