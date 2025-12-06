@@ -21,6 +21,15 @@ import { authGetLoginInfo } from "./api/ApiAuth";
 // import viteLogo from '/vite.svg'
 
 
+// 检查是否启用Cookie，如果没启用Cookie，提示可能无法使用大量功能
+const CookieAbleCheck = () => {
+  document.cookie = "test=test";
+  if (document.cookie.indexOf("test=") === -1) {
+    alert("Please enable cookies to use this website!");
+  }
+  return null;
+}
+
 const NavigationScroll = () => {
   const location = useLocation();
   useEffect(() => {
@@ -82,6 +91,7 @@ const App = () => {
     <Provider store={store}>
       <NavigationScroll />
       <RefreshLoginInfo />
+      <CookieAbleCheck/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/club" element={<Club />} />

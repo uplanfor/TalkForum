@@ -18,7 +18,7 @@ class ThemeUtil {
    * @param themeKey 主题key
    */
   static loadTheme(themeKey: ThemeKey): void {
-    const actualThemeKey = themeKey === 'default' ? this.getSystemTheme() : themeKey;
+    const actualThemeKey = themeKey === DEFAULT_THEME_KEY ? this.getSystemTheme() : themeKey;
     const theme = THEMES[actualThemeKey];
     if (!theme) return;
 
@@ -31,7 +31,7 @@ class ThemeUtil {
     this.currentThemeKey = themeKey;
     
     // // 只有非default主题才保存到localStorage
-    // if (themeKey !== 'default') {
+    // if (themeKey !== DEFAULT_THEME_KEY) {
     //   localStorage.setItem('theme', themeKey);
     // }
 
@@ -80,15 +80,15 @@ class ThemeUtil {
     if (savedTheme && THEMES[savedTheme]) {
       this.loadTheme(savedTheme);
     } else {
-      this.loadTheme('default');
+      this.loadTheme(DEFAULT_THEME_KEY);
     }
     
     // 监听系统主题变化
     if (typeof window !== 'undefined' && window.matchMedia) {
       this.systemThemeListener = window.matchMedia('(prefers-color-scheme: dark)');
       this.systemThemeListener.addListener(() => {
-        if (this.currentThemeKey === 'default') {
-          this.loadTheme('default');
+        if (this.currentThemeKey === DEFAULT_THEME_KEY) {
+          this.loadTheme(DEFAULT_THEME_KEY);
         }
       });
     }

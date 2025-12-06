@@ -26,7 +26,7 @@ export const PostContainerTargetType = {
   CLUB: "club"     // 俱乐部空间
 } as const;
 
-type PostContainerTargetType = typeof PostContainerTargetType[keyof typeof PostContainerTargetType];
+export type PostContainerTargetType = typeof PostContainerTargetType[keyof typeof PostContainerTargetType];
 
 /**
  * 帖子容器组件属性接口

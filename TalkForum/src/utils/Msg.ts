@@ -209,13 +209,15 @@ const createBlockDialog = (
           if (needComfirm) {
             // 需要确认：仅标记选中状态，不直接返回
             // 重置所有菜单项样式
-            Array.from(menuContainer!.children).forEach(item => {
-              Object.assign(item.style, {
-                backgroundColor: 'var(--neutral-bg)',
-                borderColor: 'var(--neutral-border)',
-                color: 'var(--neutral-text-main)',
+            if (menuContainer) {
+              Array.from(menuContainer.children).forEach(item => {
+                Object.assign((item as HTMLElement).style, {
+                  backgroundColor: 'var(--neutral-bg)',
+                  borderColor: 'var(--neutral-border)',
+                  color: 'var(--neutral-text-main)',
+                });
               });
-            });
+            }
             // 设置当前选中项样式
             Object.assign(menuItem.style, {
               backgroundColor: 'var(--secondary-cool-light)', // 选中背景（浅蓝）
@@ -234,7 +236,9 @@ const createBlockDialog = (
         const menuTextEl = document.createElement('span');
         menuTextEl.textContent = menuText;
         menuItem.appendChild(menuTextEl);
-        menuContainer.appendChild(menuItem);
+        if (menuContainer) {
+          menuContainer.appendChild(menuItem);
+        }
       });
 
       dialog.appendChild(menuContainer);
@@ -289,7 +293,7 @@ const createBlockDialog = (
         } else if (type === 'menu') {
           resolve(-1); // 【新增】取消返回-1
         }
-        destroyDialog();
+        destroyDialogWithCleanup();
       });
       btnContainer.appendChild(leftBtn);
 
@@ -315,7 +319,7 @@ const createBlockDialog = (
         } else if (type === 'menu') {
           resolve(selectedIndex); // 【新增】确认返回选中索引（未选中则-1）
         }
-        destroyDialog();
+        destroyDialogWithCleanup();
       });
       btnContainer.appendChild(rightBtn);
 
@@ -336,7 +340,7 @@ const createBlockDialog = (
         } else if (type === 'menu') {
           resolve(-1); // 【新增】超时返回-1
         }
-        destroyDialog();
+        destroyDialogWithCleanup();
       }, duration);
     }
 
@@ -353,7 +357,7 @@ const createBlockDialog = (
         if (type === 'confirm') resolve(false);
         else if (type === 'prompt') resolve({ value: inputEl?.value || '', response: 0 });
         else if (type === 'menu') resolve(-1); // 【新增】点击遮罩返回-1
-        destroyDialog();
+        destroyDialogWithCleanup();
       }
     });
 
@@ -362,14 +366,72 @@ const createBlockDialog = (
       dialog.style.maxWidth = '90vw'; // 极端小屏时占90%视口宽度
     };
     window.addEventListener('resize', resizeHandler);
-    // 销毁时移除监听
-    destroyDialog = (() => {
-      const originalDestroy = destroyDialog;
-      return () => {
-        window.removeEventListener('resize', resizeHandler);
-        originalDestroy();
-      };
-    })();
+    
+    // 修改destroyDialog函数，添加移除事件监听器的逻辑
+    const originalDestroyDialog = destroyDialog;
+    const destroyDialogWithCleanup = () => {
+      window.removeEventListener('resize', resizeHandler);
+      originalDestroyDialog();
+    };
+    
+    // 在所有使用destroyDialog的地方，改为使用destroyDialogWithCleanup
+    // 更新按钮点击事件
+    const leftBtnClickHandler = () => {
+      if (type === 'confirm') {
+        resolve(false);
+      } else if (type === 'prompt') {
+        resolve({ value: inputEl?.value || '', response: 0 });
+      } else if (type === 'menu') {
+        resolve(-1);
+      }
+      destroyDialogWithCleanup();
+    };
+    
+    const rightBtnClickHandler = () => {
+      if (type === 'confirm') {
+        resolve(true);
+      } else if (type === 'prompt') {
+        resolve({ value: inputEl?.value || '', response: 1 });
+      } else if (type === 'menu') {
+        resolve(selectedIndex);
+      }
+      destroyDialogWithCleanup();
+    };
+    
+    // 更新超时处理
+    if (duration > 0) {
+      timeoutTimer = window.setTimeout(() => {
+        if (type === 'confirm') {
+          resolve(false);
+        } else if (type === 'prompt') {
+          resolve({ value: inputEl?.value || '', response: 2 });
+        } else if (type === 'menu') {
+          resolve(-1);
+        }
+        destroyDialogWithCleanup();
+      }, duration);
+    }
+    
+    // 更新点击遮罩层关闭
+    mask.addEventListener('click', (e) => {
+      if (e.target === mask) {
+        if (type === 'confirm') resolve(false);
+        else if (type === 'prompt') resolve({ value: inputEl?.value || '', response: 0 });
+        else if (type === 'menu') resolve(-1);
+        destroyDialogWithCleanup();
+      }
+    });
+    
+    // 更新按钮点击事件
+    if (type !== 'menu' || needComfirm) {
+      const leftBtn = document.createElement('button');
+      // ... 左按钮代码 ...
+      leftBtn.addEventListener('click', leftBtnClickHandler);
+      
+      const rightBtn = document.createElement('button');
+      // ... 右按钮代码 ...
+      rightBtn.addEventListener('click', rightBtnClickHandler);
+    }
   });
 };
 

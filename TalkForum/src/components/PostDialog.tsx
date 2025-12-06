@@ -16,11 +16,11 @@ import { throttle } from "../utils/debounce&throttle";
  * 帖子对话框组件属性接口
  */
 interface PostDialogProps {
-  onClose: () => void;           // 关闭对话框的回调函数
-  notification: string;         // 对话框标题通知
-  title: string;                // 帖子标题（编辑时使用）
+  onClose: () => any;           // 关闭对话框的回调函数
+  notification?: string;         // 对话框标题通知
+  title?: string;                // 帖子标题（编辑时使用）
   clubInputId?: number;         // 俱乐部ID（可选）
-  content: string;              // 帖子内容（编辑时使用）
+  content?: string;              // 帖子内容（编辑时使用）
   postId?: number | null;       // 帖子ID（编辑时使用，新建时为null）
 }
 

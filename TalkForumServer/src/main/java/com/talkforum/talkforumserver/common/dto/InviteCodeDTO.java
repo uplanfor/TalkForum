@@ -3,14 +3,14 @@ package com.talkforum.talkforumserver.common.dto;
 import com.sun.istack.NotNull;
 import lombok.Data;
 
-import java.util.Date;
-
 @Data
 public class InviteCodeDTO {
     @NotNull
-    public Integer maxCount;
+    private Integer count;  // 生成数量
+    
     @NotNull
-    public Integer generateCount;
+    private Integer expiredDays;  // 过期时间
+    
     @NotNull
-    public Integer expireDays;
+    private Integer maxCount;  // 最大使用次数
 }

@@ -33,7 +33,7 @@ const cache = new Map<string, CacheItem>();
  * @param targetId 目标ID
  * @returns 复合键字符串
  */
-const getCacheKey = (targetType: string, targetId?: number): string => {
+const getCacheKey = (targetType: PostContainerTargetType, targetId?: number): string => {
   return `${targetType}-${targetId || 'null'}`;
 };
 
@@ -43,7 +43,7 @@ const getCacheKey = (targetType: string, targetId?: number): string => {
  * @param targetId 目标ID
  * @returns 缓存项或undefined
  */
-export const getCache = (targetType: string, targetId?: number): CacheItem | undefined => {
+export const getCache = (targetType: PostContainerTargetType, targetId?: number): CacheItem | undefined => {
   const cacheItem = cache.get(getCacheKey(targetType, targetId));
   if (cacheItem && isCacheValid(cacheItem)) {
     return cacheItem;
@@ -62,7 +62,7 @@ export const getCache = (targetType: string, targetId?: number): CacheItem | und
  * @param targetId 目标ID
  * @param cacheItem 缓存项
  */
-export const setCache = (targetType: string, targetId: number | undefined, cacheItem: Omit<CacheItem, 'timestamp'>): void => {
+export const setCache = (targetType: PostContainerTargetType, targetId: number | undefined, cacheItem: Omit<CacheItem, 'timestamp'>): void => {
   cache.set(getCacheKey(targetType, targetId), {
     ...cacheItem,
     timestamp: Date.now()
@@ -74,7 +74,7 @@ export const setCache = (targetType: string, targetId: number | undefined, cache
  * @param targetType 目标类型
  * @param targetId 目标ID
  */
-export const clearCache = (targetType: string, targetId?: number): void => {
+export const clearCache = (targetType: PostContainerTargetType, targetId?: number): void => {
   cache.delete(getCacheKey(targetType, targetId));
 };
 

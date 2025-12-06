@@ -3,14 +3,20 @@ package com.talkforum.talkforumserver.invitecode;
 
 import com.talkforum.talkforumserver.common.anno.AdminRequired;
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
+import com.talkforum.talkforumserver.common.dto.DeleteInviteCodesDTO;
 import com.talkforum.talkforumserver.common.dto.InviteCodeDTO;
+import com.talkforum.talkforumserver.common.dto.UpdateInviteCodeDTO;
 import com.talkforum.talkforumserver.common.entity.InviteCode;
 import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
+import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,11 +68,14 @@ public class InviteCodeController {
     public Result generateInviteCodes(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, @RequestBody InviteCodeDTO inviteCodeDTO) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         Long userId = ((Number)(information.get("id"))).longValue();
-        return Result.success("Success to generate invite codes!", inviteCodeService.generateInviteCodes(userId, inviteCodeDTO));
+        List<InviteCode> codes = inviteCodeService.generateInviteCodes(userId, inviteCodeDTO);
+
+        return Result.success("Success to generate " + codes.size() + " invite codes!",
+               codes);
     }
 
     /**
-     * 删除邀请码
+     * 删除邀请码（似乎废弃了呢）
      * @param code 邀请码
      * @return 删除结果
      */
@@ -77,5 +86,31 @@ public class InviteCodeController {
         return success ? 
             Result.success("Invite code deleted successfully") :
             Result.error("Failed to delete invite code");
+    }
+    
+    /**
+     * 修改邀请码
+     * @param updateInviteCodeDTO 修改邀请码DTO
+     * @return 修改结果
+     */
+    @AdminRequired
+    @PutMapping("/admin")
+    public Result updateInviteCodes(@RequestBody UpdateInviteCodeDTO updateInviteCodeDTO) {
+        int updatedCount = inviteCodeService.updateInviteCodes(updateInviteCodeDTO);
+        return updatedCount > 0 ? 
+            Result.success("Invite code updated successfully, updated count: " + updatedCount) :
+            Result.error("Failed to update invite code");
+    }
+    
+    /**
+     * 批量删除邀请码
+     * @param deleteInviteCodesDTO 删除邀请码DTO
+     * @return 删除结果
+     */
+    @AdminRequired
+    @DeleteMapping("/admin")
+    public Result deleteInviteCodes(DeleteInviteCodesDTO deleteInviteCodesDTO) {
+        int count = inviteCodeService.deleteInviteCodes(deleteInviteCodesDTO);
+        return  Result.success("Success to delete " + count + "invite codes!");
     }
 }

@@ -179,10 +179,25 @@ export const THEMES: Record<ThemeKey, Theme> = {
       '--neutral-shadow': '#FEE2E2',
     },
   },
+  default: {
+    key: 'default',
+    name: 'Default',
+    variables: {
+      '--primary': '#2dd6bb',
+      '--secondary-warm-1': '#76e5d5',
+      '--secondary-warm-2': '#1aa891',
+      '--secondary-cool': '#60a5fa',
+      '--neutral-bg': '#f0fdfa',
+      '--neutral-module': '#ffffff',
+      '--neutral-text-main': '#2d3748',
+      '--neutral-text-secondary': '#718096',
+      '--neutral-border': '#e0f2fe',
+      '--neutral-shadow': '#e8f4f8',
+    },
+  },
 };
 
 /**
- * 默认主题 key
  * 应用启动时使用的初始主题
  */
-export const DEFAULT_THEME_KEY: ThemeKey = 'teal';
+export const DEFAULT_THEME_KEY: ThemeKey = 'default';

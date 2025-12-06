@@ -47,20 +47,26 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthVO login(LoginDTO loginDTO, HttpServletResponse response) throws BusinessRuntimeException {
         User loginCheck = userMapper.getUserLoginInfoByNameOrEmail(loginDTO.nameOrEmail);
+        // 判断用户是否存在
         if (loginCheck == null) {
             throw new BusinessRuntimeException("Wrong username or password!");
         }
+        // 判断账号是否被封
         if (!loginCheck.status.equals(UserConstant.STATUS_NORMAL)) {
             throw new BusinessRuntimeException("Your account has been locked!Please contact the administrator!");
         }
+        // 判断密码是否正确
         if (PasswordHelper.verifyPassword(loginDTO.password, loginCheck.password)) {
+            // 生成JWT
             Map<String, Object> information = new HashMap<>();
             information.put("id", loginCheck.id);
             information.put("role", loginCheck.role);
             userMapper.updateLoginTime(loginCheck.id);
             String jwtToken = (jwtHelper.generateJWTToken(information));
-            CookieHelper.setCookie(response, ServerConstant.LOGIN_COOKIE, jwtToken);
             loginCheck.lastLoginAt = new Date();
+
+            // 存入Redis和HttpOnlyCookie
+            CookieHelper.setCookie(response, ServerConstant.LOGIN_COOKIE, jwtToken);
             stringRedisTemplate.opsForValue().set(RedisKeyConstant.TOKEN_USER + loginCheck.id, jwtToken, jwtHelper.getExpire(), TimeUnit.MILLISECONDS);
             // 生成认证信息
             return new AuthVO(new UserVO(loginCheck),
@@ -72,6 +78,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logout(long userId, HttpServletResponse response) {
+        // 移除Cookie
         stringRedisTemplate.delete(RedisKeyConstant.TOKEN_USER+userId);
         CookieHelper.removeCookie(response, ServerConstant.LOGIN_COOKIE);
     }
@@ -80,6 +87,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthVO auth(long userId, HttpServletResponse response)
     {
+        // 尝试判断用户是否登录
         try {
             List<Long> arr= interactionMapper.queryInteractFollowingByUserId(userId);
             return new AuthVO(userMapper.getUserVOById(userId),

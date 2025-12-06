@@ -36,6 +36,20 @@
         DELETE FROM invite_code WHERE code = #{code}
     </delete>
 
+    <delete id="deleteByCodes" parameterType="java.util.List">
+        DELETE FROM invite_code WHERE code IN
+        <foreach collection="list" item="code" open="(" separator="," close=")">
+            #{code}
+        </foreach>
+    </delete>
+
+    <update id="updateInviteCodes" parameterType="java.util.List">
+        UPDATE invite_code SET expired_at = #{expiredAt}, max_count = {#maxCount} IN
+        <foreach collection="list" item="code" open="(" separator="," close=")">
+            #{code}
+        </foreach>
+    </update>
+
 <!-- 处理特殊字符，我记住了-->
     <select id="checkInviteCodeValid" resultType="int">
     <![CDATA[
@@ -53,5 +67,9 @@
             expired_at, max_count, used_count
         FROM invite_code
         LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countInviteCodes" resultType="long">
+        SELECT COUNT(*) FROM invite_code
     </select>
 </mapper>

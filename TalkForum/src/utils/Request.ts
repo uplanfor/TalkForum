@@ -46,7 +46,7 @@ class Request {
         // 有响应数据的情况（接口返回了错误状态码）
         if (error.response) {
           // 优先取接口返回的message
-          errorMessage = error.response.data?.message || 
+          errorMessage = (error.response.data as any)?.message || 
                           // 备用：HTTP状态文本（如404 Not Found）
                           error.response.statusText || 
                           defaultMessage;

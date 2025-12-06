@@ -4,6 +4,7 @@
  */
 import type ApiResponse from "./ApiResponse";
 import Request from "../utils/Request";
+import { PostCommentStatusEnum, type PostStatus } from "../constants/post_comment_status";
 
 /**
  * 帖子类型接口
@@ -15,7 +16,7 @@ export interface PostType {
     content: string;          // 帖子内容
     userId: number;           // 发布用户ID
     clubId: number | null;    // 所属俱乐部ID（可为空）
-    status: number;           // 帖子状态
+    status: string;           // 帖子状态
     isEssence: number;        // 是否精华（0：非精华，1：精华）
     createdAt: string;        // 创建时间
     updatedAt: string;        // 更新时间
@@ -60,6 +61,7 @@ interface PostTypePage {
     data: PostType[];         // 帖子列表数据
     total: number;            // 总帖子数
 }
+
 
 /**
  * 帖子响应接口
@@ -142,7 +144,7 @@ export const postsAdminGetPostList = async(params: AdminPosstListParams) : Promi
  * @param status 审核状态
  * @returns 审核帖子的响应
  */
-export const postsAdminAuditPost = async (postId: string | number, status: string) : Promise<ApiResponse> => {
+export const postsAdminAuditPost = async (postId: string | number, status: PostStatus) : Promise<ApiResponse> => {
     return Request.put_auth<ApiResponse>(`/api/posts/admin/${postId}/audit`, {status});
 };
 

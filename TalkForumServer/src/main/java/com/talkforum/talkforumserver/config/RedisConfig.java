@@ -12,17 +12,17 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  */
 @Configuration
 public class RedisConfig {
-//    /**
-//     * 配置RedisTemplate，用于操作对象类型数据
-//     * @param factory Redis连接工厂
-//     * @return RedisTemplate实例
-//     */
-//    @Bean
-//    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
-//        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-//        redisTemplate.setConnectionFactory(factory);
-//        return redisTemplate;
-//    }
+    /**
+     * 配置RedisTemplate，用于操作对象类型数据
+     * @param factory Redis连接工厂
+     * @return RedisTemplate实例
+     */
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(factory);
+        return redisTemplate;
+    }
 
     /**
      * 配置StringRedisTemplate，用于操作字符串类型数据

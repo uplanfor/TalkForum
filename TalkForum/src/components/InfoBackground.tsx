@@ -24,7 +24,7 @@ interface InfoBackgroundProps {
   /**
    * 目标ID（可选）
    */
-  targetId: number;
+  targetId?: number;
 }
 
 /**
@@ -40,7 +40,7 @@ const InfoBackground = (props: InfoBackgroundProps) => {
     fansCount, followingCount, following } = useSelector((state: RootState) => state.user);
 
   const targetType = props.targetType;
-  const targetId = targetType === InfoBackgroundType.SELF ? id : props.targetId;
+  const targetId = targetType === InfoBackgroundType.SELF ? id : (props.targetId ?? 0);
   console.log(targetType, targetId);
   // 判断是否为当前用户
   let isSelf = (targetType === InfoBackgroundType.SELF && isLoggedIn) || (targetType === InfoBackgroundType.USER && isLoggedIn && targetId == id);
@@ -54,12 +54,12 @@ const InfoBackground = (props: InfoBackgroundProps) => {
     if (isLoggedIn) {
       if (targetId != null) {
         const isCurrentlyFollowing = following.includes(targetId);
-        
+
         await interactionsFollowOrUnfollowUser(targetId, !isCurrentlyFollowing).then(res => {
           if (res.success) {
             Msg.success(res.message);
             dispatch(changeUserFollowing(targetId));
-            
+
             // 本地更新粉丝数和关注人数
             if (isSelf) {
               // 如果是查看自己的页面，不需要额外更新，因为changeUserFollowing已经处理了
@@ -79,9 +79,9 @@ const InfoBackground = (props: InfoBackgroundProps) => {
         }).catch(err => {
           Msg.error(err.message);
         });
-      } else {
-        Msg.error("Please sign in!");
       }
+    } else {
+      Msg.error("Please sign in!");
     }
   }
 

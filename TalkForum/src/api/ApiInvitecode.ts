@@ -11,7 +11,7 @@ import Request from "../utils/Request";
  */
 export interface Invitecode {
     code: string;         // 邀请码字符串
-    creatorId: string;    // 创建者ID
+    creatorId: number;    // 创建者ID
     createdAt: string;    // 创建时间
     expiredAt: string;     // 过期时间
     maxCount: number;     // 最大使用次数
@@ -67,6 +67,27 @@ export const adminGetInvitecodeByPage = async (page: number, pageSize: number): 
  * @param {number} generateCount - 生成的邀请码数量
  * @returns {Promise<GenerateInvitecodeResponse>} 生成邀请码响应
  */
-export const generateInvitecode = async (maxCount: number, expireDays: number, generateCount: number): Promise<GenerateInvitecodeResponse> => {
-    return Request.post<GenerateInvitecodeResponse>("/api/invitecode/admin", { maxCount, expireDays, generateCount });
+export const adminGenerateInviteCodes = async (maxCount: number, expiredDays: number, generateCount: number): Promise<GenerateInvitecodeResponse> => {
+    return Request.post<GenerateInvitecodeResponse>("/api/invitecode/admin", { maxCount, expiredDays, count: generateCount });
+};
+
+
+/**
+ * 更新邀请码最大使用次数或过期天数
+ * @param {string[]} codes - 邀请码字符串
+ * @param {number} maxCount - 新的最大使用次数
+ * @param {number} expiredDays - 新的过期天数
+ * @returns {Promise<ApiResponse>} 更新邀请码响应
+ */
+export const adminUpdateInviteCodes = async (codes: string[], maxCount: number, expiredDays: number): Promise<ApiResponse> => {
+    return Request.put<ApiResponse>("/api/invitecode/admin", { codes, maxCount, expiredDays });
+};
+
+/**
+ * 删除邀请码
+ * @param {string[]} codes - 邀请码字符串
+ * @returns {Promise<ApiResponse>} 删除邀请码响应
+ */
+export const adminDeleteInviteCodes = async (codes: string[]): Promise<ApiResponse> => {
+    return Request.delete<ApiResponse>("/api/invitecode/admin", { codes });
 };
