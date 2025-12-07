@@ -16,6 +16,7 @@ import com.talkforum.talkforumserver.constant.UserConstant;
 import com.talkforum.talkforumserver.interaction.InteractionMapper;
 import com.talkforum.talkforumserver.post.PostMapper;
 import com.talkforum.talkforumserver.post.PostService;
+import com.talkforum.talkforumserver.user.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +43,8 @@ public class PostServiceImpl implements PostService {
      */
     @Autowired
     private InteractionMapper interactionMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * 根据帖子ID获取帖子信息
@@ -183,6 +186,11 @@ public class PostServiceImpl implements PostService {
     public void essencePost(Long postId, int isEssence) {
         // 调用Mapper更新帖子精华状态
         postMapper.essencePost(postId, isEssence);
+    }
+
+    @Override
+    public String getContent(Long postId) {
+        return postMapper.getContent(postId);
     }
     
     /**

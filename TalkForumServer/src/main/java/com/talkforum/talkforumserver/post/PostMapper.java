@@ -25,4 +25,6 @@ public interface PostMapper {
     long adminCountPosts(AdminPostRequestDTO adminPostRequestDTO);
     int auditPost(Long postId, String status);
     int essencePost(Long postId, int isEssence);
+
+    String getContent(Long postId);
 }

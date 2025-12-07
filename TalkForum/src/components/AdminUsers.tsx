@@ -10,6 +10,7 @@ import ShowTable from './ShowTable';
 import Pagination from './Pagination';
 import Msg from '../utils/msg';
 import dayjs from 'dayjs';
+import "./styles/style_admin_common.css"
 
 // 定义用户角色选项
 const userRoles: UserRole[] = Object.values(UserRoleEnum);
@@ -119,13 +120,50 @@ const AdminUser: React.FC = () => {
 
   // 设置用户状态
   const handleSetStatus = async (userId: number, userName: string) => {
-
+    const menu = [UsersStatusEnum.NORMAL, UsersStatusEnum.UNABLE];
+    const result = await Msg.menu(menu, `Set status for user "${userName}(${userId})"`);
+    if (result !== -1) {
+      await usersAdminSetUserStatus(userId, menu[result]).then(res => {
+        if (res.success) {
+          Msg.success(res.message || `Status set successfully for user "${userName}"`);
+        } else {
+          throw new Error(res.message);
+        }
+      }).catch(err => {
+        Msg.error(err || 'Failed to set status');
+        console.error(err);
+      });
+    }
   };
 
   // 设置用户角色
-  const handleSetRole = async (userId: number, userName: string) => {
-
+  const handleSetRole = async (userId: number, userName: string, role: string) => {
+    if (role === UserRoleEnum.ADMIN) {
+      Msg.error("Cannot change administator's role!")
+      return;
+    } 
+    const menu = [UserRoleEnum.USER, UserRoleEnum.MODERATOR];
+    const result = await Msg.menu(menu, `Set role for user "${userName}(${userId}"`);
+    if (result !== -1) {
+      await usersAdminSetUserRole(userId, menu[result]).then(res => {
+        if (res.success) {
+          Msg.success(res.message || `Role set successfully for user "${userName}"`);
+        } else {
+          throw new Error(res.message);
+        }
+    }).catch(err => {
+        Msg.error(err || 'Failed to set role');
+        console.error(err);
+      });
+    }
   };
+  
+  // 处理详情
+  const handleDetail = (item: UserVO) => {
+    Msg.confirm(`Name ${item.name} ID: ${item.id}\n
+      Email: ${item.email} Created At: ${item.createdAt} Last Login At: ${item.lastLoginAt}\n
+      Role: ${item.role} Status: ${item.status} Followers Count: ${item.fansCount} Following Count: ${item.followingCount}\n`);
+  }
 
   const totalPages = Math.ceil(total / pageSize);
 
@@ -171,8 +209,7 @@ const AdminUser: React.FC = () => {
                 onChange={() => handleSelectUser(item.id)}
               />
             </td>
-            <td>{item.id}</td>
-            <td>{item.name}</td>
+            <td>{item.name}({item.id})</td>
             <td>
               <button
                 className="btn btn-secondary"
@@ -184,7 +221,7 @@ const AdminUser: React.FC = () => {
             <td>
               <button
                 className="btn btn-secondary"
-                onClick={() => handleSetRole(item.id, item.name)}
+                onClick={() => handleSetRole(item.id, item.name, item.role)}
               >
                 {item.role}  </button></td>
             <td>
@@ -196,11 +233,9 @@ const AdminUser: React.FC = () => {
               </button>
             </td>
             <td>{item.email}</td>
-            <td>{item.intro}</td>
-            <td>{item.fansCount}</td>
-            <td>{item.followingCount}</td>
             <td>{dayjs(item.createdAt).format("HH:mm MMM DD, YYYY")}</td>
             <td>{dayjs(item.lastLoginAt).format("HH:mm MMM DD, YYYY")}</td>
+            <td><button className="btn btn-secondary" onClick={()=>handleDetail(item)}>More</button></td>
           </tr>
         )}
         renderHeader={() => (<tr>
@@ -211,17 +246,14 @@ const AdminUser: React.FC = () => {
               onChange={handleSelectAll}
             />
           </th>
-          <th>ID</th>
-          <th>Name</th>
+          <th>Name(ID)</th>
           <th>Status</th>
           <th>Role</th>
           <th>Password</th>
           <th>Email</th>
-          <th>Intro</th>
-          <th>Fans</th>
-          <th>Following</th>
           <th>Created At</th>
           <th>Last Login</th>
+          <th>Details</th>
         </tr>)}
         emptyContent={<div>No users found</div>}
       />

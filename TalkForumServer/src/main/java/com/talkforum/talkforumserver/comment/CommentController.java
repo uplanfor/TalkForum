@@ -10,6 +10,7 @@ import com.talkforum.talkforumserver.common.entity.Comment;
 import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.constant.ServerConstant;
+import com.talkforum.talkforumserver.constant.UserConstant;
 import com.talkforum.talkforumserver.user.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -47,9 +48,13 @@ public class CommentController {
             @NotNull long postId, Integer cursor, @NotNull int pageSize,
             @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false) String token) {
         Long userId = null;
-        if (token != null) {
-            Map<String, Object> information = jwtHelper.parseJWTToken(token);
-            userId = ((Number) information.get("id")).longValue();
+        try {
+            if (token != null) {
+                Map<String, Object> information = jwtHelper.parseJWTToken(token);
+                userId = ((Number) information.get("id")).longValue();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return Result.success("Successfully get comment list!",
                 commentService.getComments(postId, cursor, pageSize, userId));
@@ -72,9 +77,13 @@ public class CommentController {
             @NotNull int pageSize, @NotNull Long rootId,
             Long parentId, @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false) String token) {
         Long userId = null;
-        if (token != null) {
-            Map<String, Object> information = jwtHelper.parseJWTToken(token);
-            userId = ((Number) information.get("id")).longValue();
+        try {
+            if (token != null) {
+                Map<String, Object> information = jwtHelper.parseJWTToken(token);
+                userId = ((Number) information.get("id")).longValue();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return Result.success("Successfully get comment replies",
                 commentService.getCommentReplyList(postId, cursor, pageSize, rootId, parentId, userId));
@@ -102,7 +111,8 @@ public class CommentController {
                 addCommentDTO.getParentId(),
                 userId, role);
         if (comment.id != null) {
-            return Result.success("Successfully add comment!", comment);
+            return Result.success(role.equals(UserConstant.ROLE_USER) ?
+                    "Success! Your comment will be seen after the moderators' auditing!" : "Success to comment!Refresh to see it!", comment);
         }
         return Result.error("Fail to add comment!");
     }
@@ -141,7 +151,8 @@ public class CommentController {
      */
     @ModeratorRequired
     @PutMapping("/admin/audit")
-    public Result adminAduitComments(@RequestBody AdminAuditCommentsDTO adminAuditCommentsDTO) {
+    public Result adminAuditComments(@RequestBody AdminAuditCommentsDTO adminAuditCommentsDTO) {
         return Result.success("Successfully audit comments!", commentService.adminAuditComments(adminAuditCommentsDTO));
     }
+
 }

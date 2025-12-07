@@ -1,4 +1,7 @@
 /* 管理员邀请码页面样式 */
+@import './style_admin_shared.css';
+
+/* 邀请码页面布局样式 */
 .admin-invite-codes-container {
   padding: 20px;
   max-width: 1200px;
@@ -7,69 +10,76 @@
   background-color: var(--neutral-bg);
 }
 
+/* 查询条件区域样式 */
+.search-filters {
+  background-color: var(--neutral-surface);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: flex-end;
+}
+
+.filter-row:last-child {
+  margin-bottom: 0;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+}
+
+.filter-item label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--neutral-text-main);
+}
+
+.filter-item input,
+.filter-item select {
+  padding: 8px 12px;
+  border: 1px solid var(--neutral-border);
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: var(--neutral-background);
+  color: var(--neutral-text-main);
+  transition: border-color 0.2s;
+}
+
+.filter-item input:focus,
+.filter-item select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+}
+
+.filter-actions {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  margin-left: auto;
+}
+
 /* 操作按钮区域样式 */
 .action-buttons {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px 15px;
   background-color: var(--neutral-module);
-  padding: 15px;
   border-radius: 8px;
-  border: 1px solid var(--neutral-border);
-}
-
-/* 按钮基础样式 */
-.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
-  font-weight: 500;
   box-shadow: 0 2px 4px var(--neutral-shadow);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.btn-primary {
-  background-color: var(--primary);
-  color: var(--neutral-text-main);
   border: 1px solid var(--neutral-border);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background-color: var(--secondary-warm-1);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px var(--neutral-shadow);
-}
-
-.btn-danger {
-  background-color: var(--primary);
-  color: var(--neutral-text-main);
-  border: 1px solid var(--neutral-border);
-}
-
-.btn-danger:hover:not(:disabled) {
-  background-color: var(--secondary-warm-1);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px var(--neutral-shadow);
-}
-
-.btn-secondary {
-  background-color: var(--secondary-warm-2);
-  color: var(--neutral-text-main);
-  border: 1px solid var(--neutral-border);
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background-color: var(--secondary-warm-1);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px var(--neutral-shadow);
 }
 
 /* 分页信息样式 */
@@ -84,107 +94,6 @@
   border-radius: 4px;
   color: var(--neutral-text-main);
   box-shadow: 0 2px 4px var(--neutral-shadow);
-}
-
-/* 刷新按钮样式 */
-.refresh-button {
-  padding: 6px 12px;
-  border: 1px solid var(--neutral-border);
-  border-radius: 4px;
-  background-color: var(--secondary-warm-2);
-  color: var(--neutral-text-main);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all 0.2s;
-  box-shadow: 0 1px 3px var(--neutral-shadow);
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.refresh-button:hover {
-  background-color: var(--secondary-warm-1);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 5px var(--neutral-shadow);
-}
-
-.refresh-button:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 2px var(--neutral-shadow);
-}
-
-/* 对话框样式 */
-.dialog-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(45, 55, 72, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.dialog {
-  background-color: var(--neutral-module);
-  border-radius: 8px;
-  padding: 20px;
-  width: 400px;
-  max-width: 90%;
-  box-shadow: 0 4px 12px var(--neutral-shadow);
-  border: 1px solid var(--neutral-border);
-}
-
-.dialog h2 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  color: var(--neutral-text-main);
-  font-weight: 600;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  color: var(--neutral-text-main);
-  font-weight: 500;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--neutral-border);
-  border-radius: 4px;
-  background-color: var(--neutral-bg);
-  color: var(--neutral-text-main);
-  transition: border-color 0.2s;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: var(--secondary-cool);
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
-}
-
-.dialog-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-/* 复选框样式 */
-input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  accent-color: var(--secondary-cool);
 }
 
 /* 表格样式增强 */
@@ -218,4 +127,90 @@ input[type="checkbox"] {
 
 .admin-invite-codes-container tr:hover {
   background-color: var(--secondary-warm-1);
+}
+
+/* 状态按钮样式 */
+.status-button {
+  padding: 4px 8px;
+  border: 1px solid var(--neutral-border);
+  border-radius: 4px;
+  background-color: var(--secondary-warm-2);
+  color: var(--neutral-text-main);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.status-button.active {
+  background-color: var(--secondary-cool);
+  color: var(--neutral-text-inverse);
+}
+
+.status-button.used {
+  background-color: var(--primary);
+  color: var(--neutral-text-main);
+}
+
+.status-button.expired {
+  background-color: var(--secondary-warm-2);
+  color: var(--neutral-text-secondary);
+}
+
+.status-button:hover {
+  transform: translateY(-1px);
+}
+
+/* 生成按钮样式 */
+.generate-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--secondary-cool);
+  color: var(--neutral-text-inverse);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.generate-button:hover {
+  background-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* 邀请码样式 */
+.invite-code {
+  font-family: monospace;
+  font-weight: 600;
+  color: var(--secondary-cool);
+}
+
+/* 复制按钮样式 */
+.copy-button {
+  padding: 4px 8px;
+  border: 1px solid var(--neutral-border);
+  border-radius: 4px;
+  background-color: var(--secondary-warm-2);
+  color: var(--neutral-text-main);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.copy-button:hover {
+  background-color: var(--secondary-warm-1);
+  transform: translateY(-1px);
+}
+
+.copy-button.copied {
+  background-color: var(--secondary-cool);
+  color: var(--neutral-text-inverse);
 }

@@ -76,4 +76,11 @@ public interface PostService {
      * @param isEssence 是否精华（0：非精华，1：精华）
      */
     void essencePost(Long postId, int isEssence);
+
+    /**
+     * 获得帖子内容
+     * @param postId
+     * @return 帖子内容
+     */
+    String getContent(Long postId);
 }

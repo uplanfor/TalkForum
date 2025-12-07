@@ -2,7 +2,7 @@
  * 管理员邀请码管理组件
  * 用于管理员生成、管理和分发邀请码
  */
-import "./styles/style_admininvitecodes.css"
+import "./styles/style_admin_common.css"
 import ShowTable from "./ShowTable";
 import Pagination from "./Pagination";
 import Msg from "../utils/msg";

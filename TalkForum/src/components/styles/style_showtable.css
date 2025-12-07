@@ -58,3 +58,8 @@
 .custom-table th:last-child {
   border-right: none;
 }
+
+
+.custom-table tbody tr:hover {
+  background-color: var(--secondary-cool);
+}

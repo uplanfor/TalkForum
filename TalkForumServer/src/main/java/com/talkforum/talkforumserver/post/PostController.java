@@ -7,6 +7,7 @@ import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.common.vo.PostListVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
+import com.talkforum.talkforumserver.constant.UserConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -54,11 +55,14 @@ public class PostController {
     public Result getPosts(PostRequestDTO postRequestDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false) String token) {
         // 解析Token获取用户ID，未登录则为null
         Long userId = null;
-        if (token != null) {
-            Map<String, Object> information = jwtHelper.parseJWTToken(token);
-            userId = ((Number)information.get("id")).longValue();
+        try {
+            if (token != null) {
+                Map<String, Object> information = jwtHelper.parseJWTToken(token);
+                userId = ((Number)information.get("id")).longValue();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        
         PostListVO postListVO = postService.getPosts(postRequestDTO, userId);
         return Result.success("Success to get post list!", postListVO);
     }
@@ -75,7 +79,11 @@ public class PostController {
     public Result commitPost(@RequestBody PostCommitDTO postCommitDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
         postCommitDTO.userId = ((Number)(information.get("id"))).longValue(); // 设置用户ID
-        return Result.success("Success to commit post!", postService.commitPost(postCommitDTO, (String)(information.get("role"))));
+        String role = (String) information.get("role");
+        return Result.success(
+                role.equals(UserConstant.ROLE_USER) ?
+                        "Success!Your post will be seen after the moderators' auditing!" : "Success to commit your post! Refresh to see your post!"
+                ,postService.commitPost(postCommitDTO, role));
     }
 
     /**
@@ -92,8 +100,10 @@ public class PostController {
         Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
         postEditDTO.userId = ((Number)(information.get("id"))).longValue(); // 设置用户ID
         postEditDTO.id = postId; // 设置帖子ID
-        postService.editPost(postEditDTO, (String)(information.get("role"))); // 调用服务层编辑帖子
-        return Result.success("Success to edit post!");
+        String role = (String) information.get("role");
+        postService.editPost(postEditDTO, role); // 调用服务层编辑帖子
+        return Result.success(role.equals(UserConstant.ROLE_USER) ?
+                "Success!The new version will be seen after the moderators' auditing!" : "Success to edit your post! Refresh to see it!");
     }
 
     /**
@@ -151,5 +161,15 @@ public class PostController {
         System.out.println(essenceDTO.getIsEssence()); // 打印日志
         postService.essencePost(postId, essenceDTO.getIsEssence()); // 调用服务层设置精华
         return Result.success("Success to modify!");
+    }
+
+    /**
+     * 管理员获得帖子内容
+     * @param postId
+     */
+    @ModeratorRequired
+    @GetMapping("/admin/{postId}/content")
+    public Result getContent(@PathVariable Long postId) {
+        return Result.success("Success to get post!", postService.getContent(postId));
     }
 }

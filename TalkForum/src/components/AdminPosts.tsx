@@ -13,11 +13,12 @@ import {
   type PostType
 } from "../api/ApiPosts";
 import { PostCommentStatusEnum, type PostStatus } from "../constants/post_comment_status";
-import "./styles/style_adminposts.css";
+import "./styles/style_admin_common.css";
 import { getSingleSimpleUserInfo, requestSimpleUserInfoCache } from '../utils/simpleUserInfoCache';
 import dayjs from 'dayjs';
 import { throttle } from '../utils/debounce&throttle';
 import { EyeIcon, HandThumbUpIcon, ChatBubbleBottomCenterIcon } from '@heroicons/react/24/outline';
+import AuditPostDialog from "./AuditPostDialog";
 
 const AdminPosts = () => {
   const [posts, setPosts] = useState<PostType[]>([]);
@@ -27,6 +28,7 @@ const AdminPosts = () => {
   const [loading, setLoading] = useState(false);
   const [selectedPosts, setSelectedPosts] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [showAuditDialog, setShowAuditDialog] = useState(false);
   
   // 查询条件状态
   const [keyword, setKeyword] = useState('');
@@ -303,6 +305,12 @@ const AdminPosts = () => {
         >
           Batch Audit {selectedPosts.length > 0 && `(${selectedPosts.length} selected)`}
         </button>
+        <button
+          className="btn btn-success"
+          onClick={() => setShowAuditDialog(true)}
+        >
+          Goto Audit View
+        </button>
       </div>
 
       <div className="pagination-info">
@@ -340,7 +348,7 @@ const AdminPosts = () => {
               </button></td>
             <td>
               <button
-                className="essence-button"
+                className={`essence-button ${item.isEssence != 0 ? 'yes' : 'no'}`}
                 onClick={() => handleToggleEssence(item.id, item.isEssence)}
               >
                 {item.isEssence != 0 ? 'Yes' : 'No'}
@@ -363,7 +371,8 @@ const AdminPosts = () => {
               </span>
             </td>
             <td>
-              <button>More</button>
+              <button 
+                className="btn btn-secondary">More</button>
             </td>
           </tr>
         )}
@@ -392,6 +401,11 @@ const AdminPosts = () => {
         loading={loading}
         onPageChange={setPage}
       />
+      
+      {/* 审核对话框 */}
+      {showAuditDialog && (
+        <AuditPostDialog onClose={() => setShowAuditDialog(false)}/>
+      )}
     </div>
   )
 };

@@ -12,11 +12,12 @@ import {
   type Comment
 } from "../api/ApiComments";
 import { PostCommentStatusEnum, type CommentStatus } from "../constants/post_comment_status";
-import "./styles/style_admincomments.css";
+import "./styles/style_admin_common.css";
 import { getSingleSimpleUserInfo, requestSimpleUserInfoCache } from '../utils/simpleUserInfoCache';
 import dayjs from 'dayjs';
 import { throttle } from '../utils/debounce&throttle';
 import { HandThumbUpIcon, ChatBubbleBottomCenterIcon } from '@heroicons/react/24/outline';
+import AuditCommentDialog from './AuditCommentDialog';
 
 const AdminComments = () => {
   const [comments, setComments] = useState<Comment[]>([]);
@@ -26,6 +27,7 @@ const AdminComments = () => {
   const [loading, setLoading] = useState(false);
   const [selectedComments, setSelectedComments] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [showAuditDialog, setShowAuditDialog] = useState(false);
   
   // 查询条件状态
   const [status, setStatus] = useState('');
@@ -34,7 +36,8 @@ const AdminComments = () => {
   const loadComments = async () => {
     setLoading(true);
     
-    await commentAdminGetCommentsByPage(page, pageSize, status).then(async res => {
+    // 根据status是否为空字符串决定是否传递status参数
+    await commentAdminGetCommentsByPage(page, pageSize, status || null).then(async res => {
       if (res.success) {
         const userIds = res.data.data.map(item => item.userId);
         await requestSimpleUserInfoCache(userIds);
@@ -227,6 +230,12 @@ const AdminComments = () => {
         >
           Batch Audit {selectedComments.length > 0 && `(${selectedComments.length} selected)`}
         </button>
+        <button
+          className="btn btn-primary audit-dialog-btn"
+          onClick={() => setShowAuditDialog(true)}
+        >
+          Quick Audit Comments
+        </button>
       </div>
 
       <div className="pagination-info">
@@ -281,7 +290,8 @@ const AdminComments = () => {
             </td>
             <td>{dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss')}</td>
             <td>
-              <button>More</button>
+              <button 
+                className="btn btn-secondary">More</button>
             </td>
           </tr>
         )}
@@ -293,7 +303,7 @@ const AdminComments = () => {
               onChange={handleSelectAll}
             />
           </th>
-          <th>CommentID</th>
+          <th>ID</th>
           <th>Author</th>
           <th>PostID</th>
           <th>Content</th>
@@ -311,6 +321,11 @@ const AdminComments = () => {
         loading={loading}
         onPageChange={setPage}
       />
+      
+      {/* 审核对话框 */}
+      {showAuditDialog && (
+        <AuditCommentDialog onClose={() => setShowAuditDialog(false)} />
+      )}
     </div>
   )
 }

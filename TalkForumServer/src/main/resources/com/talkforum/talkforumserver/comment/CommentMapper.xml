@@ -81,7 +81,7 @@
             c.status, c.created_at, c.like_count, c.comment_count
         FROM `comment` c
         <where>
-            <if test="status != null">status = #{status}</if>
+            <if test="status != null">c.status = #{status}</if>
         </where>
         LIMIT #{offset}, #{pageSize}
     </select>

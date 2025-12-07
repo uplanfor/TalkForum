@@ -5,6 +5,7 @@
 import type ApiResponse from "./ApiResponse";
 import Request from "../utils/Request";
 import { PostCommentStatusEnum, type PostStatus } from "../constants/post_comment_status";
+import PostDialog from "../components/PostDialog";
 
 /**
  * 帖子类型接口
@@ -63,6 +64,7 @@ interface PostTypePage {
 }
 
 
+
 /**
  * 帖子响应接口
  * 扩展了ApiResponse接口，包含PostType类型的数据
@@ -74,6 +76,11 @@ interface PostResponse extends ApiResponse<PostType> {}
  * 扩展了ApiResponse接口，包含PostTypePage类型的数据
  */
 interface PostTypePageResponse extends ApiResponse<PostTypePage> {}
+
+/**
+ * 帖子内容响应接口
+ */
+interface PostContentResponse extends ApiResponse<string> {}
 
 /**
  * 发布新帖子
@@ -157,3 +164,13 @@ export const postsAdminAuditPost = async (postId: string | number, status: PostS
 export const postsAdminSetPostAsEssence = async (postId: string | number, isEssence: number) : Promise<ApiResponse> => {
     return Request.put_auth<ApiResponse>(`/api/posts/admin/${postId}/essence`, {isEssence});
 };
+
+
+/**
+ * 管理员获得帖子内容
+ * @param postId 帖子ID
+ * @returns 帖子内容响应
+ */
+export const postsAdminGetPostContent = async (PostId: string | number) : Promise<ApiResponse> => {
+    return Request.get_auth<PostContentResponse>(`/api/posts/admin/${PostId}/content`);
+}

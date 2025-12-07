@@ -1,4 +1,7 @@
 /* 管理员帖子页面样式 */
+@import './style_admin_shared.css';
+
+/* 帖子页面布局样式 */
 .admin-posts-container {
   padding: 20px;
   max-width: 1200px;
@@ -66,35 +69,6 @@
   margin-left: auto;
 }
 
-.search-button,
-.reset-button {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.search-button {
-  background-color: var(--primary);
-  color: var(--neutral-text-inverse);
-}
-
-.search-button:hover {
-  box-shadow: 0 4px 8px var(--neutral-shadow);
-}
-
-.reset-button {
-  background-color: var(--secondary-cool);
-  color: var(--neutral-text-main);
-}
-
-.reset-button:hover {
-  box-shadow: 0 4px 8px var(--neutral-shadow);
-}
-
 /* 操作按钮区域样式 */
 .action-buttons {
   display: flex;
@@ -141,46 +115,6 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* 按钮基础样式 */
-.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: box-shadow 0.3s;
-  font-weight: 500;
-}
-
-.btn-primary {
-  background-color: var(--secondary-cool);
-  color: white;
-}
-
-.btn-primary:hover {
-  box-shadow: 0 4px 8px var(--neutral-shadow);
-}
-
-.btn-danger {
-  background-color: var(--primary);
-  color: var(--neutral-text-main);
-  border: 1px solid var(--neutral-border);
-}
-
-.btn-danger:hover:not(:disabled) {
-  box-shadow: 0 4px 8px var(--neutral-shadow);
-}
-
-.btn-secondary {
-  background-color: var(--secondary-warm-2);
-  color: var(--neutral-text-main);
-  border: 1px solid var(--neutral-border);
-}
-
-.btn-secondary:hover:not(:disabled) {
-  box-shadow: 0 4px 8px var(--neutral-shadow);
-}
-
 /* 分页信息样式 */
 .pagination-info {
   display: flex;
@@ -193,38 +127,6 @@
   border-radius: 4px;
   color: var(--neutral-text-main);
   box-shadow: 0 2px 4px var(--neutral-shadow);
-}
-
-/* 刷新按钮样式 */
-.refresh-button {
-  padding: 6px 12px;
-  border: 1px solid var(--neutral-border);
-  border-radius: 4px;
-  background-color: var(--secondary-cool);
-  color: var(--neutral-text-main);
-  cursor: pointer;
-  font-size: 12px;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.refresh-button:hover {
-  background-color: var(--primary);
-  transform: translateY(-1px);
-}
-
-.refresh-button:active {
-  transform: translateY(0);
-}
-
-/* 复选框样式 */
-input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  accent-color: var(--secondary-cool);
 }
 
 /* 表格样式增强 */
@@ -260,8 +162,16 @@ input[type="checkbox"] {
   background-color: var(--secondary-warm-1);
 }
 
+/* 帖子内容样式 */
+.post-content {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* 精华按钮样式 */
-.essence-button {
+.featured-button {
   padding: 4px 8px;
   border: 1px solid var(--neutral-border);
   border-radius: 4px;
@@ -269,10 +179,16 @@ input[type="checkbox"] {
   color: var(--neutral-text-main);
   cursor: pointer;
   font-size: 12px;
+  font-weight: 500;
   transition: all 0.2s;
 }
 
-.essence-button:hover {
+.featured-button.featured {
+  background-color: var(--primary);
+  color: var(--neutral-text-main);
+}
+
+.featured-button:hover {
   background-color: var(--secondary-warm-1);
   transform: translateY(-1px);
 }
@@ -282,37 +198,38 @@ input[type="checkbox"] {
   padding: 4px 8px;
   border: 1px solid var(--neutral-border);
   border-radius: 4px;
-  background-color: var(--secondary-cool);
+  background-color: var(--secondary-warm-2);
   color: var(--neutral-text-main);
   cursor: pointer;
   font-size: 12px;
+  font-weight: 500;
   transition: all 0.2s;
 }
 
-.audit-button:hover {
-  box-shadow: 0 4px 8px var(--neutral-shadow);
+.audit-button.approved {
+  background-color: var(--secondary-cool);
+  color: var(--neutral-text-inverse);
+}
+
+.audit-button.rejected {
   background-color: var(--primary);
+  color: var(--neutral-text-main);
+}
+
+.audit-button:hover {
   transform: translateY(-1px);
 }
 
 /* 互动统计样式 */
 .interaction-stats {
   display: flex;
-  gap: 12px;
-  align-items: center;
-  cursor: pointer;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--neutral-text-secondary);
 }
 
 .stat-item {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 12px;
-  color: var(--neutral-text-main);
-}
-
-.stat-icon {
-  width: 16px;
-  height: 16px;
-  color: var(--secondary-cool);
 }

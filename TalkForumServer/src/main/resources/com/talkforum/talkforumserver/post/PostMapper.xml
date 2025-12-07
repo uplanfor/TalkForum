@@ -127,4 +127,8 @@
             </if>
         </where>
     </select>
+
+    <select id="getContent" resultType="String">
+        SELECT content FROM post WHERE id = #{postId}
+    </select>
 </mapper>

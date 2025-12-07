@@ -115,12 +115,12 @@ export const commentDeleteComment = (commentId: number): Promise<ApiResponse> =>
  * 管理员获取评论列表（分页）
  * @param {number} page - 页码
  * @param {number} pageSize - 每页大小
- * @param {string | null} stauts - 评论状态（可选，用于筛选）
+ * @param {string | null} status - 评论状态（可选，用于筛选）
  * @returns {Promise<CommentPageResponse>} 评论分页响应
  */
-export const commentAdminGetCommentsByPage = (page: number, pageSize: number, stauts: CommentStatus | null): Promise<CommentPageResponse> => {
+export const commentAdminGetCommentsByPage = (page: number, pageSize: number, status?: CommentStatus | null): Promise<CommentPageResponse> => {
     return Request.get_auth<CommentPageResponse>("/api/comments/admin", {
-        page, pageSize, stauts,
+        page, pageSize, status,
     });
 }
 
