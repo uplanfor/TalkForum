@@ -19,6 +19,9 @@ public class PostVO {
     public Integer viewCount;
     public Integer likeCount;
     public Integer commentCount;
+    public String tag1;
+    public String tag2;
+    public String tag3;
 
     public Integer interactContent;
 }

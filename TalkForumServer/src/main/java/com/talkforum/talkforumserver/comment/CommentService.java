@@ -81,4 +81,11 @@ public interface CommentService {
      * @param adminAuditCommentsDTO 审核请求对象
      */
     public int adminAuditComments(AdminAuditCommentsDTO adminAuditCommentsDTO);
+
+    /**
+     * 管理员获取评论内容
+     * @param commentIds
+     * @return
+     */
+    List<Comment> adminGetCommentsContent(List<Long> commentIds);
 }

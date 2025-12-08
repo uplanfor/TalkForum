@@ -124,7 +124,7 @@
 }
 
 
-.post-card .detail {
+.post-card .interaction {
     display: flex;
     width: 100%;
     height: auto;
@@ -132,7 +132,7 @@
     gap: 16px;
 }
 
-.post-card .detail span {
+.post-card .interaction span {
     display: flex;
     align-items: center;
     height: 24px;
@@ -143,24 +143,60 @@
     transition: color 0.2s ease;
 }
 
-.post-card .detail span:hover {
+.post-card .interaction span:hover {
     color: var(--neutral-text-primary);
 }
 
-.post-card .detail span svg {
+.post-card .interaction span svg {
     width: 16px;
     height: 16px;
     margin-right: 4px;
 }
 
 /* 点赞按钮悬停效果 */
-.post-card .detail .like-btn:hover {
+.post-card .interaction .like-btn:hover {
     color: var(--primary);
 }
 
 /* 点赞按钮选中状态 */
-.post-card .detail .like-btn svg.liked {
+.post-card .interaction .like-btn svg.liked {
     color: var(--primary);
+}
+
+
+.post-card .belong {
+    display: flex;
+}
+
+.post-card .belong span {
+    display: block;
+    width: fit-content;
+    height: 28px;
+}
+
+.post-card .belong span.tag {
+    margin-right: 3px;
+    padding: 5px;
+    color: var(--neutral-module);
+    border-radius: 9px;
+}
+
+.post-card .belong span.tag.tag1 {
+    background-color: var(--primary);
+}
+
+
+.post-card .belong span.tag.tag2 {
+    background-color: var(--secondary-warm-1);
+}
+
+
+.post-card .belong span.tag.tag3 {
+    background-color: var(--secondary-warm-2);
+}
+
+.post-card .belong span.tag::before {
+    content: "#";
 }
 
 

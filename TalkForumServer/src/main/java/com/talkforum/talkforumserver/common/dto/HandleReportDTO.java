@@ -8,5 +8,5 @@ import lombok.Data;
 public class HandleReportDTO {
     @NotNull(message="You must point on how your deal with the report![post expected]")
     private String status;
-    private Report[] reportIds;
+    private Long[] reportIds;
 }

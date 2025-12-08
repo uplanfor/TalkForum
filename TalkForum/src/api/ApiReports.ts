@@ -15,6 +15,7 @@ export interface Report {
     reportType: string;     // 举报类型
     reportTargetType: string; // 举报目标类型（如帖子、评论、用户等）
     reportTarget: string;   // 举报目标ID
+    status: string;         // 处理状态
     reason: string;         // 举报原因
     createdAt: string;      // 举报时间
     handledAt: string | null; // 处理时间（未处理则为null）
@@ -38,7 +39,7 @@ export interface ReportPage {
  * @param {string} [reason] - 举报原因（可选）
  * @returns {Promise<ApiResponse>} 提交结果响应
  */
-export const reportsPostReport = async (reportType: string, reportTargetType: string, reportTarget: string, reason?: string) => {
+export const reportsPostReport = async (reportType: string, reportTargetType: string, reportTarget: number, reason?: string) => {
     return Request.post<ApiResponse>(`/api/reports/`, { 
         reportType, reportTargetType, reportTarget, reason });
 }
@@ -47,10 +48,18 @@ export const reportsPostReport = async (reportType: string, reportTargetType: st
  * 管理员获取举报列表（分页）
  * @param {number} page - 页码
  * @param {number} pageSize - 每页大小
+ * @param {string} [reportTargetType] - 举报目标类型（可选）
+ * @param {string} [status] - 处理状态（可选）
  * @returns {Promise<ApiResponse>} 举报列表响应
  */
-export const reportsAdminGetReports = async (page: number, pageSize: number) => {
-    return Request.get_auth<ApiResponse>(`/api/reports/admin?page=${page}&pageSize=${pageSize}`);
+export const reportsAdminGetReports = async (page: number, pageSize: number, reportTargetType?: string, status?: string) => {
+    return Request.get_auth<ApiResponse>(
+        `/api/reports/admin`, {
+            page,
+            pageSize,
+            reportTargetType,
+            status,
+    });
 }
 
 /**
@@ -60,6 +69,6 @@ export const reportsAdminGetReports = async (page: number, pageSize: number) => 
  * @param {string} status - 处理结果状态
  * @returns {Promise<ApiResponse>} 处理结果响应
  */
-export const reportsAdminHandleReport = async (reportIds: number[], handledBy: number, status: string) => {
-    return Request.put_auth<ApiResponse>(`/api/reports/admin`, { reportIds, handledBy, status });
+export const reportsAdminHandleReport = async (reportIds: number[], status: string) => {
+    return Request.put_auth<ApiResponse>(`/api/reports/admin`, { reportIds, status });
 }

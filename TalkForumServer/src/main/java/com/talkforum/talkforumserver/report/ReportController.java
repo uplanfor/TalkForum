@@ -40,7 +40,7 @@ public class ReportController {
     }
 
 
-    @PostMapping("/admin")
+    @PutMapping("/admin")
     @ModeratorRequired
     @Validated
     public Result handleReports(@RequestBody HandleReportDTO handleReportDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {

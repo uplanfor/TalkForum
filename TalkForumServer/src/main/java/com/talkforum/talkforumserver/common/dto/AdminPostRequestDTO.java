@@ -9,6 +9,7 @@ public class AdminPostRequestDTO {
     String status;
     Long[] clubIds;
     Long[] userIds;
+    String tag;
     int isEssence = 0;
 
     int page;

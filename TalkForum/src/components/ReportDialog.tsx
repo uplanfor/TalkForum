@@ -9,9 +9,11 @@
 import "./styles/style_reportdialog.css"
 import PopUpDialogBase from "./PopUpDialogBase"
 import { type PopUpDialogButton } from "./PopUpDialogBase"
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { throttle } from "../utils/debounce&throttle";
 import { ReportTypeEnum } from "../constants/report_constant";
+import { reportsPostReport } from "../api/ApiReports";
+import Msg from "../utils/msg";
 
 /**
  * 举报对话框属性接口
@@ -33,6 +35,10 @@ interface ReportDialogProps {
    * 举报对象的ID
    */
   reportId: number;
+  /**
+   * 举报对象的类型
+   */
+  reportTargetType: string;
 }
 
 /**
@@ -40,9 +46,10 @@ interface ReportDialogProps {
  * 用于用户提交举报，选择举报类型并填写举报原因
  * @param {ReportDialogProps} props - 组件属性
  */
-const ReportDialog = ({ onClose, notification = "Report", content = "" }: ReportDialogProps) => {
+const ReportDialog = ({ onClose, notification = "Report", content = "", reportId, reportTargetType }: ReportDialogProps) => {
   // 举报内容文本域引用，用于获取用户输入的举报原因
   const contentRef = useRef<HTMLTextAreaElement>(null);
+  const [reportTypeValue, setReportTypeValue] = useState<string>(ReportTypeEnum[0].value);
 
   /**
    * 节流处理的举报提交函数
@@ -50,7 +57,16 @@ const ReportDialog = ({ onClose, notification = "Report", content = "" }: Report
    */
   const throttleReport = throttle(async () => {
     if (!contentRef.current) { return; }
-    // TODO: 调用举报API提交举报信息
+    console.log(reportTargetType, reportId, contentRef.current.value, reportTypeValue);
+    await reportsPostReport(reportTypeValue, reportTargetType, reportId, contentRef.current.value).then((res)=>{
+      if (res.success) {
+        Msg.success(res.message);
+      } else {
+        throw new Error(res.message);
+      }
+    }).catch((err)=>{
+      Msg.error(err.message);
+    });
   }, 500);
 
   // 底部按钮配置
@@ -70,6 +86,11 @@ const ReportDialog = ({ onClose, notification = "Report", content = "" }: Report
       type: "submit"
     }
   ];
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // e.preventDefault();
+    setReportTypeValue(e.target.value);
+  };
 
   /**
    * 组件挂载时初始化举报内容
@@ -101,7 +122,7 @@ const ReportDialog = ({ onClose, notification = "Report", content = "" }: Report
             return (
               <label 
                 htmlFor={radioId} 
-                key={radioId} // React 列表必须加唯一 key
+                key={radioId}
                 style={{ marginRight: '16px', cursor: 'pointer' }} // 基础样式分隔
               >
                 <input
@@ -109,6 +130,8 @@ const ReportDialog = ({ onClose, notification = "Report", content = "" }: Report
                   name="IllegalContent" // 同名保证互斥
                   id={radioId}
                   value={item.value}
+                  checked={reportTypeValue == item.value}
+                  onChange={handleChange}
                 />
                 <span style={{ marginLeft: '4px' }}>{item.label}</span>
               </label>

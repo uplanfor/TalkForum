@@ -269,4 +269,16 @@ public class CommentServiceImpl implements CommentService {
         return commentMapper.auditComments(adminAuditCommentsDTO);
     }
 
+    /**
+     * 管理员获取评论内容
+     * @param commentIds
+     * @return
+     */
+    public List<Comment> adminGetCommentsContent(List<Long> commentIds) {
+        List<Comment> comments = commentMapper.adminGetCommentsContent(commentIds);
+        if (comments == null || comments.size() != commentIds.size()) {
+            throw new BusinessRuntimeException("Invalid number of comments!");
+        }
+        return comments;
+    }
 }

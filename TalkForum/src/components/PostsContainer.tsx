@@ -295,18 +295,18 @@ const PostContainer = ({
             // USER类型：查询指定用户的帖子
             queryParams.userIds = [targetId!];
             break;
-          case PostContainerTargetType.CLUB:
-            // CLUB类型：已经在前面处理，这里不会执行到
-            break;
+          // case PostContainerTargetType.CLUB:
+          //   // CLUB类型：已经在前面处理，这里不会执行到
+          //   break;
         }
 
-        console.log("API调用参数:", {
-          targetType,
-          targetId,
-          currentTab,
-          queryParams,
-          cursor
-        });
+        // console.log("API调用参数:", {
+        //   targetType,
+        //   targetId,
+        //   currentTab,
+        //   queryParams,
+        //   cursor
+        // });
 
         // 使用Promise包装API请求，添加延迟以模拟真实网络请求
         const result = await new Promise<ApiResponse>((resolve, reject) => {

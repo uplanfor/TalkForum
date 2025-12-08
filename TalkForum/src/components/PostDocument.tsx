@@ -162,7 +162,7 @@ const PostDocument = (props: PostDocumentProps) => {
       if (res.success) {
         setCursor(res.data.cursor);
         // 打印从API获取的评论数据
-        console.log("API returned comments:", res.data.data.map(c => ({ id: c.id, interactContent: c.interactContent })));
+        // console.log("API returned comments:", res.data.data.map(c => ({ id: c.id, interactContent: c.interactContent })));
         
         // 如果是刷新状态，替换评论列表，否则追加
       if (isRefreshing) {
@@ -178,7 +178,7 @@ const PostDocument = (props: PostDocumentProps) => {
             interactContent: existingComment ? existingComment.interactContent : item.interactContent
           };
         });
-        console.log("Refreshed comments with interactContent:", newComments.map(c => ({ id: c.id, interactContent: c.interactContent })));
+        // console.log("Refreshed comments with interactContent:", newComments.map(c => ({ id: c.id, interactContent: c.interactContent })));
         setComments(newComments);
       } else {
         // 追加评论时，保持原有评论不变，只添加新评论
@@ -202,7 +202,7 @@ const PostDocument = (props: PostDocumentProps) => {
               };
             }
           });
-          console.log("Updated comments with interactContent:", updatedComments.map(c => ({ id: c.id, interactContent: c.interactContent })));
+          // console.log("Updated comments with interactContent:", updatedComments.map(c => ({ id: c.id, interactContent: c.interactContent })));
           return updatedComments;
         });
       }
@@ -239,7 +239,7 @@ const PostDocument = (props: PostDocumentProps) => {
   useEffect(() => {
     // 如果已经加载过初始数据、正在刷新或API请求已在进行中，则直接返回
     if (hasInitialLoaded.current || isRefreshing || isLoadingRef.current) {
-      console.log("Initial load skipped - already loaded, refreshing, or loading");
+      // console.log("Initial load skipped - already loaded, refreshing, or loading");
       return;
     }
 
@@ -247,7 +247,7 @@ const PostDocument = (props: PostDocumentProps) => {
     hasInitialLoaded.current = true;
 
     // 组件挂载时直接调用loadMore
-    console.log("Initial load - calling loadMore");
+    // console.log("Initial load - calling loadMore");
     loadMore();
   }, []); // 只在组件首次挂载时执行，不在id变化时执行
 
@@ -255,7 +255,7 @@ const PostDocument = (props: PostDocumentProps) => {
   useEffect(() => {
     if (isRefreshing) {
       const refreshComments = async () => {
-        console.log("Refresh triggered - calling loadMore");
+        // console.log("Refresh triggered - calling loadMore");
         await loadMore();
         setIsRefreshing(false);
       };
@@ -405,6 +405,12 @@ const PostDocument = (props: PostDocumentProps) => {
                 Last Edited at {dayjs(updatedAt).format("HH:mm:ss MM DD, YYYY")}
               </span>
             </div>
+          </div>
+          <div className="interaction">
+            {`${viewCount} Views ${likeCount} Likes ${commentCount} Comments`}
+          </div>
+          <div className="belong">
+
           </div>
         </div>
         <div className="post-content" dangerouslySetInnerHTML={{ __html: renderContent }}></div>

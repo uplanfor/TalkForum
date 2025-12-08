@@ -7,7 +7,7 @@
        <bind name="offset" value="(page-1)*pageSize"></bind>
 
         SELECT id, user_id, report_type, report_target_type, report_target,
-               reason, status, created_at, handled_at
+               reason, status, created_at, handled_at, handled_by
         FROM report
         <where>
             <if test="reportTargetType != null">AND report_target_type = #{reportTargetType}</if>
@@ -33,8 +33,8 @@
         )
     </insert>
 
-    <update id="handleReport">
-        UPDATE report SET handled_by = #{userId}, status = #{status}
+    <update id="handleReports">
+        UPDATE report SET handled_by = #{userId}, status = #{status}, handled_at = NOW()
         WHERE id IN
         <foreach collection="reportIds" item="reportId" open="(" separator="," close=")">
             #{reportId}

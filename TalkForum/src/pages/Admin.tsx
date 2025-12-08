@@ -38,6 +38,7 @@ const AdminComments = lazy(() => import("../components/AdminComments"));
 const AdminClubs = lazy(() => import("../components/AdminClubs"));
 const AdminApplications = lazy(() => import("../components/AdminApplications"));
 const AdminInviteCodes = lazy(() => import("../components/AdminInviteCodes"));
+const AdminReports = lazy(() => import("../components/AdminReports"));
 
 /**
  * 菜单项接口
@@ -71,9 +72,10 @@ const Admin = () => {
         { icon: UsersIcon, label: "Users", component: <AdminUsers/> },
         { icon: DocumentTextIcon, label: "Posts", component: <AdminPosts/> },
         { icon: ChatBubbleLeftRightIcon, label: "Comments", component: <AdminComments/> },
-        { icon: UserGroupIcon, label: "Clubs", component: <AdminClubs/> },
+        { icon: ClipboardDocumentListIcon, label: "Reports", component: <AdminReports/> },
         { icon: ClipboardDocumentListIcon, label: "Applications", component: <AdminApplications/> },
-        { icon: KeyIcon, label: "Invite Codes", component: <AdminInviteCodes/> }
+        { icon: UserGroupIcon, label: "Clubs", component: <AdminClubs/> },
+        { icon: KeyIcon, label: "Invite Codes", component: <AdminInviteCodes/> },
     ];
     
     // 当前选中的菜单项索引

@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { usersAdminGetUsersByPage, usersAdminSetUserRole, usersAdminSetUserStatus, usersAdminResetUserPassword, type UserVO } from '../api/ApiUsers';
-import { getSingleSimpleUserInfo, type SimpleUserInfo } from '../utils/simpleUserInfoCache';
+import { getSingleSimpleUserInfo} from '../utils/simpleUserInfoCache';
 import { UserRoleEnum, UsersStatusEnum, type UserRole, type UserStatus } from '../constants/user_constant';
 import ShowTable from './ShowTable';
 import Pagination from './Pagination';

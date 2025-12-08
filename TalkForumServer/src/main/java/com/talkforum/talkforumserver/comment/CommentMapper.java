@@ -22,4 +22,6 @@ public interface CommentMapper {
     public void auditComment(Long commentId, String status);
 
     int auditComments(AdminAuditCommentsDTO adminAuditCommentsDTO);
+
+    List<Comment> adminGetCommentsContent(List<Long> commentIds);
 }

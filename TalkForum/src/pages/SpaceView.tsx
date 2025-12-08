@@ -8,6 +8,12 @@ import { ArrowLeftIcon, EllipsisHorizontalIcon } from "@heroicons/react/20/solid
 import { useState, useEffect } from "react";
 import NotFound from "./NotFound";
 import { usersGetDetailedUserInfo } from "../api/ApiUsers";
+import Msg from "../utils/msg";
+import ReportDialog from "../components/ReportDialog";
+import { copyToClipboard } from "../utils/clipboard";
+import { ReportTargetConstant } from "../constants/report_constant";
+import { createPortal } from "react-dom";
+import { getSingleSimpleUserInfo } from "../utils/simpleUserInfoCache";
 
 /**
  * SpaceView组件属性接口
@@ -22,6 +28,7 @@ const SpaceView = ({}: SpaceViewProps) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [ok, setOk] = useState(true);
+  const [showReportDialog, setShowReportDialog] = useState(false);
 
   // 验证type参数并转换为PostContainerTargetType
   const validType = type === "club" ? PostContainerTargetType.CLUB : PostContainerTargetType.USER;
@@ -79,7 +86,20 @@ const SpaceView = ({}: SpaceViewProps) => {
         <h2 className="space-title">
           {validType === "club" ? "Club Space" : "User Space"}
         </h2>
-        <EllipsisHorizontalIcon/>
+        <EllipsisHorizontalIcon onClick={async (e)=>{
+          const menus = [
+            "Share Space", "Report"
+          ];
+          const res = await Msg.menu(menus);
+          if (res != -1) {
+            if (res == 0) {
+              copyToClipboard(String(window.location));
+              Msg.success("Already copy the link at the copyboard!Send to friends to recommand it!")
+            } else if (res == 1) {
+              setShowReportDialog(true);
+            }
+          }
+        }}/>
       </div>
       <InfoBackground 
         targetId={spaceId}
@@ -89,6 +109,20 @@ const SpaceView = ({}: SpaceViewProps) => {
         targetType={validType} 
         targetId={spaceId}
       />
+
+      {showReportDialog && createPortal(
+        validType == PostContainerTargetType.USER ?
+        <ReportDialog 
+          onClose={() => setShowReportDialog(false)} 
+          reportId={spaceId} reportTargetType={ReportTargetConstant.USER} 
+          notification={`Report the user ${getSingleSimpleUserInfo(spaceId).name} (${spaceId})`}/> :
+        <ReportDialog 
+          onClose={() => setShowReportDialog(false)} 
+          reportId={spaceId} reportTargetType={ReportTargetConstant.CLUB} 
+          notification={`Report the club ${spaceId}`}/>,
+        document.body)
+
+      }
     </div>
   ) : (
     <NotFound />

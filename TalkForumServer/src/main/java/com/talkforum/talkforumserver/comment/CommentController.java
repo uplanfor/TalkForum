@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -154,5 +155,17 @@ public class CommentController {
     public Result adminAuditComments(@RequestBody AdminAuditCommentsDTO adminAuditCommentsDTO) {
         return Result.success("Successfully audit comments!", commentService.adminAuditComments(adminAuditCommentsDTO));
     }
+
+    /**
+     * 管理员获取评论内容
+     * @param commentIds 评论id
+     * @return 评论列表
+     */
+    @ModeratorRequired
+    @GetMapping("/admin/content")
+    public Result adminGetCommentsContent(List<Long> commentIds) {
+        return Result.success("Successfully get comments content", commentService.adminGetCommentsContent(commentIds));
+    }
+
 
 }

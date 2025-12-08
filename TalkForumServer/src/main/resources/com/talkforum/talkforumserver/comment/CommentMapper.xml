@@ -104,4 +104,15 @@
             #{commentId}
         </foreach>
     </update>
+
+    <select id="adminGetCommentsContent" resultType="com.talkforum.talkforumserver.common.entity.Comment">
+        SELECT
+            c.id, c.post_id, c.user_id, c.root_id, c.parent_id, c.content,
+            c.status, c.created_at, c.like_count, c.comment_count
+        FROM `comment` c
+        WHERE id IN
+        <foreach collection="commentIds" item="commentId" open="(" close=")" separator=",">
+            #{commentId}
+        </foreach>
+    </select>
 </mapper>

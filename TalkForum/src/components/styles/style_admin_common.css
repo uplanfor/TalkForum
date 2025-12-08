@@ -4,7 +4,8 @@
 .admin-posts-container,
 .admin-comments-container,
 .admin-users-container,
-.admin-invitecodes-container {
+.admin-invitecodes-container,
+.admin-reports-container {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
@@ -102,7 +103,8 @@
 .admin-posts-container table,
 .admin-comments-container table,
 .admin-users-container table,
-.admin-invitecodes-container table {
+.admin-invitecodes-container table,
+.admin-reports-container table {
   border-collapse: collapse;
   width: 100%;
   background-color: var(--neutral-module);
@@ -114,7 +116,8 @@
 .admin-posts-container th,
 .admin-comments-container th,
 .admin-users-container th,
-.admin-invitecodes-container th {
+.admin-invitecodes-container th,
+.admin-reports-container th {
   background-color: var(--secondary-warm-1);
   color: var(--neutral-text-main);
   font-weight: 600;
@@ -126,7 +129,8 @@
 .admin-posts-container td,
 .admin-comments-container td,
 .admin-users-container td,
-.admin-invitecodes-container td {
+.admin-invitecodes-container td,
+.admin-reports-container td {
   padding: 12px 15px;
   border-bottom: 1px solid var(--neutral-border);
   color: var(--neutral-text-main);
@@ -135,14 +139,16 @@
 .admin-posts-container tr:last-child td,
 .admin-comments-container tr:last-child td,
 .admin-users-container tr:last-child td,
-.admin-invitecodes-container tr:last-child td {
+.admin-invitecodes-container tr:last-child td,
+.admin-reports-container tr:last-child td {
   border-bottom: none;
 }
 
 .admin-posts-container tr:hover,
 .admin-comments-container tr:hover,
 .admin-users-container tr:hover,
-.admin-invitecodes-container tr:hover {
+.admin-invitecodes-container tr:hover,
+.admin-reports-container tr:hover {
   background-color: var(--secondary-warm-1);
 }
 
@@ -356,6 +362,38 @@ input[type="checkbox"] {
   height: 16px;
   cursor: pointer;
   accent-color: var(--secondary-cool);
+}
+
+/* 复选框列样式 */
+.checkbox-column {
+  width: 50px;
+}
+
+/* 用户信息样式 */
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+/* 空内容样式 */
+.empty-content {
+  padding: 20px;
+  text-align: center;
+}
+
+/* 分页容器样式 */
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
 }
 
 /* 响应式设计 */

@@ -11,7 +11,7 @@ public interface ReportMapper {
 
     long countReports(String reportTargetType, String status);
 
-    void handleReports(String status, Report[] reportIds, long userId);
+    void handleReports(String status, Long[] reportIds, long userId);
 
     void addReport(long userId, String reportType, String reportTargetType, Long reportTarget, String reason);
 }

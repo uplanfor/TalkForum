@@ -136,3 +136,15 @@ export const commentAdminAuditComments = (commentIds: number[], status: CommentS
         commentIds, status,
     });
 }
+
+
+/**
+ * 管理员获得评论内容
+ * @param {number[]} commentIds - 评论ID数组
+ * @returns {Promise<ApiResponse<Comment[]>>} 评论内容响应
+ */
+export const commentAdminGetCommentsContent = (commentIds: number[]): Promise<ApiResponse<Comment[]>> => {
+    return Request.get_auth<ApiResponse<Comment[]>>("/api/comments/admin/content", {
+        commentIds,
+    });
+}

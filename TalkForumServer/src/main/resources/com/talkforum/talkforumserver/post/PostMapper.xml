@@ -7,9 +7,10 @@
 
     <select id="getPostVO" resultType="com.talkforum.talkforumserver.common.vo.PostVO">
         SELECT
-        id, title, brief, user_id, content,
-        club_id, status, is_essence, created_at, updated_at,
-        view_count, like_count, comment_count
+            id, title, brief, user_id, content,
+            club_id, status, is_essence, created_at, updated_at,
+            view_count, like_count, comment_count,
+            tag1, tag2, tag3
         FROM post
         WHERE id = #{postId}
     </select>
@@ -24,9 +25,10 @@
 
     <select id="getPosts" resultType="com.talkforum.talkforumserver.common.vo.PostVO">
         SELECT
-        id, title, brief, user_id,
-        club_id, status, is_essence, created_at,
-        view_count, like_count, comment_count
+            id, title, brief, user_id,
+            club_id, status, is_essence, created_at,
+            view_count, like_count, comment_count,
+            tag1, tag2, tag3
         FROM post
         <where>
             status = 'PASS'
@@ -43,6 +45,8 @@
                     #{userId}
                 </foreach>
             </if>
+            <if test="tag != null">
+                AND (tag1 = #{tag} OR tag2 = #{tag} OR tag3 = #{tag})</if>
             <if test="isEssence != null">AND is_essence = #{isEssence}</if>
         </where>
         ORDER BY id DESC <!-- 按id降序，id越大越新 -->
@@ -51,9 +55,11 @@
 
     <insert id="addPost" useGeneratedKeys="true" keyProperty="postCommitDTO.id" keyColumn="id">
         INSERT INTO post (
-            title, content, user_id, club_id, status, brief
+            title, content, user_id, club_id, status, brief, tag1, tag2, tag3
         ) VALUES (
-            #{postCommitDTO.title}, #{postCommitDTO.content}, #{postCommitDTO.userId}, #{postCommitDTO.clubId}, #{status}, #{brief}
+            #{postCommitDTO.title}, #{postCommitDTO.content}, #{postCommitDTO.userId},
+                  #{postCommitDTO.clubId}, #{status}, #{brief},
+                  #{postCommitDTO.tag1}, #{postCommitDTO.tag2}, #{postCommitDTO.tag3}
         )
     </insert>
 
@@ -62,6 +68,9 @@
         <set>
             <if test="postEditDTO.title != null">title = #{postEditDTO.title},</if>
             <if test="postEditDTO.content != null">content = #{postEditDTO.content},</if>
+            <if test="postEditDTO.tag1 != null">tag1 = #{postEditDTO.tag1},</if>
+            <if test="postEditDTO.tag2 != null">tag2 = #{postEditDTO.tag2},</if>
+            <if test="postEditDTO.tag3 != null">tag3 = #{postEditDTO.tag3},</if>
             <if test="status != null">status = #{status},</if>
             updated_at = NOW(),
             brief = #{brief}
@@ -84,11 +93,11 @@
     <select id="adminGetPosts" resultType="com.talkforum.talkforumserver.common.vo.PostVO">
         <bind name="offset" value="(page - 1) * pageSize"></bind>
         <!--这样就可以计算offset了-->
-
         SELECT
-        id, title, brief, user_id,
-        club_id, status, is_essence, created_at,
-        view_count, like_count, comment_count
+            id, title, brief, user_id,
+            club_id, status, is_essence, created_at,
+            view_count, like_count, comment_count,
+            tag1, tag2, tag3
         FROM post
         <where>
             <if test="status != null">AND status = #{status}</if>
@@ -103,6 +112,9 @@
                 <foreach collection="userIds" item="userId" open="(" separator="," close=")">
                     #{userId}
                 </foreach>
+            </if>
+            <if test="tag != null">
+                AND (tag1 = #{tag} OR tag2 = #{tag} OR tag3 = #{tag})
             </if>
         </where>
         ORDER BY id DESC

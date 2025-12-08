@@ -41,13 +41,14 @@ const InfoBackground = (props: InfoBackgroundProps) => {
 
   const targetType = props.targetType;
   const targetId = targetType === InfoBackgroundType.SELF ? id : (props.targetId ?? 0);
-  console.log(targetType, targetId);
   // 判断是否为当前用户
   let isSelf = (targetType === InfoBackgroundType.SELF && isLoggedIn) || (targetType === InfoBackgroundType.USER && isLoggedIn && targetId == id);
 
   // 其他用户信息状态
   const [otherUser, setOtherUser] = useState<UserVO | null>(null);
 
+  
+  // console.log(targetType, targetId);
 
   // 实现关注功能
   const handleFollow = async () => {

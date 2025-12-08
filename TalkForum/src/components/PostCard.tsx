@@ -35,7 +35,10 @@ export interface PostCardProps {
     commentCount: number;    // 评论数
     isEssence: number;       // 是否精华（0：非精华，1：精华）
     createdAt: string;       // 发布时间
-    interactContent?: number;// 互动内容
+    interactContent?: number;// 互动内容（参考interaction接口）
+    tag1?: string | null;    // 标签1（可为空）
+    tag2?: string | null;    // 标签2（可为空）
+    tag3?: string | null;    // 标签3（可为空）
 };
 
 /**
@@ -46,7 +49,8 @@ const PostCard = (props: PostCardProps) => {
     // 解构组件属性
     const { title, brief, coverLink,
         userId, id, clubId, createdAt, isEssence,
-        viewCount, likeCount, commentCount, interactContent
+        viewCount, likeCount, commentCount, interactContent,
+        tag1, tag2, tag3
     } = props;
 
     // 路由导航钩子
@@ -216,7 +220,7 @@ const PostCard = (props: PostCardProps) => {
         </div>
 
         {/* 帖子统计信息，点击打开评论区 */}
-        <div className="detail" onClick={() => openPost(id, PostViewType.COMMENT)}>
+        <div className="interaction" onClick={() => openPost(id, PostViewType.COMMENT)}>
             <span> <EyeIcon /> {viewCount} </span>     {/* 浏览量 */}
             <span className="like-btn" onClick={(e) => {
                 e.stopPropagation();
@@ -225,6 +229,15 @@ const PostCard = (props: PostCardProps) => {
             <span> <ChatBubbleBottomCenterIcon /> {commentCount}</span> {/* 评论数 */}
             {/* <span>{clubId}</span> */}
         </div>
+
+        {/* 圈子信息和标签 */}
+        <div className="belong">
+            {clubId && <span onClick={() => openSpaceView(clubId, SpaceViewType.CLUB)}>{clubId}</span>}
+            {tag1 && <span className="tag tag1">{tag1}</span>}
+            {tag2 && <span className="tag tag2">{tag2}</span>}
+            {tag3 && <span className="tag tag3">{tag3}</span>}
+        </div>
+        
 
         {/* 帖子操作菜单 */}
         <div className="menu">

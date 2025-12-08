@@ -29,7 +29,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public void handleReports(String status, Report[] reportIds, long userId) {
+    public void handleReports(String status, Long[] reportIds, long userId) {
         reportMapper.handleReports(status, reportIds, userId);
     }
 

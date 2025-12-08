@@ -13,7 +13,7 @@ import PostDialog from "../components/PostDialog";
 import { createPortal } from "react-dom";
 import BackgroundImg from "../components/BackgroundImg";
 import "./styles/style_postview.css"
-import { DefaultBackgroundUrl, PostViewType } from "../constants/default";
+import { DefaultBackgroundUrl, PostViewType, UserType } from "../constants/default";
 import { useEffect, useState, useRef, useCallback, type JSX } from "react";
 import { debounce } from "../utils/debounce&throttle";
 import { postsDeletePostAuth, postsGetPostDetailInformation } from "../api/ApiPosts";
@@ -28,6 +28,7 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 import { copyToClipboard } from "../utils/clipboard";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import NotFound from "./NotFound";
+import { ReportTargetConstant, ReportTypeEnum } from "../constants/report_constant";
 
 
 /**
@@ -64,7 +65,7 @@ const PostView = () => {
   // 渲染的帖子内容（Markdown转换后的HTML）
   const [renderContent, setRenderContent] = useState<string>("");
   // 从Redux获取用户登录状态
-  const { isLoggedIn } = useSelector((state: any) => state.user);
+  const { isLoggedIn, role } = useSelector((state: any) => state.user);
   // 评论回复目标状态
   const [commentTarget, setCommentTarget] = useState<CommentTarget>({ parentId: null, rootId: null, userId: null, commentToContent: "" });
   // 是否显示编辑帖子对话框
@@ -75,10 +76,11 @@ const PostView = () => {
   const [post, setPost] = useState<PostType>({
     id: postId ? parseInt(postId) : 0,
     title: "",
+    brief: "",
     content: "",
     userId: 0,
     clubId: null,
-    status: 0,
+    status: "PASS",
     isEssence: 0,
     createdAt: "",
     updatedAt: "",
@@ -86,6 +88,9 @@ const PostView = () => {
     likeCount: 0,
     commentCount: 0,
     interactContent: 0,
+    tag1: null,
+    tag2: null,
+    tag3: null,
   });
 
   // 目录数据状态
@@ -232,12 +237,18 @@ const PostView = () => {
         <ArrowLeftIcon onClick={handleClose} />
 
         <EllipsisHorizontalIcon onClick={async () => {
-          const menus = [
+          let menus;
+          if (isLoggedIn && role != UserType.USER) {
+            menus = [
             "Share Post",
             "Report post",
             "Edit post",
             "Delete post",
-          ]
+          ]} else {
+            menus = [
+            "Share Post",
+            "Report post",
+          ]}
           
           await Msg.menu(menus, "What do you want to do with this post?").then(async res => {
             switch (res) {
@@ -259,10 +270,10 @@ const PostView = () => {
                       Msg.success(res.message);
                       handleClose();
                     } else {
-                      Msg.error(res.message);
+                      throw new Error(res.message);
                     }
                   }).catch(err => {
-                    Msg.error(err.message);
+                    Msg.error(err);
                     console.log(err);
                   })
                 }
@@ -332,11 +343,18 @@ const PostView = () => {
       </div>
 
       {showPostDialog && createPortal(
-        <PostDialog notification="Edit post" title={post.title} content={post.content} postId={post.id} onClose={() => setShowPostDialog(false)} />,
+        <PostDialog 
+          notification="Edit post" 
+          title={post.title} content={post.content} 
+          tag1={post.tag1} tag2={post.tag2} tag3={post.tag3}
+          postId={post.id} onClose={() => setShowPostDialog(false)} />,
         document.body
       )}
       {showReportDialog && createPortal(
-        <ReportDialog onClose={() => setShowReportDialog(false)} reportId={post.id} />,
+        <ReportDialog 
+          onClose={() => setShowReportDialog(false)} 
+          reportId={post.id} reportTargetType={ReportTargetConstant.POST} 
+          notification={`Report Post(id: ${post.id}) By author ${getSingleSimpleUserInfo(post.userId).name}(id: ${post.userId}): ${ post.brief.length > 16 ? post.brief.substring(0, 16) + "..." : post.brief }`}/>,
         document.body)}
     </div>) : <NotFound />
   );

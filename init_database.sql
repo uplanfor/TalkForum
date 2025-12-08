@@ -87,6 +87,9 @@ CREATE TABLE `post` (
   `view_count` int NOT NULL DEFAULT 0 COMMENT '阅读次数',
   `like_count` int NOT NULL DEFAULT 0 COMMENT '点赞数量',
   `comment_count` int NOT NULL DEFAULT 0 COMMENT '评论数量',
+  `tag1` varchar(32) DEFAULT NULL COMMENT '标签1',
+  `tag2` varchar(32) DEFAULT NULL COMMENT '标签2',
+  `tag3` varchar(32) DEFAULT NULL COMMENT '标签3',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_post_club_status_created` (`club_id`, `status`, `created_at` DESC) COMMENT '规范要求：复合唯一索引（圈子+状态+创建时间倒序）',
   KEY `fk_post_user` (`user_id`) COMMENT '关联作者',
@@ -95,6 +98,9 @@ CREATE TABLE `post` (
   KEY `idx_post_is_essence` (`is_essence`) COMMENT '筛选精华帖',
   KEY `idx_post_created_at` (`created_at`) COMMENT '按创建时间排序',
   KEY `idx_post_updated_at` (`updated_at`) COMMENT '按更新时间排序',
+  KEY `idx_post_tag1` (`tag1`) COMMENT '按标签1筛选帖子',
+  KEY `idx_post_tag2` (`tag2`) COMMENT '按标签2筛选帖子',
+  KEY `idx_post_tag3` (`tag3`) COMMENT '按标签3筛选帖子',
   CONSTRAINT `fk_post_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_post_club` FOREIGN KEY (`club_id`) REFERENCES `club` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='帖子表（储存所有帖子，作者删除时级联删除帖子；圈子删除时级联删除帖子）';
@@ -240,3 +246,13 @@ CREATE TABLE `report` (
   KEY `idx_report_handled` (`handled_at`) COMMENT '按处理时间排序',
   CONSTRAINT `fk_report_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='举报表（记录举报记录，举报人删除时级联删除举报记录）';
+
+
+-- 14. 标签表
+CREATE TABLE `tag` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '标签唯一标识',
+  `name` varchar(32) NOT NULL COMMENT '标签名称',
+  `description` varchar(512) DEFAULT NULL COMMENT '标签描述',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_tag_name` (`name`) COMMENT '规范要求：标签名称唯一'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='标签表（记录所有标签）';

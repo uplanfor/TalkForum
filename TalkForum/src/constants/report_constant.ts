@@ -14,3 +14,17 @@ export const ReportTypeEnum: ReportTypeItem[] = [
   { value: 'feudalSuperstition', label: 'Feudal superstition' },
   { value: 'others', label: 'Others' },
 ];
+
+
+export const ReportTargetConstant = {
+  POST: "POST",
+  COMMENT: "COMMENT",
+  USER: "USER",
+  CLUB: "CLUB",
+}
+
+
+export const ReportProcessConstant = {
+  PENDING: "PENDING",
+  HANDLED: "HANDLED",
+}

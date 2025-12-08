@@ -51,8 +51,8 @@ export const authSignIn = (nameOrEmail: string, password: string) : Promise<Auth
  * 用户登出
  * @returns 登出响应
  */
-export const authSignOut = () : Promise<any> => {
-    return Request.post("/api/auth/logout");
+export const authSignOut = () : Promise<ApiResponse> => {
+    return Request.post<ApiResponse>("/api/auth/logout");
 }
 
 /**

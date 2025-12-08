@@ -18,6 +18,134 @@
     background-color: var(--neutral-module);
 }
 
+/* 标签容器样式 */
+.post-dialog-tags-container {
+    margin-bottom: 16px;
+}
+
+/* 标签编辑器容器 */
+.post-dialog-tag-editor {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+/* 标签样式 */
+.post-tag1, .post-tag2, .post-tag3 {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    border: 1px solid var(--primary);
+    border-radius: 20px;
+    font-size: 14px;
+    /* background-color: var(--secondary-warm-1); */
+    color: var(--neutral-text-main);
+    outline: none;
+    min-width: 60px;
+    max-width: 200px;
+    width: auto;
+    cursor: text;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+/* 标签容器前添加#符号 */
+.post-tag1::before, .post-tag2::before, .post-tag3::before {
+    content: "#";
+    position: absolute;
+    left: 12px;
+    color: var(--primary);
+    z-index: 1;
+    pointer-events: none;
+    font-weight: normal;
+}
+
+/* 标签内输入框样式 */
+.post-tag-input {
+    padding: 0 5px;
+    width: 90px;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 14px;
+    color: var(--neutral-text-main);
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 标签删除按钮样式 */
+.post-tag-remove {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--secondary-warm-2);
+    opacity: 0.7;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.post-tag-remove:hover {
+    opacity: 1;
+    color: var(--primary);
+}
+
+/* 标签输入容器样式 */
+.post-dialog-tag-input-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* 标签输入框样式 */
+.post-dialog-tag-input {
+    padding: 8px 12px;
+    border: 1px solid var(--neutral-border);
+    border-radius: 20px;
+    font-size: 14px;
+    color: var(--neutral-text-main);
+    outline: none;
+    min-width: 100px;
+}
+
+/* 标签添加按钮样式 */
+.post-dialog-tag-add-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--primary);
+    border-radius: 20px;
+    background-color: var(--neutral-module);
+    color: var(--primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.post-dialog-tag-add-btn:hover:not(:disabled) {
+    background-color: var(--secondary-warm-1);
+    border-color: var(--primary);
+    color: var(--secondary-warm-2);
+}
+
+.post-dialog-tag-add-btn:disabled {
+    background-color: var(--neutral-bg);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
 .post-dialog-textarea {
     flex: 1;
     width: 100%;
