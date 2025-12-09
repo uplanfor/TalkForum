@@ -11,6 +11,8 @@ import { usersGetDetailedUserInfo, type UserVO } from "../api/ApiUsers";
 import { changeUserFollowing } from "../store/slices/userSlice";
 import Msg from "../utils/msg";
 import { interactionsFollowOrUnfollowUser } from "../api/ApiInteractions";
+import { createPortal } from "react-dom";
+import ProfileDialog from "./ProfileDialog";
 
 /**
  * 信息背景组件属性接口
@@ -46,6 +48,9 @@ const InfoBackground = (props: InfoBackgroundProps) => {
 
   // 其他用户信息状态
   const [otherUser, setOtherUser] = useState<UserVO | null>(null);
+  
+  // ProfileDialog显示状态
+  const [showProfileDialog, setShowProfileDialog] = useState(false);
 
   
   // console.log(targetType, targetId);
@@ -196,7 +201,16 @@ const InfoBackground = (props: InfoBackgroundProps) => {
       <div className="info-container">
         <div className="info">
           {/* 关注按钮 */}
-          <button className={`info-interact-button ${following.includes(targetId) ? "following" : "follow"}`} onClick={handleFollow}>{following.includes(targetId) ? "Following" : "Follow"}</button>
+          {targetType === InfoBackgroundType.SELF ? (
+            <button
+              className="info-interact-button follow"
+              onClick={() => setShowProfileDialog(true)}
+            >
+              Edit
+            </button>
+          ) : (
+            <button className={`info-interact-button ${following.includes(targetId) ? "following" : "follow"}`} onClick={handleFollow}>{following.includes(targetId) ? "Following" : "Follow"}</button>
+          )}
           {/* 用户头像 */}
           <img src={userInfo.avatarLink} alt="Avatar Image" />
           <div className="info-combo">
@@ -229,6 +243,16 @@ const InfoBackground = (props: InfoBackgroundProps) => {
           {userInfo.intro}
         </div>
       </div>
+      
+      {/* ProfileDialog挂载到body下 */}
+      {showProfileDialog &&
+        createPortal(
+          <ProfileDialog
+            onClose={() => setShowProfileDialog(false)}
+          />,
+          document.body
+        )
+      }
     </BackgroundImg>
   );
 };

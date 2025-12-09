@@ -10,13 +10,11 @@ import dayjs from "dayjs";
 import { useState, useEffect, useCallback } from "react";
 import {
   adminGetInvitecodeByPage,
-  adminUpdateInviteCodes,
-  adminDeleteInviteCodes,
-  adminGenerateInviteCodes,
-  type InvitecodePage
+  adminDeleteInviteCodes
 } from "../api/ApiInvitecode";
 import { requestSimpleUserInfoCache, getSingleSimpleUserInfo } from "../utils/simpleUserInfoCache";
 import { throttle } from '../utils/debounce&throttle';
+import InviteCodeDialog, { type InviteCodeDialogType } from "./InviteCodeDialog";
 
 /**
  * 管理员邀请码管理组件
@@ -29,16 +27,11 @@ const AdminInviteCodes = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selectedCodes, setSelectedCodes] = useState<string[]>([]);
-  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
-  const [updateMaxCount, setUpdateMaxCount] = useState("");
-  const [updateExpiredDays, setUpdateExpiredDays] = useState("");
   const [selectAll, setSelectAll] = useState(false);
 
-  // 创建邀请码相关状态
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [createMaxCount, setCreateMaxCount] = useState("");
-  const [createExpiredDays, setCreateExpiredDays] = useState("");
-  const [createCount, setCreateCount] = useState("");
+  // 邀请码对话框状态
+  const [showInviteCodeDialog, setShowInviteCodeDialog] = useState(false);
+  const [dialogType, setDialogType] = useState<InviteCodeDialogType>("create");
 
   const loadInviteCodes = async (pageNum: number, size: number) => {
     setLoading(true);
@@ -96,118 +89,51 @@ const AdminInviteCodes = () => {
   // 判断是否所有项目都被选中
   const isAllSelected = inviteCodes.length > 0 && selectedCodes.length === inviteCodes.length;
 
-  // 批量更新邀请码
-  const handleUpdateCodes = async () => {
+  // 打开创建邀请码对话框
+  const handleOpenCreateDialog = () => {
+    setDialogType("create");
+    setShowInviteCodeDialog(true);
+  };
+
+  // 打开更新邀请码对话框
+  const handleOpenUpdateDialog = () => {
     if (selectedCodes.length === 0) {
       Msg.error("Please select invite codes to update");
       return;
     }
-
-    if (!updateMaxCount || !updateExpiredDays) {
-      Msg.error("Both max usage count and expiration days are required");
-      return;
-    }
-
-    const maxCount = parseInt(updateMaxCount);
-    const expiredDays = parseInt(updateExpiredDays);
-
-    if (isNaN(maxCount) || maxCount < 1) {
-      Msg.error("Max usage count must be a positive number");
-      return;
-    }
-
-    if (isNaN(expiredDays) || expiredDays < 1) {
-      Msg.error("Expiration days must be a positive number");
-      return;
-    }
-
-    await adminUpdateInviteCodes(selectedCodes, maxCount, expiredDays).then(async res => {
-      if (res.success) {
-        Msg.success(res.message || "Invite codes updated successfully");
-        setShowUpdateDialog(false);
-        setUpdateMaxCount("");
-        setUpdateExpiredDays("");
-        setSelectedCodes([]);
-        setSelectAll(false);
-        await loadInviteCodes(page, pageSize);
-      } else {
-        throw new Error(res.message);
-      }
-    }).catch(err => {
-      Msg.error(err || "Update failed");
-      console.error(err);
-    })
+    setDialogType("update");
+    setShowInviteCodeDialog(true);
   };
 
-  // 批量删除邀请码
+  // 处理对话框成功回调
+  const handleDialogSuccess = () => {
+    setSelectedCodes([]);
+    setSelectAll(false);
+    loadInviteCodes(page, pageSize);
+  };
+
+  // 删除选中的邀请码
   const handleDeleteCodes = async () => {
     if (selectedCodes.length === 0) {
       Msg.error("Please select invite codes to delete");
       return;
     }
-
-    const confirmed = await Msg.confirm(`Are you sure you want to delete the selected ${selectedCodes.length} invite codes?`);
-    if (!confirmed) {
-      return;
-    }
-
-    await adminDeleteInviteCodes(selectedCodes).then(async res => {
+    
+    try {
+      const res = await adminDeleteInviteCodes(selectedCodes);
       if (res.success) {
-        Msg.success(res.message || "Invite codes deleted successfully");
+        Msg.success(`Successfully deleted ${selectedCodes.length} invite code(s)`);
         setSelectedCodes([]);
         setSelectAll(false);
-        await loadInviteCodes(page, pageSize);
+        loadInviteCodes(page, pageSize);
       } else {
         throw new Error(res.message);
       }
-    }).catch(err => {
-      Msg.error(err || "Delete failed");
+    } catch (err: any) {
+      Msg.error(err.message || "Failed to delete invite codes");
       console.error(err);
-    })
+    }
   };
-
-  // 批量创建邀请码
-  const handleCreateCodes = async () => {
-    if (!createMaxCount || !createExpiredDays || !createCount) {
-      Msg.error("All fields are required");
-      return;
-    }
-
-    const maxCount = parseInt(createMaxCount);
-    const expiredDays = parseInt(createExpiredDays);
-    const generateCount = parseInt(createCount);
-
-    if (isNaN(maxCount) || maxCount < 1) {
-      Msg.error("Max usage count must be a positive number");
-      return;
-    }
-
-    if (isNaN(expiredDays) || expiredDays < 1) {
-      Msg.error("Expiration days must be a positive number");
-      return;
-    }
-
-    if (isNaN(generateCount) || generateCount < 1) {
-      Msg.error("Generate count must be a positive number");
-      return;
-    }
-
-    await adminGenerateInviteCodes(maxCount, expiredDays, generateCount).then(async res => {
-      if (res.success) {
-        Msg.success(res.message || `${generateCount} invite codes created successfully`);
-        setShowCreateDialog(false);
-        setCreateMaxCount("");
-        setCreateExpiredDays("");
-        setCreateCount("");
-        await loadInviteCodes(page, pageSize);
-      } else {
-        throw new Error(res.message);
-      }
-    }).catch(err => {
-      Msg.error(err || "Create failed");
-      console.error(err);
-    });
-  }
 
   const totalPages = Math.ceil(total / pageSize);
 
@@ -219,13 +145,13 @@ const AdminInviteCodes = () => {
       <div className="action-buttons">
         <button
           className="btn btn-primary"
-          onClick={() => setShowCreateDialog(true)}
+          onClick={handleOpenCreateDialog}
         >
           Create New Invite Codes
         </button>
         <button
           className="btn btn-primary"
-          onClick={() => setShowUpdateDialog(true)}
+          onClick={handleOpenUpdateDialog}
           disabled={selectedCodes.length === 0}
         >
           Update Selected ({selectedCodes.length})
@@ -292,98 +218,14 @@ const AdminInviteCodes = () => {
         onPageChange={setPage}
       />
 
-      {/* 更新对话框 */}
-      {showUpdateDialog && (
-        <div className="dialog-overlay">
-          <div className="dialog">
-            <h2>Update Invite Codes (All fields required)</h2>
-            <div className="form-group">
-              <label>Max Usage Count *</label>
-              <input
-                type="number"
-                value={updateMaxCount}
-                onChange={(e) => setUpdateMaxCount(e.target.value)}
-                min="1"
-                placeholder="Enter max usage count"
-              />
-            </div>
-            <div className="form-group">
-              <label>Expiration Days *</label>
-              <input
-                type="number"
-                value={updateExpiredDays}
-                onChange={(e) => setUpdateExpiredDays(e.target.value)}
-                min="1"
-                placeholder="Enter expiration days"
-              />
-            </div>
-            <div className="dialog-buttons">
-              <button className="btn btn-secondary" onClick={() => {
-                setShowUpdateDialog(false);
-                setUpdateMaxCount("");
-                setUpdateExpiredDays("");
-              }}>
-                Cancel
-              </button>
-              <button className="btn btn-primary" onClick={handleUpdateCodes}>
-                Confirm Update
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 创建对话框 */}
-      {showCreateDialog && (
-        <div className="dialog-overlay">
-          <div className="dialog">
-            <h2>Create New Invite Codes (All fields required)</h2>
-            <div className="form-group">
-              <label>Max Usage Count *</label>
-              <input
-                type="number"
-                value={createMaxCount}
-                onChange={(e) => setCreateMaxCount(e.target.value)}
-                min="1"
-                placeholder="Enter max usage count"
-              />
-            </div>
-            <div className="form-group">
-              <label>Expiration Days *</label>
-              <input
-                type="number"
-                value={createExpiredDays}
-                onChange={(e) => setCreateExpiredDays(e.target.value)}
-                min="1"
-                placeholder="Enter expiration days"
-              />
-            </div>
-            <div className="form-group">
-              <label>Generate Count *</label>
-              <input
-                type="number"
-                value={createCount}
-                onChange={(e) => setCreateCount(e.target.value)}
-                min="1"
-                placeholder="Enter number of codes to generate"
-              />
-            </div>
-            <div className="dialog-buttons">
-              <button className="btn btn-secondary" onClick={() => {
-                setShowCreateDialog(false);
-                setCreateMaxCount("");
-                setCreateExpiredDays("");
-                setCreateCount("");
-              }}>
-                Cancel
-              </button>
-              <button className="btn btn-primary" onClick={handleCreateCodes}>
-                Create Invite Codes
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 邀请码操作对话框 */}
+      <InviteCodeDialog
+        type={dialogType}
+        isOpen={showInviteCodeDialog}
+        onClose={() => setShowInviteCodeDialog(false)}
+        selectedCodes={selectedCodes}
+        onSuccess={handleDialogSuccess}
+      />
     </div>
   )
 }

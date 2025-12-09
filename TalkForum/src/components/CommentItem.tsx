@@ -3,20 +3,27 @@
  * 用于展示单个评论及其回复列表
  * 支持展开/折叠回复、加载更多回复、回复评论等功能
  */
-import "./styles/style_commentitem.css"
-import { type Comment } from "../api/ApiComments";
-import { getSingleSimpleUserInfo } from "../utils/simpleUserInfoCache";
-import dayjs from "dayjs";
-import { type CommentTargetCallback } from "../pages/PostView";
-import { HandThumbUpIcon, HandThumbDownIcon } from "@heroicons/react/24/solid";
-import { useState, useEffect } from "react";
-import { commentGetCommentReplyList } from "../api/ApiComments";
-import { interactionMakeInteractionWithComment, INTERACT_COMMENT } from "../api/ApiInteractions";
-import Msg from "../utils/msg";
-import { throttle } from "../utils/debounce&throttle";
-import { useNavigate, useLocation } from "react-router-dom";
-import { SpaceViewType } from "../constants/default";
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { HandThumbUpIcon, HandThumbDownIcon } from '@heroicons/react/24/solid';
+import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
+import { throttle } from '../utils/debounce&throttle';
+import { commentGetCommentReplyList, commentDeleteComment } from '../api/ApiComments';
+import { interactionMakeInteractionWithComment, INTERACT_COMMENT } from '../api/ApiInteractions';
+import Msg  from '../utils/msg';
+import { type Comment } from '../api/ApiComments';
+import { type CommentTargetCallback } from '../pages/PostView';
+import { getSingleSimpleUserInfo } from '../utils/simpleUserInfoCache';
+import dayjs from 'dayjs';
+import { SpaceViewType } from '../constants/default';
+import { useSelector } from "react-redux";
+import { type RootState } from "../store";
+import { UserRoleEnum } from "../constants/user_constant";
+import { ReportTargetConstant } from "../constants/report_constant";
+import { copyToClipboard } from "../utils/clipboard";
+import ReportDialog from "./ReportDialog";
 import ReplyItem from "./ReplyItem";
+import { createPortal } from 'react-dom';
 
 /**
  * 评论项组件属性接口
@@ -25,17 +32,20 @@ import ReplyItem from "./ReplyItem";
 export interface CommentItemProps extends Comment {
     setCommentTarget: CommentTargetCallback; // 设置评论目标的回调函数，用于回复评论
     onInteractionChange?: (commentId: number, newInteractContent: number, newLikeCount: number) => void; // 互动状态变化回调
+    onCommentDelete?: (commentId: number) => void; // 评论删除回调
 }
 
 /**
  * 评论项组件
  * @param {CommentItemProps} props - 组件属性
  */
-const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount, commentCount, postId, interactContent, onInteractionChange }: CommentItemProps) => {
+const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount, commentCount, postId, interactContent, onInteractionChange, onCommentDelete }: CommentItemProps) => {
     // 路由导航钩子
     const navigate = useNavigate();
     // 当前路由信息钩子
     const location = useLocation();
+    // 获取用户状态
+    const user = useSelector((state: RootState) => state.user);
     // 回复列表状态
     const [replyList, setReplyList] = useState<Comment[]>([]);
     
@@ -56,6 +66,9 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
     
     // 当前是否踩的状态
     const [isDisliked, setIsDisliked] = useState(interactContent === INTERACT_COMMENT.DISLIKE);
+    
+    // 举报对话框显示状态
+    const [showReportDialog, setShowReportDialog] = useState(false);
 
     // 当interactContent变化时，更新点赞/踩状态
     useEffect(() => {
@@ -219,6 +232,81 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
      * 限制调用频率，防止频繁请求API
      */
     const throttleLoadMoreReplies = throttle(loadMoreReplies, 1000);
+    
+    /**
+     * 处理操作菜单点击事件
+     */
+    const handleMenuClick = useCallback(async () => {
+        // 构建菜单选项
+        const menuOptions = ["Copy", "Report"];
+        
+        // 检查是否显示删除选项
+        const canDelete = user.isLoggedIn && 
+                         (user.role !== UserRoleEnum.USER || userId === user.id);
+        
+        if (canDelete) {
+            menuOptions.push("Delete");
+        }
+        
+        // 显示菜单
+        const selectedIndex = await Msg.menu(menuOptions, "Comment Options");
+        
+        // 处理用户选择
+        switch (selectedIndex) {
+            case 0: // Copy
+                handleCopy();
+                break;
+            case 1: // Report
+                setShowReportDialog(true);
+                break;
+            case 2: // Delete
+                handleDelete();
+                break;
+            default:
+                // 用户取消或关闭菜单
+                break;
+        }
+    }, [user.isLoggedIn, user.role, user.id, userId]);
+    
+    /**
+     * 处理复制评论内容
+     */
+    const handleCopy = useCallback(() => {
+        try {
+            copyToClipboard(content);
+            Msg.success("Comment copied to clipboard");
+        } catch (error) {
+            Msg.error("Failed to copy comment");
+        }
+    }, [content]);
+    
+    /**
+     * 处理删除评论
+     */
+    const handleDelete = useCallback(async () => {
+        // 显示确认对话框
+        const isConfirmed = await Msg.confirm("Are you sure you want to delete this comment?");
+        
+        if (isConfirmed) {
+            try {
+                // TODO: 调用删除评论API
+                const res = await commentDeleteComment(id);
+                
+                if (res.success) {
+                    Msg.success("Comment deleted successfully");
+                    // 通知父组件更新评论列表
+                    if (onCommentDelete) {
+                        onCommentDelete(id);
+                    }
+                } else {
+                    throw new Error(res.message);
+                }
+            } catch (error) {
+                console.error(error);
+                Msg.error("Failed to delete comment");
+            }
+        }
+    }, [id, onCommentDelete]);
 
     return (
         <div className="comment-item">
@@ -229,8 +317,13 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
             
             {/* 评论信息 */}
             <div className="comment-info">
-                {/* 用户名 */}
-                <h4 className="comment-user-name">{getSingleSimpleUserInfo(userId).name}</h4>
+                {/* 用户名和菜单 */}
+                <div className="comment-header">
+                    <h4 className="comment-user-name" onClick={() => openSpaceView(userId)}>{getSingleSimpleUserInfo(userId).name}</h4>
+                    <div className="comment-menu">
+                        <EllipsisHorizontalIcon className="menu-icon" onClick={handleMenuClick} />
+                    </div>
+                </div>
                 
                 {/* 评论内容 */}
                 <p className="comment-content">{content}</p>
@@ -262,6 +355,8 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
                                     {...comment}
                                     setCommentTarget={setCommentTarget}
                                     rootId={id}
+                                    onInteractionChange={onInteractionChange}
+                                    onCommentDelete={onCommentDelete}
                                 />
                             ))
                         )}
@@ -274,6 +369,16 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
                             {hasMore && <span onClick={throttleLoadMoreReplies}>See More</span>} </p>
                     </div>)}
             </div>
+            
+            {/* 举报对话框 - 使用Portal挂载到body下 */}
+            {showReportDialog && createPortal(
+                <ReportDialog
+                    reportId={id}
+                    reportTargetType={ReportTargetConstant.COMMENT}
+                    onClose={() => setShowReportDialog(false)}
+                />,
+                document.body
+            )}
         </div>
     )
 }

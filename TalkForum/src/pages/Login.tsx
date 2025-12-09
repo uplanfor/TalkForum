@@ -8,10 +8,11 @@
  * - 登录状态检查
  */
 import "../assets/normalize.css"
-import React, { useEffect } from "react";
+import React, { useEffect, lazy, Suspense } from "react";
 import "./styles/style_login.css";
 import { useNavigate } from "react-router-dom";
 import Msg from '../utils/msg.ts';
+import { createPortal } from "react-dom";
 
 // Redux相关导入
 import { useDispatch } from 'react-redux';
@@ -21,6 +22,9 @@ import { type AppDispatch } from '../store'; // 导入类型定义
 // API相关导入
 import { authGetLoginInfo, authSignIn } from "../api/ApiAuth.ts";
 import { usersSignOn } from "../api/ApiUsers.ts";
+
+// 懒加载PrivacyDialog组件
+const PrivacyDialog = lazy(() => import('../components/PrivacyDialog'));
 
 /**
  * 登录/注册页面组件
@@ -68,6 +72,12 @@ const Login = () => {
     inviteCode: ""      // 仅注册（可选）
   });
 
+  // 隐私协议同意状态
+  const [agreedToPrivacy, setAgreedToPrivacy] = React.useState(false);
+  
+  // 隐私政策对话框显示状态
+  const [showPrivacyDialog, setShowPrivacyDialog] = React.useState(false);
+
   /**
    * 输入框变更事件处理函数
    * 实时更新表单数据状态
@@ -94,14 +104,14 @@ const Login = () => {
 
   /**
    * 表单验证函数
-   * - 登录表单：验证用户名/邮箱和密码非空
-   * - 注册表单：验证所有必填字段非空，密码一致性
+   * - 登录表单：验证用户名/邮箱和密码非空，隐私协议勾选
+   * - 注册表单：验证所有必填字段非空，密码一致性，隐私协议勾选
    * @returns {boolean} 验证是否通过
    */
   const validateForm = (): boolean => {
     const { username, email, password, confirmPassword } = formData;
 
-    // 登录表单校验（用户名/邮箱 + 密码非空）
+    // 登录表单校验（用户名/邮箱 + 密码非空 + 隐私协议）
     if (isLogin) {
       if (!username.trim()) {
         Msg.error("Username or Email cannot be empty!", 3000);
@@ -111,8 +121,12 @@ const Login = () => {
         Msg.error("Password cannot be empty!", 3000);
         return false;
       }
+      if (!agreedToPrivacy) {
+        Msg.error("Please agree to the TalkForum Privacy Policy!", 3000);
+        return false;
+      }
     }
-    // 注册表单校验（非空 + 密码一致性）
+    // 注册表单校验（非空 + 密码一致性 + 隐私协议）
     else {
       if (!username.trim()) {
         Msg.error("Username cannot be empty!", 3000);
@@ -128,6 +142,10 @@ const Login = () => {
       }
       if (password.trim() !== confirmPassword.trim()) {
         Msg.error("Passwords do not match!", 3000);
+        return false;
+      }
+      if (!agreedToPrivacy) {
+        Msg.error("Please agree to the TalkForum Privacy Policy!", 3000);
         return false;
       }
       // 邀请码可选，无需校验
@@ -269,6 +287,32 @@ const Login = () => {
               </div>
             </>
           )}
+          
+          {/* 隐私协议同意选项 - 登录和注册表单都显示 */}
+          <div className="form-group privacy-agreement">
+            <label className="checkbox-container">
+              <input
+                type="checkbox"
+                checked={agreedToPrivacy}
+                onChange={(e) => setAgreedToPrivacy(e.target.checked)}
+              />
+              <span className="checkmark"></span>
+              <span className="privacy-text">
+                I have agreed with 
+                <button 
+                  type="button" 
+                  className="privacy-link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowPrivacyDialog(true);
+                  }}
+                >
+                  TalkForum Privacy
+                </button>
+              </span>
+            </label>
+          </div>
+          
           <button type="submit" className="submit-btn">
             {isLogin ? "Sign in" : "Sign up"}
           </button>
@@ -284,6 +328,24 @@ const Login = () => {
           </button>
         </p>
       </div>
+      
+      {/* 版权声明 - 移到组件最外层 */}
+      <div className="copyright-notice">
+        <p>© 2024 TalkForum. All rights reserved.</p>
+      </div>
+      
+      {/* 隐私政策对话框 - 挂载在body下 */}
+      {showPrivacyDialog &&
+        createPortal(
+          <Suspense fallback={<div>Loading...</div>}>
+            <PrivacyDialog
+              isOpen={showPrivacyDialog}
+              onClose={() => setShowPrivacyDialog(false)}
+            />
+          </Suspense>,
+          document.body
+        )
+      }
     </div>
   );
 };

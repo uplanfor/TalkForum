@@ -84,15 +84,15 @@ const Nav = ({
             {/* 导航链接 */}
             <ul>
                 <li><Link to="/">Home</Link></li>
-                <li><Link to="/club">Club</Link></li>
-                <li><Link to="/mail">Mail</Link></li>
+                {/* <li><Link to="/club">Club</Link></li>
+                <li><Link to="/mail">Mail</Link></li> */}
                 <li><Link to="/me">Me</Link></li>
             </ul>
             
             {/* 搜索框 */}
             <div className="search-container">
                 <MagnifyingGlassIcon />
-                <input type="text" placeholder="seek fun" onClick={showSearchDialog} />
+                <input type="text" placeholder="search for others' posts!" onClick={showSearchDialog} />
             </div>
 
             {/* 用户信息组件 */}
@@ -105,9 +105,9 @@ const Nav = ({
             {/* 底部导航链接 */}
             <ul>
                 <li><Link to="/">Home</Link></li>
-                <li><Link to="/club">Club</Link></li>
+                {/* <li><Link to="/club">Club</Link></li> */}
                 <li>{/* 占位 */}</li>
-                <li><Link to="/mail">Mail</Link></li>
+                {/* <li><Link to="/mail">Mail</Link></li> */}
                 <li><Link to="/me">Me</Link></li>
             </ul>
             {/* 发布帖子按钮 */}

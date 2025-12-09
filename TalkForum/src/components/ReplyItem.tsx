@@ -8,11 +8,20 @@ import { getSingleSimpleUserInfo } from "../utils/simpleUserInfoCache";
 import dayjs from "dayjs";
 import { type CommentTargetCallback } from "../pages/PostView";
 import { HandThumbUpIcon, HandThumbDownIcon } from "@heroicons/react/24/solid";
-import { useState, useEffect } from "react";
+import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
+import { useState, useEffect, useCallback } from "react";
 import { interactionMakeInteractionWithComment, INTERACT_COMMENT } from "../api/ApiInteractions";
-import Msg from "../utils/msg";
+import { commentDeleteComment } from "../api/ApiComments";
+import { useSelector } from "react-redux";
+import { type RootState } from "../store";
+import { UserRoleEnum } from "../constants/user_constant";
+import { ReportTargetConstant } from "../constants/report_constant";
+import  Msg  from "../utils/msg";
+import { copyToClipboard } from "../utils/clipboard";
+import ReportDialog from "./ReportDialog";
 import { useNavigate, useLocation } from "react-router-dom";
 import { SpaceViewType } from "../constants/default";
+import { createPortal } from "react-dom";
 
 /**
  * 回复项组件属性接口
@@ -21,17 +30,21 @@ import { SpaceViewType } from "../constants/default";
 export interface ReplyItemProps extends Comment {
     setCommentTarget: CommentTargetCallback; // 设置评论目标的回调函数，用于回复评论
     rootId: number; // 根评论ID
+    onInteractionChange?: (commentId: number, newInteractContent: number, newLikeCount: number) => void; // 互动状态变化回调
+    onCommentDelete?: (commentId: number) => void; // 评论删除回调
 }
 
 /**
  * 回复项组件
  * @param {ReplyItemProps} props - 组件属性
  */
-const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount, interactContent, rootId }: ReplyItemProps) => {
+const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount, interactContent, rootId, onInteractionChange, onCommentDelete }: ReplyItemProps) => {
     // 路由导航钩子
     const navigate = useNavigate();
     // 当前路由信息钩子
     const location = useLocation();
+    // 获取用户状态
+    const user = useSelector((state: RootState) => state.user);
     
     // 当前点赞数的状态
     const [curLikeCount, setCurLikeCount] = useState(likeCount);
@@ -41,6 +54,9 @@ const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount
     
     // 当前是否踩的状态
     const [isDisliked, setIsDisliked] = useState(interactContent === INTERACT_COMMENT.DISLIKE);
+    
+    // 举报对话框显示状态
+    const [showReportDialog, setShowReportDialog] = useState(false);
 
     // 当interactContent变化时，更新点赞/踩状态
     useEffect(() => {
@@ -96,14 +112,22 @@ const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount
                 // 更新点赞状态
                 setIsLiked(!isLiked);
                 
-                // 更新点赞数
+                // 计算新的点赞数
+                let newLikeCount;
                 if (isDisliked) {
                     // 如果之前是踩，现在是点赞，点赞数+2
                     setIsDisliked(false);
-                    setCurLikeCount(prev => prev + 2);
+                    newLikeCount = curLikeCount + 2;
+                    setCurLikeCount(newLikeCount);
                 } else {
                     // 正常点赞/取消点赞
-                    setCurLikeCount(prev => isLiked ? prev - 1 : prev + 1);
+                    newLikeCount = isLiked ? curLikeCount - 1 : curLikeCount + 1;
+                    setCurLikeCount(newLikeCount);
+                }
+                
+                // 通知父组件更新互动状态
+                if (onInteractionChange) {
+                    onInteractionChange(id, newInteractContent, newLikeCount);
                 }
             } else {
                 Msg.error(res.message);
@@ -136,14 +160,22 @@ const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount
                 // 更新踩状态
                 setIsDisliked(!isDisliked);
                 
-                // 更新点赞数
+                // 计算新的点赞数
+                let newLikeCount;
                 if (isLiked) {
                     // 如果之前是点赞，现在是踩，点赞数-2
                     setIsLiked(false);
-                    setCurLikeCount(prev => prev - 2);
+                    newLikeCount = curLikeCount - 2;
+                    setCurLikeCount(newLikeCount);
                 } else {
                     // 正常踩/取消踩
-                    setCurLikeCount(prev => isDisliked ? prev + 1 : prev - 1);
+                    newLikeCount = isDisliked ? curLikeCount + 1 : curLikeCount - 1;
+                    setCurLikeCount(newLikeCount);
+                }
+                
+                // 通知父组件更新互动状态
+                if (onInteractionChange) {
+                    onInteractionChange(id, newInteractContent, newLikeCount);
                 }
             } else {
                 Msg.error(res.message);
@@ -152,6 +184,81 @@ const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount
             console.error(error);
         }
     }
+    
+    /**
+     * 处理操作菜单点击事件
+     */
+    const handleMenuClick = useCallback(async () => {
+        // 构建菜单选项
+        const menuOptions = ["Copy", "Report"];
+        
+        // 检查是否显示删除选项
+        const canDelete = user.isLoggedIn && 
+                         (user.role !== UserRoleEnum.USER || userId === user.id);
+        
+        if (canDelete) {
+            menuOptions.push("Delete");
+        }
+        
+        // 显示菜单
+        const selectedIndex = await Msg.menu(menuOptions, "Reply Options");
+        
+        // 处理用户选择
+        switch (selectedIndex) {
+            case 0: // Copy
+                handleCopy();
+                break;
+            case 1: // Report
+                setShowReportDialog(true);
+                break;
+            case 2: // Delete
+                handleDelete();
+                break;
+            default:
+                // 用户取消或关闭菜单
+                break;
+        }
+    }, [user.isLoggedIn, user.role, user.id, userId]);
+    
+    /**
+     * 处理复制回复内容
+     */
+    const handleCopy = useCallback(() => {
+        try {
+            copyToClipboard(content);
+            Msg.success("Reply copied to clipboard");
+        } catch (error) {
+            Msg.error("Failed to copy reply");
+        }
+    }, [content]);
+    
+    /**
+     * 处理删除回复
+     */
+    const handleDelete = useCallback(async () => {
+        // 显示确认对话框
+        const isConfirmed = await Msg.confirm("Are you sure you want to delete this reply?");
+        
+        if (isConfirmed) {
+            try {
+                // 调用删除回复API
+                const res = await commentDeleteComment(id);
+                
+                if (res.success) {
+                    Msg.success("Reply deleted successfully");
+                    // 通知父组件更新评论列表
+                    if (onCommentDelete) {
+                        onCommentDelete(id);
+                    }
+                } else {
+                    throw new Error(res.message);
+                }
+            } catch (error) {
+                console.error(error);
+                Msg.error("Failed to delete reply");
+            }
+        }
+    }, [id, onCommentDelete]);
 
     return (
         <div className="comment-item comment-reply-item">
@@ -159,7 +266,12 @@ const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount
                 <img src={getSingleSimpleUserInfo(userId).avatarLink} alt="user-avatar" onClick={() => openSpaceView(userId)} />
             </div>
             <div className="comment-info">
-                <h4 className="comment-user-name">{getSingleSimpleUserInfo(userId).name}</h4>
+                <div className="comment-header">
+                    <h4 className="comment-user-name">{getSingleSimpleUserInfo(userId).name}</h4>
+                    <div className="comment-menu">
+                        <EllipsisHorizontalIcon className="menu-icon" onClick={handleMenuClick} />
+                    </div>
+                </div>
                 <p className="comment-content">{content}</p>
                 <p className="comment-footer">
                     <span className="comment-footer-time">{dayjs(createdAt).format("HH:mm, MMM DD, YYYY")} </span>
@@ -176,6 +288,16 @@ const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount
                     </span>
                 </p>
             </div>
+            
+            {/* 举报对话框 - 使用Portal挂载到body下 */}
+            {showReportDialog && createPortal(
+                <ReportDialog
+                    reportId={id}
+                    reportTargetType={ReportTargetConstant.COMMENT}
+                    onClose={() => setShowReportDialog(false)}
+                />,
+                document.body
+            )}
         </div>
     )
 }

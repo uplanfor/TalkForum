@@ -1,0 +1,49 @@
+/**
+ * 隐私政策对话框样式
+ * 使用ThemeConfig中定义的CSS变量确保样式和谐
+ */
+
+.privacy-dialog-content {
+  padding: 20px;
+  color: var(--neutral-text-main);
+}
+
+.privacy-dialog-content h3 {
+  color: var(--primary);
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.privacy-dialog-content h3:first-child {
+  margin-top: 0;
+}
+
+.privacy-dialog-content p {
+  line-height: 1.6;
+  margin-bottom: 15px;
+  color: var(--neutral-text-secondary);
+}
+
+.privacy-last-updated {
+  font-style: italic;
+  font-size: 14px;
+  margin-top: 30px;
+  color: var(--neutral-text-secondary);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .privacy-dialog-content {
+    padding: 15px;
+  }
+  
+  .privacy-dialog-content h3 {
+    font-size: 16px;
+  }
+  
+  .privacy-dialog-content p {
+    font-size: 14px;
+  }
+}

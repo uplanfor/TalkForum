@@ -171,6 +171,15 @@ const PostDialog = ({
     }
   }, [tags]);
 
+  // 创建稳定的ref回调函数
+  const setTagRef = useCallback((index: number) => (el: HTMLDivElement | null) => {
+    tagRefs.current[index] = el;
+  }, []);
+
+  const setTagInputRef = useCallback((index: number) => (el: HTMLInputElement | null) => {
+    tagInputRefs.current[index] = el;
+  }, []);
+
   /**
    * 节流处理的提交帖子方法
    * 防止频繁提交，支持发布新帖子和修改现有帖子
@@ -307,9 +316,9 @@ const PostDialog = ({
             {/* 已添加的标签 */}
             {tags.map((tag, index) => (
               <div 
-                key={index} 
+                key={`tag-${index}-${tag}`} 
                 className={`post-tag${index + 1}`}
-                ref={el => tagRefs.current[index] = el}
+                ref={setTagRef(index)}
               >
                 <button 
                   className="post-tag-remove"
@@ -324,7 +333,7 @@ const PostDialog = ({
                 <input
                   type="text"
                   className="post-tag-input"
-                  ref={el => tagInputRefs.current[index] = el}
+                  ref={setTagInputRef(index)}
                   value={tag}
                   onChange={(e) => {
                     const value = e.target.value.slice(0, 16);
@@ -343,7 +352,7 @@ const PostDialog = ({
                 className="post-dialog-tag-add-btn"
                 onClick={handleAddTag}
               >
-                + Add
+                + Add Tag
               </button>
             )}
           </div>

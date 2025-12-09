@@ -56,7 +56,7 @@
         AND c.id = #{rootId}
     </select>
 
-    <select id="countDeleteComment" resultType="com.talkforum.talkforumserver.common.entity.Comment">
+    <select id="checkDeleteComment" resultType="com.talkforum.talkforumserver.common.entity.Comment">
         SELECT user_id FROM `comment` WHERE status = 'PASS' AND id = #{commentId}
     </select>
 

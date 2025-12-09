@@ -83,3 +83,67 @@
 .toggle-btn:hover {
   color: var(--secondary-warm-1);
 }
+
+/* 隐私协议复选框样式 */
+.privacy-agreement {
+  margin: 1rem 0;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  color: var(--neutral-text-secondary);
+  cursor: pointer;
+}
+
+.checkbox-container input[type="checkbox"] {
+  margin-right: 0.5rem;
+  margin-top: 0.2rem;
+  width: auto;
+  padding: 0;
+  border: 1px solid var(--neutral-border);
+  background: var(--neutral-bg);
+  color: var(--primary);
+  box-shadow: none;
+}
+
+.privacy-text {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.privacy-link {
+  background: none;
+  border: none;
+  color: var(--secondary-cool);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  margin-left: 0.3rem;
+  transition: color 0.2s;
+}
+
+.privacy-link:hover {
+  color: var(--secondary-warm-1);
+}
+
+/* 版权声明样式 */
+.copyright-notice {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  padding: 1rem 0;
+  /* background: rgba(255, 255, 255, 0.8); */
+  /* backdrop-filter: blur(5px); */
+  color: var(--neutral-text-secondary);
+  font-size: 0.8rem;
+  z-index: 10;
+}
+
+.copyright-notice p {
+  margin: 0;
+}

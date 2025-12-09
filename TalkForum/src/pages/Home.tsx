@@ -21,7 +21,9 @@ const Home = () => (
         <Nav></Nav>
         
         {/* 背景图片组件，使用默认背景图URL */}
-        <BackgroundImg src={DefaultBackgroundUrl} />
+        <BackgroundImg src={DefaultBackgroundUrl} >
+            
+        </BackgroundImg>
         {/* <BackgroundImg src="https://bing.img.run/1366x768.php" /> */}
 
         {/* 帖子容器组件，首页模式，支持最新、精华和关注标签页 */}
