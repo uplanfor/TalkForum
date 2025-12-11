@@ -22,7 +22,13 @@ const Home = () => (
         
         {/* 背景图片组件，使用默认背景图URL */}
         <BackgroundImg src={DefaultBackgroundUrl} >
-            
+            <div style={{
+                position: "absolute", top: "50%", left: "50%", textAlign: "center",
+                transform: "translate(-50%, -50%)", width: "fit-content", height: "fit-content",
+                fontSize: "2rem", color: "white", fontWeight: "bold",}}>
+                Talk anywhere!
+                <p style={{fontSize: "1rem", fontWeight: "normal"}}>Talk as you like!</p>
+            </div>
         </BackgroundImg>
         {/* <BackgroundImg src="https://bing.img.run/1366x768.php" /> */}
 

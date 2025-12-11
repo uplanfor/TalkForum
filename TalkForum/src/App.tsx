@@ -13,6 +13,7 @@ import Mail from './pages/Mail';
 import Club from './pages/Club';
 import PostView from './pages/PostView';
 import SpaceView from './pages/SpaceView';
+import Search from "./pages/Search";
 import { useDispatch } from 'react-redux';
 import { userLogout, userLogin } from './store/slices/userSlice';
 import { type AppDispatch } from './store';
@@ -26,6 +27,11 @@ const CookieAbleCheck = () => {
   document.cookie = "test=test";
   if (document.cookie.indexOf("test=") === -1) {
     alert("Please enable cookies to use this website!");
+  }
+  // 阻止IE浏览器访问
+  if (navigator.userAgent.indexOf("MSIE") > 0) {
+    alert("Please use a modern browser to use this website!")
+    window.location.href = "https://www.google.com/chrome/";
   }
   return null;
 }
@@ -99,6 +105,7 @@ const App = () => {
         <Route path="/me" element={<Me />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/search" element={<Search/>}/>
         <Route path="/post/:postId" element={<PostView />} />
         <Route path="/:type/:id" element={<SpaceView />} />
         <Route path="*" element={<NotFound />} />

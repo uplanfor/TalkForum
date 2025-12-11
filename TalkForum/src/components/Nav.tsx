@@ -41,6 +41,8 @@ const Nav = ({
     
     // 搜索对话框可见性状态
     const [searchDialogVisible, setSearchDialogVisible] = useState(false);
+    // 搜索输入框内容状态
+    const [searchKeyword, setSearchKeyword] = useState("");
     
     /**
      * 显示搜索对话框
@@ -92,7 +94,18 @@ const Nav = ({
             {/* 搜索框 */}
             <div className="search-container">
                 <MagnifyingGlassIcon />
-                <input type="text" placeholder="search for others' posts!" onClick={showSearchDialog} />
+                <input 
+                    type="text" 
+                    placeholder="search for others' posts!" 
+                    onClick={showSearchDialog}
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                            navigate(`/search?keyword=${encodeURIComponent(searchKeyword)}`);
+                        }
+                    }}
+                />
             </div>
 
             {/* 用户信息组件 */}

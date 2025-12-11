@@ -11,7 +11,7 @@ import PostCardPlaceholder from "./PostCardPlaceholder";
 import { postsGetPostList } from "../api/ApiPosts";
 import { debounce } from "../utils/debounce&throttle";
 import { requestSimpleUserInfoCache } from "../utils/simpleUserInfoCache";
-import { getCache, setCache } from "../utils/postsContainerCache";
+import { clearCache, getCache, setCache } from "../utils/postsContainerCache";
 import type ApiResponse from "../api/ApiResponse";
 import { useDispatch, useSelector } from "react-redux";
 import { type RootState, type AppDispatch } from "../store";
@@ -20,13 +20,25 @@ import { type RootState, type AppDispatch } from "../store";
  * 帖子容器组件的目标类型常量
  */ 
 export const PostContainerTargetType = {
-  SELF: "self",    // 自己的空间
-  HOME: "home",    // 首页
-  USER: "user",    // 其他用户的空间
-  CLUB: "club"     // 俱乐部空间
+  SELF: "self",     // 自己的空间
+  HOME: "home",     // 首页
+  USER: "user",     // 其他用户的空间
+  CLUB: "club",     // 俱乐部空间
+  TAG: "tag",       // 标签空间
+  SEARCH: "search"  // 搜索空间
 } as const;
 
 export type PostContainerTargetType = typeof PostContainerTargetType[keyof typeof PostContainerTargetType];
+
+/**
+ * 帖子容器搜索参数接口
+ */
+export interface PostsContainerSearchParams {
+  userIds?: number[];
+  tag?: string;
+  keyword: string;
+  clubIds?: number[];
+}
 
 /**
  * 帖子容器组件属性接口
@@ -35,6 +47,7 @@ interface PostContainerProps {
   targetType: PostContainerTargetType;  // 目标类型
   targetId?: number;                    // 目标ID（可选）
   defaultTab?: number;                  // 默认选中的标签索引（可选）
+  searchParams?: PostsContainerSearchParams;  // 搜索参数（仅SEARCH模式需要）
 }
 
 /**
@@ -46,6 +59,7 @@ const PostContainer = ({
   targetType,
   targetId,
   defaultTab = 0,
+  searchParams,
 }: PostContainerProps) => {  
   // Redux dispatch钩子
   const dispatch = useDispatch<AppDispatch>();
@@ -94,6 +108,8 @@ const PostContainer = ({
   useEffect(() => {
     tabsRef.current = tabs;
   }, [tabs]);
+  
+  // debugger;
 
   // 统一处理缓存检查、tabs生成和初始加载的useEffect
   useEffect(() => {
@@ -113,14 +129,26 @@ const PostContainer = ({
       case PostContainerTargetType.CLUB:
         newTabs = ["Latest", "Essence"];
         break;
+      case PostContainerTargetType.TAG:
+        newTabs = ["Latest", "Essence"];
+        break;
+      case PostContainerTargetType.SEARCH:
+        newTabs = ["Latest", "Essence"];
+        break;
       default:
         newTabs = [];
     }
     
     setTabs(newTabs);
+
+
     
     // 检查是否有缓存数据
-    const cacheItem = getCache(targetType, targetId);
+    // 对于SEARCH模式，使用传递的searchParams作为缓存键的一部分
+    const searchParamsString = targetType === PostContainerTargetType.SEARCH && searchParams 
+      ? JSON.stringify(searchParams) 
+      : undefined;
+    const cacheItem = getCache(targetType, targetId, searchParamsString);
     
     if (cacheItem) {
       // 使用缓存的数据
@@ -151,7 +179,32 @@ const PostContainer = ({
         }, 0);
       }
     }
-  }, [targetType, targetId, defaultTab, following]); // 只依赖following，而不是整个user对象
+  }, [targetType, targetId, defaultTab, following, searchParams]); // 添加searchParams作为依赖项
+  
+  // 监听搜索参数变化，如果是SEARCH模式，则重新加载数据
+  useEffect(() => {
+    // 如果是SEARCH模式且搜索参数发生变化，则重新加载数据
+    if (targetType === PostContainerTargetType.SEARCH && hasInitialLoaded.current && searchParams) {
+      // 重置状态
+      setCursor(null);
+      setPosts([]);
+      setIsError(false);
+      setHasMore(true);
+      setIsRefreshing(true);
+      
+      // 对于SEARCH模式，不使用缓存，直接重新加载数据
+      
+      // 直接调用loadMore函数，避免将其作为依赖项
+      const reloadData = async () => {
+        await loadMore();
+      };
+      
+      // 使用setTimeout确保在下一个事件循环中调用reloadData
+      setTimeout(() => {
+        reloadData();
+      }, 0);
+    }
+  }, [searchParams, targetType, targetId]); // 添加loadMore作为依赖项
 
   /**
    * 处理刷新操作
@@ -162,6 +215,14 @@ const PostContainer = ({
     if (isLoadingRef.current) {
       return;
     }
+    
+    // 对于SEARCH模式，使用传递的searchParams作为缓存键的一部分
+    const searchParamsString = targetType === PostContainerTargetType.SEARCH && searchParams 
+      ? JSON.stringify(searchParams) 
+      : undefined;
+    
+    // 清除当前缓存
+    clearCache(targetType, targetId, searchParamsString);
     
     setIsRefreshing(true);
     setCursor(null);
@@ -174,6 +235,9 @@ const PostContainer = ({
     await loadMore();
     setIsRefreshing(false);
   };
+
+  console.log("posts container", searchParams);
+  
 
   /**
    * 处理重新加载操作
@@ -194,6 +258,11 @@ const PostContainer = ({
   const changeTab = async (index: number) => {
     // 如果点击的是当前选中的标签，则不执行任何操作
     if (index === curTabIndex) { return; }
+    
+    // 对于SEARCH模式，使用传递的searchParams作为缓存键的一部分
+    const searchParamsString = targetType === PostContainerTargetType.SEARCH && searchParams 
+      ? JSON.stringify(searchParams) 
+      : undefined;
     
     // 更新当前选中的标签索引
     setCurTabIndex(index);
@@ -231,11 +300,16 @@ const PostContainer = ({
     // 获取当前标签
     const currentTab = tabsRef.current[curTabIndexRef.current];
     
+    // 对于SEARCH模式，使用传递的searchParams作为缓存键的一部分
+    const searchParamsString = targetType === PostContainerTargetType.SEARCH && searchParams 
+      ? JSON.stringify(searchParams) 
+      : undefined;
+    
     // 如果是CLUB类型，按照要求什么都不显示
     if (targetType === PostContainerTargetType.CLUB) {
       setHasMore(false);
       // 更新缓存
-      setCache(targetType, targetId, {
+      setCache(targetType, targetId, searchParamsString, {
         posts: [],
         hasMore: false,
         cursor: null,
@@ -249,7 +323,7 @@ const PostContainer = ({
         currentTab === "Likes") {
       setHasMore(false);
       // 更新缓存
-      setCache(targetType, targetId, {
+      setCache(targetType, targetId, searchParamsString, {
         posts: [],
         hasMore: false,
         cursor: null,
@@ -294,6 +368,30 @@ const PostContainer = ({
           case PostContainerTargetType.USER:
             // USER类型：查询指定用户的帖子
             queryParams.userIds = [targetId!];
+            break;
+          case PostContainerTargetType.SEARCH:
+            // SEARCH类型：使用父组件传递的搜索参数
+            if (searchParams) {
+              // 添加关键词
+              if (searchParams.keyword) {
+                queryParams.keyword = searchParams.keyword;
+              }
+              
+              // 添加用户ID列表
+              if (searchParams.userIds && searchParams.userIds.length > 0) {
+                queryParams.userIds = searchParams.userIds;
+              }
+              
+              // 添加标签
+              if (searchParams.tag) {
+                queryParams.tag = searchParams.tag;
+              }
+              
+              // 添加俱乐部ID列表
+              if (searchParams.clubIds && searchParams.clubIds.length > 0) {
+                queryParams.clubIds = searchParams.clubIds;
+              }
+            }
             break;
           // case PostContainerTargetType.CLUB:
           //   // CLUB类型：已经在前面处理，这里不会执行到
@@ -365,7 +463,7 @@ const PostContainer = ({
         setHasMore(updatedHasMore);
 
         // 更新缓存
-        setCache(targetType, targetId, {
+        setCache(targetType, targetId, searchParamsString, {
           posts: isRefreshing || cursor === null ? updatedPosts : [...posts, ...updatedPosts],
           hasMore: updatedHasMore,
           cursor: updatedCursor,
@@ -384,13 +482,13 @@ const PostContainer = ({
         setIsLoading(false);
         setIsRefreshing(false);
       }
-  }, [targetType, targetId, following]); // 减少依赖项，只依赖必要的props
+  }, [targetType, targetId, following, searchParams]); 
 
   /**
    * 防抖处理的加载更多方法
    * 限制调用频率，防止频繁请求API
    */
-  const debounceLoadMore = useRef(debounce(() => loadMore(), 1000)).current;
+  const debounceLoadMore = useRef(debounce(() => loadMore(), 500)).current;
 
   return (
     <div className="container">

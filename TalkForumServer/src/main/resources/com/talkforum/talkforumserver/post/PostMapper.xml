@@ -12,7 +12,7 @@
             view_count, like_count, comment_count,
             tag1, tag2, tag3
         FROM post
-        WHERE id = #{postId}
+        WHERE id = #{postId} AND status = 'PASS'
     </select>
 
     <select id="countPassPost" resultType="long">
@@ -48,6 +48,11 @@
             <if test="tag != null">
                 AND (tag1 = #{tag} OR tag2 = #{tag} OR tag3 = #{tag})</if>
             <if test="isEssence != null">AND is_essence = #{isEssence}</if>
+            <if test="keyword != null and keyword.trim() != ''">
+                AND (
+                    title LIKE CONCAT('%', #{keyword}, '%')
+                    OR brief LIKE CONCAT('%', #{keyword}, '%')
+                )</if>
         </where>
         ORDER BY id DESC <!-- 按id降序，id越大越新 -->
         LIMIT #{pageSize}

@@ -3,6 +3,7 @@
  * 提供搜索功能，包括搜索输入、热门话题和搜索历史
  */
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 // import "../assets/normalize.css"
 import "./styles/style_searchdialog.css"
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
@@ -24,12 +25,23 @@ interface SearchDialogProps {
  */
 const SearchDialog = (props : SearchDialogProps) => {
     const { onClose } = props;
+    const navigate = useNavigate();
     
     // 是否正在关闭状态，用于动画效果
     const [isClosing, setIsClosing] = useState(false);
     
     // 组件是否已挂载状态，用于防止内存泄漏
     const [isMounted, setIsMounted] = useState(false);
+    
+    // 搜索输入框内容状态
+    const [searchKeyword, setSearchKeyword] = useState("");
+    
+    // 处理搜索函数
+    const handleSearch = () => {
+        if (searchKeyword.trim()) {
+            navigate(`/search?keyword=${encodeURIComponent(searchKeyword)}`);
+        }
+    };
 
     /**
      * 组件挂载时设置isMounted为true，卸载时设置为false
@@ -83,11 +95,21 @@ const SearchDialog = (props : SearchDialogProps) => {
                 {/* 搜索输入组合 */}
                 <div className="combo">
                     <MagnifyingGlassIcon /> {/* 搜索图标 */}
-                    <input type="text" placeholder="search something..." /> {/* 搜索输入框 */}
+                    <input 
+                        type="text" 
+                        placeholder="search something..." 
+                        value={searchKeyword}
+                        onChange={(e) => setSearchKeyword(e.target.value)}
+                        onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                                handleSearch();
+                            }
+                        }}
+                    /> {/* 搜索输入框 */}
                 </div>
                 
                 {/* 搜索按钮 */}
-                <button>Search</button>
+                <button onClick={handleSearch}>Search</button>
             </div>
             
             {/* 搜索对话框内容 */}

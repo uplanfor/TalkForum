@@ -31,9 +31,13 @@ const cache = new Map<string, CacheItem>();
  * 获取缓存的复合键
  * @param targetType 目标类型
  * @param targetId 目标ID
+ * @param searchParams 搜索参数（仅SEARCH模式使用）
  * @returns 复合键字符串
  */
-const getCacheKey = (targetType: PostContainerTargetType, targetId?: number): string => {
+const getCacheKey = (targetType: PostContainerTargetType, targetId?: number | string, searchParams?: string): string => {
+  if (targetType === 'search' && searchParams) {
+    return `${targetType}-${searchParams}`;
+  }
   return `${targetType}-${targetId || 'null'}`;
 };
 
@@ -41,16 +45,17 @@ const getCacheKey = (targetType: PostContainerTargetType, targetId?: number): st
  * 获取缓存数据
  * @param targetType 目标类型
  * @param targetId 目标ID
+ * @param searchParams 搜索参数（仅SEARCH模式使用）
  * @returns 缓存项或undefined
  */
-export const getCache = (targetType: PostContainerTargetType, targetId?: number): CacheItem | undefined => {
-  const cacheItem = cache.get(getCacheKey(targetType, targetId));
+export const getCache = (targetType: PostContainerTargetType, targetId?: number | string, searchParams?: string): CacheItem | undefined => {
+  const cacheItem = cache.get(getCacheKey(targetType, targetId, searchParams));
   if (cacheItem && isCacheValid(cacheItem)) {
     return cacheItem;
   }
   // 如果缓存无效，则清除它
   if (cacheItem) {
-    clearCache(targetType, targetId);
+    clearCache(targetType, targetId, searchParams);
   }
   return undefined;
 };
@@ -60,10 +65,11 @@ export const getCache = (targetType: PostContainerTargetType, targetId?: number)
  * 设置缓存数据
  * @param targetType 目标类型
  * @param targetId 目标ID
+ * @param searchParams 搜索参数（仅SEARCH模式使用）
  * @param cacheItem 缓存项
  */
-export const setCache = (targetType: PostContainerTargetType, targetId: number | undefined, cacheItem: Omit<CacheItem, 'timestamp'>): void => {
-  cache.set(getCacheKey(targetType, targetId), {
+export const setCache = (targetType: PostContainerTargetType, targetId: number | string | undefined, searchParams: string | undefined, cacheItem: Omit<CacheItem, 'timestamp'>): void => {
+  cache.set(getCacheKey(targetType, targetId, searchParams), {
     ...cacheItem,
     timestamp: Date.now()
   });
@@ -73,9 +79,10 @@ export const setCache = (targetType: PostContainerTargetType, targetId: number |
  * 清除缓存
  * @param targetType 目标类型
  * @param targetId 目标ID
+ * @param searchParams 搜索参数（仅SEARCH模式使用）
  */
-export const clearCache = (targetType: PostContainerTargetType, targetId?: number): void => {
-  cache.delete(getCacheKey(targetType, targetId));
+export const clearCache = (targetType: PostContainerTargetType, targetId?: number | string, searchParams?: string): void => {
+  cache.delete(getCacheKey(targetType, targetId, searchParams));
 };
 
 /**
