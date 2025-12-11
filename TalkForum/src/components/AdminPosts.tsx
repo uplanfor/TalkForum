@@ -203,7 +203,7 @@ const AdminPosts = () => {
       <h1>Posts Management</h1>
 
       {/* 查询条件区域 */}
-      <div className="search-filters">
+      <div className="admin-search-filters">
         <div className="filter-row">
           <div className="filter-item">
             <label htmlFor="keyword">Keyword:</label>

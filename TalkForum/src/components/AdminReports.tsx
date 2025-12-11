@@ -225,7 +225,7 @@ const AdminReports = () => {
             <h1>Report Management</h1>
 
             {/* Search filters area */}
-            <div className="search-filters">
+            <div className="admin-search-filters">
                 <div className="filter-row">
                     <div className="filter-item">
                         <label>Target Type: </label>

@@ -14,7 +14,7 @@
 }
 
 /* 查询条件区域样式 */
-.search-filters {
+.admin-search-filters {
   background-color: var(--neutral-module);
   border-radius: 8px;
   padding: 16px;
@@ -328,7 +328,8 @@
 /* 内容样式 */
 .post-content,
 .comment-content {
-  max-width: 300px;
+  /* max-width: 300px; */
+  width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

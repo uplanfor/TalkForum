@@ -7,7 +7,7 @@
 import "./styles/style_postdialog.css"
 import PopUpDialogBase from "./PopUpDialogBase"
 import { type PopUpDialogButton } from "./PopUpDialogBase"
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import Msg from "../utils/msg";
 import { postsCommitPostAuth, postsModifyPostAuth } from "../api/ApiPosts";
 import { throttle, debounce } from "../utils/debounce&throttle";
@@ -102,10 +102,10 @@ const PostDialog = ({
   
   // 处理标签内容变化
   const handleTagChange = useCallback((index: number, value: string) => {
+    // 直接更新标签值，不触发额外验证
     const newTags = [...tags];
     newTags[index] = value;
     setTags(newTags);
-    // Removed validation logic from here - now only happens on blur
   }, [tags]);
   
   // 处理标签失去焦点
@@ -179,6 +179,55 @@ const PostDialog = ({
   const setTagInputRef = useCallback((index: number) => (el: HTMLInputElement | null) => {
     tagInputRefs.current[index] = el;
   }, []);
+
+  // 使用useMemo优化标签渲染，避免不必要的重新渲染
+  const tagElements = useMemo(() => 
+    tags.map((tag, index) => (
+      <div 
+        key={`tag-${index}`} 
+        className={`post-tag${index + 1}`}
+        ref={setTagRef(index)}
+      >
+        <button 
+          className="post-tag-remove"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRemoveTag(index);
+          }}
+          onMouseDown={(e) => e.preventDefault()}
+        >
+          ×
+        </button>
+        <input
+          type="text"
+          className="post-tag-input"
+          ref={setTagInputRef(index)}
+          value={tag}
+          onChange={(e) => {
+            const value = e.target.value.slice(0, 16);
+            handleTagChange(index, value);
+          }}
+          onBlur={() => handleTagBlur(index)}
+          onKeyDown={(e) => handleTagKeyDown(index, e)}
+          placeholder="Tag"
+        />
+      </div>
+    )),
+    [tags, handleRemoveTag, handleTagChange, handleTagBlur, handleTagKeyDown, setTagRef, setTagInputRef]
+  );
+
+  // 使用useMemo优化添加按钮渲染
+  const addTagButton = useMemo(() => 
+    tags.length < 3 ? (
+      <button 
+        className="post-dialog-tag-add-btn"
+        onClick={handleAddTag}
+      >
+        + Add Tag
+      </button>
+    ) : null,
+    [tags.length, handleAddTag]
+  );
 
   /**
    * 节流处理的提交帖子方法
@@ -314,47 +363,10 @@ const PostDialog = ({
         <div className="post-dialog-tags-container">
           <div className="post-dialog-tag-editor">
             {/* 已添加的标签 */}
-            {tags.map((tag, index) => (
-              <div 
-                key={`tag-${index}-${tag}`} 
-                className={`post-tag${index + 1}`}
-                ref={setTagRef(index)}
-              >
-                <button 
-                  className="post-tag-remove"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveTag(index);
-                  }}
-                  onMouseDown={(e) => e.preventDefault()}
-                >
-                  ×
-                </button>
-                <input
-                  type="text"
-                  className="post-tag-input"
-                  ref={setTagInputRef(index)}
-                  value={tag}
-                  onChange={(e) => {
-                    const value = e.target.value.slice(0, 16);
-                    handleTagChange(index, value);
-                  }}
-                  onBlur={() => handleTagBlur(index)}
-                  onKeyDown={(e) => handleTagKeyDown(index, e)}
-                  placeholder="Tag"
-                />
-              </div>
-            ))}
+            {tagElements}
             
             {/* 标签添加按钮 */}
-            {tags.length < 3 && (
-              <button 
-                className="post-dialog-tag-add-btn"
-                onClick={handleAddTag}
-              >
-                + Add Tag
-              </button>
-            )}
+            {addTagButton}
           </div>
         </div>
 

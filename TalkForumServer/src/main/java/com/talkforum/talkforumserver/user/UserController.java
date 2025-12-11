@@ -127,7 +127,7 @@ public class UserController {
     public Result setUserRole(@PathVariable long userId, @RequestBody UserRoleDTO dto) {
         String role = dto.getRole();
         // 验证角色是否合法
-        if (!UserConstant.ROLE_MODERATOR.equals(role) && !UserConstant.ROLE_ADMIN.equals(role)) {
+        if (!UserConstant.ROLE_MODERATOR.equals(role) && !UserConstant.ROLE_USER.equals(role)) {
             throw new BusinessRuntimeException("Unknown role!");
         }
         userService.setUserRole(userId, dto.getRole()); // 设置用户角色

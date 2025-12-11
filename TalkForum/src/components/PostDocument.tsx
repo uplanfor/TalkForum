@@ -437,7 +437,6 @@ const PostDocument = (props: PostDocumentProps) => {
 
           <div>
             <InfiniteScroll
-              initialLoad={false}
               loadMore={throttleLoadMore}
               hasMore={hasMore}
               threshold={100}
@@ -464,12 +463,12 @@ const PostDocument = (props: PostDocumentProps) => {
               ))}
 
               {!hasMore && (
-                <div style={{ textAlign: "center" }}>
+                <div style={{ textAlign: "center", marginTop: "20px" }}>
                   No more comments!
                 </div>
               )}
               {isError && (
-                <div style={{ textAlign: "center" }}>
+                <div style={{ textAlign: "center", marginTop: "20px" }}>
                   Error loading comments, <button onClick={handleReload}>retry</button>
                 </div>
               )}

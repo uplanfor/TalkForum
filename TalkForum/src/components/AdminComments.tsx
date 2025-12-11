@@ -183,7 +183,7 @@ const AdminComments = () => {
       <h1>Comments Management</h1>
 
       {/* 查询条件区域 */}
-      <div className="search-filters">
+      <div className="admin-search-filters">
         <div className="filter-row">
           <div className="filter-item">
             <label htmlFor="status">Status:</label>
