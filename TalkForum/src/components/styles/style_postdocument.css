@@ -454,7 +454,7 @@
 .loading-indicator {
     text-align: center;
     padding: 15px;
-    color: #666;
+    color: var(--neutral-text-secondary);
     font-size: 14px;
     font-style: italic;
 }
@@ -463,9 +463,9 @@
 .empty-indicator {
     text-align: center;
     padding: 20px;
-    color: #888;
+    color: var(--neutral-text-secondary);
     font-size: 14px;
-    background-color: #f9f9f9;
+    background-color: var(--neutral-bg);
     border-radius: 8px;
     margin: 10px 0;
 }
@@ -474,9 +474,9 @@
 .error-indicator {
     text-align: center;
     padding: 20px;
-    color: #d9534f;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
+    color: var(--neutral-module);
+    background-color: var(--secondary-warm-1);
+    border: 1px solid var(--neutral-border);
     border-radius: 8px;
     margin: 10px 0;
 }
@@ -485,8 +485,8 @@
 .retry-button {
     margin-top: 10px;
     padding: 8px 16px;
-    background-color: #007bff;
-    color: white;
+    background-color: var(--primary);
+    color: var(--neutral-module);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -495,5 +495,28 @@
 }
 
 .retry-button:hover {
-    background-color: #0056b3;
+    background-color: var(--secondary-warm-2);
+}
+
+/* 加载更多按钮样式 */
+.load-more-button {
+    background: none;
+    border: none;
+    color: var(--primary);
+    text-decoration: underline;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.load-more-button:hover {
+    color: var(--secondary-warm-2);
+}
+
+.load-more-button:disabled {
+    color: var(--neutral-text-secondary);
+    cursor: not-allowed;
+    text-decoration: none;
 }

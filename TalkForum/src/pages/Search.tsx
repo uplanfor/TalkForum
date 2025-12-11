@@ -45,8 +45,8 @@ const Search = ()=> {
         // // 替换当前页面url，重新加载
         navigate(`/search?${newParams.toString()}`, { replace: true });
 
-        // TODO: 真不会了，只能这样修了
-        window.location.reload();
+        // // TODO: 真不会了，只能这样修了
+        // window.location.reload();
         // location.search = newParams.toString();
     };
 
@@ -59,7 +59,7 @@ const Search = ()=> {
     };
 
     
-    // 初始化时设置搜索参数
+    // 当URL参数变化时，更新搜索参数并触发PostsContainer重新加载
     useEffect(() => {
         // 获取搜索参数
         const searchParams = new URLSearchParams(location.search);
@@ -118,7 +118,7 @@ const Search = ()=> {
 
         // console.log(newSearchParams);
         
-        // 更新状态
+        // 更新状态，确保PostsContainer能够重新加载
         setMySearchParams(newSearchParams);
         // console.log(newSearchParams);
     }, [location.search]); // 监听URL参数的变化

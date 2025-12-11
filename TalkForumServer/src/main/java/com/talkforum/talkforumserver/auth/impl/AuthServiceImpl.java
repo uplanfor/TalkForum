@@ -10,6 +10,7 @@ import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.CookieHelper;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.common.util.PasswordHelper;
+import com.talkforum.talkforumserver.common.util.RedisHelper;
 import com.talkforum.talkforumserver.common.vo.AuthVO;
 import com.talkforum.talkforumserver.common.vo.UserVO;
 import com.talkforum.talkforumserver.constant.RedisKeyConstant;
@@ -42,7 +43,7 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private InteractionMapper interactionMapper;
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisHelper redisHelper;
 
     @Override
     public AuthVO login(LoginDTO loginDTO, HttpServletResponse response) throws BusinessRuntimeException {
@@ -67,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
 
             // 存入Redis和HttpOnlyCookie
             CookieHelper.setCookie(response, ServerConstant.LOGIN_COOKIE, jwtToken);
-            stringRedisTemplate.opsForValue().set(RedisKeyConstant.TOKEN_USER + loginCheck.id, jwtToken, jwtHelper.getExpire(), TimeUnit.MILLISECONDS);
+            redisHelper.setLoginToken(loginCheck.id, jwtToken, (long)jwtHelper.getExpire(), TimeUnit.MILLISECONDS);
             // 生成认证信息
             return new AuthVO(new UserVO(loginCheck),
                     interactionMapper.queryInteractFollowingByUserId(loginCheck.id));
@@ -79,7 +80,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(long userId, HttpServletResponse response) {
         // 移除Cookie
-        stringRedisTemplate.delete(RedisKeyConstant.TOKEN_USER+userId);
+        redisHelper.removeLoginToken(userId);
         CookieHelper.removeCookie(response, ServerConstant.LOGIN_COOKIE);
     }
 

@@ -112,10 +112,14 @@
 
 
 .post-card .content {
-    margin-top: 9px;
+    /* margin: 0; */
+    padding: 0;
 }
 
 .post-card .content h2 {
+    margin: 0;
+    padding: 0;
+    /* margin-bottom: 9px; */
     color: var(--neutral-text-main);
 }
 

@@ -65,14 +65,14 @@ const RefreshLoginInfo = () => {
           dispatch(userLogout());
         }
       } catch (error) {
-        if (retryCount < 1) {
-          // 浏览器环境计时器，返回 number 类型
-          timer = window.setTimeout(() => {
-            setRetryCount(prev => prev + 1);
-          }, 5000);
-        } else {
-          dispatch(userLogout());
-        }
+        // if (retryCount < 1) {
+        //   // 浏览器环境计时器，返回 number 类型
+        //   timer = window.setTimeout(() => {
+        //     setRetryCount(prev => prev + 1);
+        //   }, 5000);
+        // } else {
+        //   dispatch(userLogout());
+        // }
       }
     };
 

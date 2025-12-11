@@ -205,7 +205,7 @@ const PostCard = (props: PostCardProps) => {
                     <p>{dayjs(createdAt).format("HH:mm:ss MMM DD, YYYY")}</p>
                 </div>
             </div>
-            <div onClick={() => openPost(id, PostViewType.CONTENT)}>
+            <div className="content" onClick={() => openPost(id, PostViewType.CONTENT)}>
 
                 {/* 帖子标题 */}
                 {title && <h2>{title}</h2>}

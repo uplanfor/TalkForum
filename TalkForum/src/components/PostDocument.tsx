@@ -4,9 +4,9 @@ import CommentItem from "./CommentItem";
 import dayjs from "dayjs";
 import { ArrowPathIcon } from "@heroicons/react/20/solid";
 import InfiniteScroll from "react-infinite-scroller";
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useReducer } from "react";
 import { getSingleSimpleUserInfo, requestSimpleUserInfoCache } from "../utils/simpleUserInfoCache";
-import { throttle } from "../utils/debounce&throttle";
+import { debounce } from "../utils/debounce&throttle";
 import { type CommentItemProps } from "./CommentItem";
 import { commentGetCommentList, type Comment } from "../api/ApiComments";
 import { type CommentTargetCallback } from "../pages/PostView";
@@ -61,15 +61,43 @@ const PostDocument = (props: PostDocumentProps) => {
 
   // 评论相关状态
   const [comments, setComments] = useState<CommentItemProps[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [cursor, setCursor] = useState<number | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isError, setIsError] = useState(false);
-
-  // API请求锁状态，防止并发请求
-  const [isLoading, setIsLoading] = useState(false);
-  // 使用ref跟踪加载状态，避免闭包问题
+  
+  // 使用ref管理状态，防止不必要的重新渲染
+  const hasMoreRef = useRef(true);
+  const cursorRef = useRef<number | null>(null);
+  const isRefreshingRef = useRef(false);
+  const isErrorRef = useRef(false);
   const isLoadingRef = useRef(false);
+  
+  // 使用useState仅用于触发UI更新
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
+  
+  // 状态更新辅助函数
+  const updateHasMore = (value: boolean) => {
+    hasMoreRef.current = value;
+    forceUpdate();
+  };
+  
+  const updateCursor = (value: number | null) => {
+    cursorRef.current = value;
+    forceUpdate();
+  };
+  
+  const updateIsRefreshing = (value: boolean) => {
+    isRefreshingRef.current = value;
+    forceUpdate();
+  };
+  
+  const updateIsError = (value: boolean) => {
+    isErrorRef.current = value;
+    forceUpdate();
+  };
+  
+  const updateIsLoading = (value: boolean) => {
+    isLoadingRef.current = value;
+    forceUpdate();
+  };
+  
   // 用户信息加载状态
   const [isUserInfoLoading, setIsUserInfoLoading] = useState(true);
 
@@ -95,11 +123,11 @@ const PostDocument = (props: PostDocumentProps) => {
       return;
     }
 
-    setIsRefreshing(true);
-    setIsError(false);
-    setCursor(null);
+    updateIsRefreshing(true);
+    updateIsError(false);
+    updateCursor(null);
     setComments([]);
-    setHasMore(true);
+    updateHasMore(true);
     // 重置初始加载标记，允许重新加载
     hasInitialLoaded.current = false;
   };
@@ -112,8 +140,8 @@ const PostDocument = (props: PostDocumentProps) => {
       return;
     }
 
-    setIsError(false);
-    setHasMore(true);
+    updateIsError(false);
+    updateHasMore(true);
     // 重置初始加载标记，允许重新加载
     hasInitialLoaded.current = false;
     await loadMore();
@@ -123,29 +151,25 @@ const PostDocument = (props: PostDocumentProps) => {
   const loadMore = useCallback(async () => {
     // 如果API请求已在进行中，则不执行加载操作
     if (isLoadingRef.current) {
-      // console.log("loadMore - already loading, skipping");
       return;
     }
 
     // 允许在刷新时加载，即使hasMore为false
-    if (isError && !isRefreshing) {
-      // console.log("loadMore - error state and not refreshing, skipping");
+    if (isErrorRef.current && !isRefreshingRef.current) {
       return;
     }
 
     // 如果没有更多数据且不是刷新状态，则直接返回
-    if (!hasMore && !isRefreshing) {
-      // console.log("loadMore - no more data and not refreshing, skipping");
+    if (!hasMoreRef.current && !isRefreshingRef.current) {
       return;
     }
 
     try {
       // 设置API请求锁为true（使用ref立即更新）
       isLoadingRef.current = true;
-      setIsLoading(true);
+      updateIsLoading(true);
 
-      // console.log("loadMore f - starting API request");
-      const res = await commentGetCommentList(id, cursor, 10);
+      const res = await commentGetCommentList(id, cursorRef.current, 10);
 
       // 收集需要缓存的用户ID
       const needCacheTarget: number[] = [];
@@ -160,12 +184,10 @@ const PostDocument = (props: PostDocumentProps) => {
       await requestSimpleUserInfoCache(needCacheTarget);
 
       if (res.success) {
-        setCursor(res.data.cursor);
-        // 打印从API获取的评论数据
-        // console.log("API returned comments:", res.data.data.map(c => ({ id: c.id, interactContent: c.interactContent })));
+        updateCursor(res.data.cursor);
         
         // 如果是刷新状态，替换评论列表，否则追加
-      if (isRefreshing) {
+      if (isRefreshingRef.current) {
         // 刷新时，创建新的评论数组，确保React能正确更新组件
         // 保留原有评论的interactContent属性
         const newComments = res.data.data.map(item => {
@@ -178,7 +200,6 @@ const PostDocument = (props: PostDocumentProps) => {
             interactContent: existingComment ? existingComment.interactContent : item.interactContent
           };
         });
-        // console.log("Refreshed comments with interactContent:", newComments.map(c => ({ id: c.id, interactContent: c.interactContent })));
         setComments(newComments);
       } else {
         // 追加评论时，保持原有评论不变，只添加新评论
@@ -202,66 +223,57 @@ const PostDocument = (props: PostDocumentProps) => {
               };
             }
           });
-          // console.log("Updated comments with interactContent:", updatedComments.map(c => ({ id: c.id, interactContent: c.interactContent })));
           return updatedComments;
         });
       }
-        setHasMore(res.data.hasMore);
-        // console.log("loadMore - success, hasMore:", res.data.hasMore);
+        updateHasMore(res.data.hasMore);
       }
     } catch (error) {
-      setIsError(true);
+      updateIsError(true);
       console.error("Failed to load comments:", error);
     } finally {
       // 无论请求成功还是失败，都释放API请求锁
       isLoadingRef.current = false;
-      setIsLoading(false);
-      // console.log("loadMore e - finished, lock released");
+      updateIsLoading(false);
     }
-  }, [id, cursor, hasMore, isError, isRefreshing]);
-
-  // 使用节流函数限制加载频率，但缩短延迟时间以提高响应速度
-  const throttleLoadMore = useRef(throttle(loadMore, 500)).current;
+  }, [id, setCommentTarget]);
 
   // 使用useRef来跟踪是否已经执行过初始加载，解决React StrictMode下重复加载的问题
   const hasInitialLoaded = useRef(false);
 
   // 重置状态，确保每次组件更新时都能重新初始化
   useEffect(() => {
-    setCursor(null);
+    updateCursor(null);
     setComments([]);
-    setIsError(false);
-    setHasMore(true);
+    updateIsError(false);
+    updateHasMore(true);
     hasInitialLoaded.current = false;
   }, [id]);
 
   // 初始加载评论
   useEffect(() => {
     // 如果已经加载过初始数据、正在刷新或API请求已在进行中，则直接返回
-    if (hasInitialLoaded.current || isRefreshing || isLoadingRef.current) {
-      // console.log("Initial load skipped - already loaded, refreshing, or loading");
+    if (hasInitialLoaded.current || isRefreshingRef.current || isLoadingRef.current) {
       return;
     }
 
     // 标记已经执行过初始加载
     hasInitialLoaded.current = true;
 
-    // 组件挂载时直接调用loadMore
-    // console.log("Initial load - calling loadMore");
+    // 直接调用loadMore函数
     loadMore();
-  }, []); // 只在组件首次挂载时执行，不在id变化时执行
+  }, [loadMore]); // 添加loadMore依赖
 
   // 监听刷新状态变化，触发加载
   useEffect(() => {
-    if (isRefreshing) {
+    if (isRefreshingRef.current) {
       const refreshComments = async () => {
-        // console.log("Refresh triggered - calling loadMore");
-        await loadMore();
-        setIsRefreshing(false);
+        loadMore();
+        updateIsRefreshing(false);
       };
       refreshComments();
     }
-  }, [isRefreshing, loadMore]);
+  }, [isRefreshingRef.current, loadMore]);
 
   /**
    * 处理评论互动状态变化
@@ -430,49 +442,53 @@ const PostDocument = (props: PostDocumentProps) => {
         <div className="post-comment">
           <h2>
             <div>Comments ({commentCount}) </div>
-            <button className="refresh-button" onClick={handleRefresh} disabled={isRefreshing}>
-              {isRefreshing ? <ArrowPathIcon className="animate-spin" /> : <ArrowPathIcon />}
+            <button className="refresh-button" onClick={handleRefresh} disabled={isRefreshingRef.current}>
+              {isRefreshingRef.current ? <ArrowPathIcon className="animate-spin" /> : <ArrowPathIcon />}
             </button>
           </h2>
 
           <div>
-            <InfiniteScroll
-              loadMore={throttleLoadMore}
-              hasMore={hasMore}
-              threshold={100}
-              loader={(
-                <div key="loading" style={{ textAlign: "center" }}>
-                  {!isError && "Loading Comments..."}
-                </div>
-              )}
-            >
-              {/* 刷新指示器 */}
-              {isRefreshing && (
-                <div style={{ textAlign: "center", padding: "10px", color: "var(--neutral-text-secondary)" }}>
-                  Refreshing...
-                </div>
-              )}
+            {/* 刷新指示器 */}
+            {isRefreshingRef.current && (
+              <div style={{ textAlign: "center", padding: "10px", color: "var(--neutral-text-secondary)" }}>
+                Refreshing...
+              </div>
+            )}
 
-              {comments.map(comment => (
-                <CommentItem 
-                  key={comment.id} 
-                  {...comment} 
-                  setCommentTarget={setCommentTarget} 
-                  onInteractionChange={handleCommentInteractionChange}
-                />
-              ))}
+            {comments.map(comment => (
+              <CommentItem 
+                key={comment.id} 
+                {...comment} 
+                setCommentTarget={setCommentTarget} 
+                onInteractionChange={handleCommentInteractionChange}
+              />
+            ))}
 
-              {!hasMore && (
-                <div style={{ textAlign: "center", marginTop: "20px" }}>
-                  No more comments!
-                </div>
-              )}
-              {isError && (
-                <div style={{ textAlign: "center", marginTop: "20px" }}>
-                  Error loading comments, <button onClick={handleReload}>retry</button>
-                </div>
-              )}
-            </InfiniteScroll>
+            {isLoadingRef.current && (
+              <div style={{ textAlign: "center", marginTop: "20px" }}>
+                Loading Comments...
+              </div>
+            )}
+            
+            {!isLoadingRef.current && hasMoreRef.current && (
+              <div style={{ textAlign: "center", marginTop: "20px" }}>
+                Click <button onClick={loadMore} disabled={isLoadingRef.current} className="load-more-button">
+                  here
+                </button> to load more
+              </div>
+            )}
+            
+            {!hasMoreRef.current && comments.length > 0 && (
+              <div style={{ textAlign: "center", marginTop: "20px" }}>
+                No more comments!
+              </div>
+            )}
+            
+            {isErrorRef.current && (
+              <div style={{ textAlign: "center", marginTop: "20px" }}>
+                Error loading comments, <button onClick={handleReload}>retry</button>
+              </div>
+            )}
           </div>
         </div>
       </div>

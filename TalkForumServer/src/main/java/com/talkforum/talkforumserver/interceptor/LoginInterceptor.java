@@ -5,6 +5,7 @@ import com.talkforum.talkforumserver.common.entity.User;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
 import com.talkforum.talkforumserver.common.util.CookieHelper;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
+import com.talkforum.talkforumserver.common.util.RedisHelper;
 import com.talkforum.talkforumserver.common.vo.UserVO;
 import com.talkforum.talkforumserver.constant.RedisKeyConstant;
 import com.talkforum.talkforumserver.constant.ServerConstant;
@@ -31,7 +32,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Autowired
     private JWTHelper jwtHelper; // JWT工具类，用于解析和验证JWT令牌
     @Autowired
-    private StringRedisTemplate stringRedisTemplate; // Redis操作模板，用于验证令牌是否有效
+    private RedisHelper redisHelper;
 
     /**
      * 处理请求前的拦截方法
@@ -67,7 +68,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                 Map<String, Object> information = jwtHelper.parseJWTToken(value);
                 long userId = ((Number)(information.get("id"))).longValue();
                 // 验证令牌是否在Redis中存在（用于单点登录和令牌吊销）
-                Object v =  stringRedisTemplate.opsForValue().get(RedisKeyConstant.TOKEN_USER + userId);
+                Object v =  redisHelper.getLoginToken(userId);
                 if (v == null) {
                     throw new BusinessRuntimeException("invalid token");
                 }
