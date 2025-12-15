@@ -4,11 +4,13 @@ import PostsContainer, { PostContainerTargetType, type PostsContainerSearchParam
 import { DefaultBackgroundUrl } from "../constants/default";
 import {useNavigate, useSearchParams, useLocation} from 'react-router-dom';
 import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
+import { useTranslation } from "react-i18next";
 import "./styles/style_search.css"
 
 const Search = ()=> {
     const navigate = useNavigate();
     const location = useLocation();
+    const { t } = useTranslation();
     const [mySearchParams, setMySearchParams]  = useState<PostsContainerSearchParams>();
     const [showFilters, setShowFilters] = useState(false);
     const keywordInput = useRef<HTMLInputElement>(null);
@@ -133,7 +135,7 @@ const Search = ()=> {
                     <MagnifyingGlassIcon /> {/* 搜索图标 */}
                     <input 
                         type="text" 
-                        placeholder="search something..."
+                        placeholder={t('search.placeholder')}
                         ref={keywordInput}
                         onKeyPress={handleKeyPress}
                     /> {/* 搜索输入框 */}
@@ -145,7 +147,7 @@ const Search = ()=> {
                 </div>
                 
                 {/* 搜索按钮 */}
-                <button onClick={handleSearch}>Search</button>
+                <button onClick={handleSearch}>{t('search.searchButton')}</button>
             </div>
             
             {/* 遮罩层 */}
@@ -157,35 +159,35 @@ const Search = ()=> {
             {showFilters && (
                 <div className="search-filters">
                     <div className="filter-group">
-                        <label>User ID:</label>
+                        <label>{t('search.userIdLabel')}:</label>
                         <input 
                             type="text" 
-                            placeholder="Enter user IDs, separated by commas"
+                            placeholder={t('search.userIdPlaceholder')}
                             ref={userIdsInput}
                         />
                     </div>
                     
                     <div className="filter-group">
-                        <label>Tag:</label>
+                        <label>{t('search.tagLabel')}:</label>
                         <input 
                             type="text" 
-                            placeholder="Enter tag"
+                            placeholder={t('search.tagPlaceholder')}
                             ref={tagInput}
                         />
                     </div>
                     
                     <div className="filter-group">
-                        <label>Club ID:</label>
+                        <label>{t('search.clubIdLabel')}:</label>
                         <input 
                             type="text" 
-                            placeholder="Enter club ID" 
+                            placeholder={t('search.clubIdPlaceholder')} 
                             ref={clubIdInput}
                         />
                     </div>
                     
                     <div className="filter-actions">
-                        <button onClick={() => setShowFilters(false)}>Close</button>
-                        <button onClick={handleSearch}>Apply Filters</button>
+                        <button onClick={() => setShowFilters(false)}>{t('search.closeButton')}</button>
+                        <button onClick={handleSearch}>{t('search.applyFiltersButton')}</button>
                     </div>
                 </div>
             )}

@@ -4,6 +4,7 @@
  */
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 // import "../assets/normalize.css"
 import "./styles/style_searchdialog.css"
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
@@ -26,6 +27,9 @@ interface SearchDialogProps {
 const SearchDialog = (props : SearchDialogProps) => {
     const { onClose } = props;
     const navigate = useNavigate();
+    
+    // 国际化钩子
+    const { t } = useTranslation();
     
     // 是否正在关闭状态，用于动画效果
     const [isClosing, setIsClosing] = useState(false);
@@ -97,7 +101,7 @@ const SearchDialog = (props : SearchDialogProps) => {
                     <MagnifyingGlassIcon /> {/* 搜索图标 */}
                     <input 
                         type="text" 
-                        placeholder="search something..." 
+                        placeholder={t('searchDialog.placeholder')} 
                         value={searchKeyword}
                         onChange={(e) => setSearchKeyword(e.target.value)}
                         onKeyPress={(e) => {
@@ -109,22 +113,22 @@ const SearchDialog = (props : SearchDialogProps) => {
                 </div>
                 
                 {/* 搜索按钮 */}
-                <button onClick={handleSearch}>Search</button>
+                <button onClick={handleSearch}>{t('searchDialog.searchButton')}</button>
             </div>
             
             {/* 搜索对话框内容 */}
             <div className="content">
                 {/* 热门话题 */}
-                <h2>Hot Topics</h2>
+                <h2>{t('searchDialog.hotTopics')}</h2>
                 <p>
                     <span>Computer Science</span> 
-                    <span>Caculors</span> 
-                    <span>Dishes</span> 
+                    <span>Food</span> 
+                    <span>Art</span> 
                 </p>
                 
                 {/* 搜索历史 */}
-                <h2>Search History</h2>
-                <p> <span>Cheat</span> </p>
+                <h2>{t('searchDialog.searchHistory')}</h2>
+                <p> <span>Never</span> </p>
             </div>
         </div>
     );

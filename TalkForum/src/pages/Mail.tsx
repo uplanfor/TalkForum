@@ -6,6 +6,7 @@
  * - 消息项（包含图标、标题和内容）
  */
 import Nav from "../components/Nav";
+import { useTranslation } from "react-i18next";
 import "../assets/normalize.css"
 import "./styles/style_mail.css"
 import MessageSvg from "../assets/message.svg"
@@ -16,6 +17,8 @@ import MessageSvg from "../assets/message.svg"
  * 展示用户的互动消息
  */
 const Mail = () => {
+  const { t } = useTranslation();
+  
   return (
     <>
       {/* 导航栏组件 */}
@@ -25,20 +28,20 @@ const Mail = () => {
       <ul className="mail-list">
         {/* 消息项 */}
         <li className="mail-item">
-          <img src={MessageSvg} alt="消息图标" />
+          <img src={MessageSvg} alt={t('mail.messageIconAlt')} />
           <div className="combo">
-            <h3>Interactive Messages</h3>
-            <p>[like]Jack liked your post.</p>
+            <h3>{t('mail.interactiveMessagesTitle')}</h3>
+            <p>{t('mail.likeMessage', { user: 'Jack' })}</p>
           </div>
         </li>
 
         
         {/* 消息项 */}
         <li className="mail-item">
-          <img src={MessageSvg} alt="消息图标" />
+          <img src={MessageSvg} alt={t('mail.messageIconAlt')} />
           <div className="combo">
-            <h3>Interactive Messages</h3>
-            <p>[like]Jack liked your post.</p>
+            <h3>{t('mail.interactiveMessagesTitle')}</h3>
+            <p>{t('mail.likeMessage', { user: 'Jack' })}</p>
           </div>
         </li>
 

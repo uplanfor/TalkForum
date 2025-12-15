@@ -13,6 +13,7 @@ import "./styles/style_login.css";
 import { useNavigate } from "react-router-dom";
 import Msg from '../utils/msg.ts';
 import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
 
 // Redux相关导入
 import { useDispatch } from 'react-redux';
@@ -31,6 +32,9 @@ const PrivacyDialog = lazy(() => import('../components/PrivacyDialog'));
  * 处理用户登录和注册功能
  */
 const Login = () => {
+  // 国际化钩子
+  const { t } = useTranslation();
+  
   // 控制当前显示的是登录表单还是注册表单
   const [isLogin, setIsLogin] = React.useState(true);
   // 路由导航钩子
@@ -47,7 +51,7 @@ const Login = () => {
     (async () => {
       // 判断用户是否支持cookie
       if (!navigator.cookieEnabled) {
-        Msg.error("Please enable cookies to use TalkForum!", 3000);
+        Msg.error(t('login.cookiesRequired'), 3000);
         return;
       }
       // 判断用户是否登录
@@ -114,38 +118,38 @@ const Login = () => {
     // 登录表单校验（用户名/邮箱 + 密码非空 + 隐私协议）
     if (isLogin) {
       if (!username.trim()) {
-        Msg.error("Username or Email cannot be empty!", 3000);
+        Msg.error(t('login.usernameEmailRequired'), 3000);
         return false;
       }
       if (!password.trim()) {
-        Msg.error("Password cannot be empty!", 3000);
+        Msg.error(t('login.passwordRequired'), 3000);
         return false;
       }
       if (!agreedToPrivacy) {
-        Msg.error("Please agree to the TalkForum Privacy Policy!", 3000);
+        Msg.error(t('login.privacyAgreementRequired'), 3000);
         return false;
       }
     }
     // 注册表单校验（非空 + 密码一致性 + 隐私协议）
     else {
       if (!username.trim()) {
-        Msg.error("Username cannot be empty!", 3000);
+        Msg.error(t('login.usernameRequired'), 3000);
         return false;
       }
       if (!email.trim()) {
-        Msg.error("Email cannot be empty!", 3000);
+        Msg.error(t('login.emailRequired'), 3000);
         return false;
       }
       if (!password.trim()) {
-        Msg.error("Password cannot be empty!", 3000);
+        Msg.error(t('login.passwordRequired'), 3000);
         return false;
       }
       if (password.trim() !== confirmPassword.trim()) {
-        Msg.error("Passwords do not match!", 3000);
+        Msg.error(t('login.passwordMismatch'), 3000);
         return false;
       }
       if (!agreedToPrivacy) {
-        Msg.error("Please agree to the TalkForum Privacy Policy!", 3000);
+        Msg.error(t('login.privacyAgreementRequired'), 3000);
         return false;
       }
       // 邀请码可选，无需校验
@@ -170,60 +174,60 @@ const Login = () => {
         // 登录请求：从状态中获取数据
         const res = await authSignIn(formData.username, formData.password);
         if (res.success) {
-          Msg.success('Sign in successfully!');
+          Msg.success(t('login.signInSuccess'));
           console.log(res.data)
           // 将用户信息写入Redux store
           dispatch(userLogin(res.data));
           navigate("/"); // 跳转到首页
         } else {
-          Msg.error(res.message || 'Sign in failed!', 3000);
+          Msg.error(res.message || t('login.signInFailed'), 3000);
         }
       } else {
         // 注册请求：构造注册参数
         const res = await usersSignOn(formData.username, formData.email, formData.password, formData.inviteCode.trim() || undefined);
         if (res.success) {
-          Msg.success('Sign up successfully! Please sign in!', 3000);
+          Msg.success(t('login.signUpSuccess'), 3000);
           setIsLogin(true); // 切换到登录表单
           // 清空确认密码，保留用户名和密码，方便用户直接登录
           setFormData(prev => ({ ...prev, confirmPassword: "" }));
         } else {
-          Msg.error(res.message || 'Sign up failed!', 3000);
+          Msg.error(res.message || t('login.signUpFailed'), 3000);
         }
       }
     } catch (error) {
       console.error('Login/Register failed:', error);
-      Msg.error(isLogin ? 'Failed to sign in' : 'Failed to sign up', 3000);
+      Msg.error(isLogin ? t('login.signInError') : t('login.signUpError'), 3000);
     }
   };
 
   return (
     <div className="login-container">
       <div className="login-form">
-        <h2>{isLogin ? "Sign in to TalkForum" : "Sign up to TalkForum"}</h2>
+        <h2>{isLogin ? t('login.signInTitle') : t('login.signUpTitle')}</h2>
         <form onSubmit={handleSubmit} autoComplete="off">
           {isLogin ? (
             // 登录表单：仅显示 用户名/邮箱 + 密码（共用字段保留值）
             <>
               <div className="form-group">
-                <label htmlFor="username">Username or Email</label>
+                <label htmlFor="username">{t('login.usernameOrEmailLabel')}</label>
                 <input
                   type="text"
                   id="username"
                   name="username"
                   value={formData.username} // 绑定状态
                   onChange={handleInputChange} // 绑定变更事件
-                  placeholder="Enter username or email"
+                  placeholder={t('login.usernameOrEmailPlaceholder')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="password">Password</label>
+                <label htmlFor="password">{t('login.passwordLabel')}</label>
                 <input
                   type="password"
                   id="password"
                   name="password"
                   value={formData.password} // 绑定状态（切换时保留值）
                   onChange={handleInputChange}
-                  placeholder="Enter password"
+                  placeholder={t('login.passwordPlaceholder')}
                 />
               </div>
             </>
@@ -231,58 +235,58 @@ const Login = () => {
             // 注册表单：显示所有字段（密码字段绑定同一状态，保留值）
             <>
               <div className="form-group">
-                <label htmlFor="username">Username</label>
+                <label htmlFor="username">{t('login.usernameLabel')}</label>
                 <input
                   type="text"
                   id="username"
                   name="username"
                   value={formData.username} // 共用字段，切换时保留
                   onChange={handleInputChange}
-                  placeholder="Enter username"
+                  placeholder={t('login.usernamePlaceholder')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">{t('login.emailLabel')}</label>
                 <input
                   type="email"
                   id="email"
                   name="email"
                   value={formData.email} // 仅注册字段，切换时清空
                   onChange={handleInputChange}
-                  placeholder="Enter your email"
+                  placeholder={t('login.emailPlaceholder')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="password">Password</label>
+                <label htmlFor="password">{t('login.passwordLabel')}</label>
                 <input
                   type="password"
                   id="password"
                   name="password"
                   value={formData.password} // 共用字段，切换时保留
                   onChange={handleInputChange}
-                  placeholder="Enter password (8-32 characters)"
+                  placeholder={t('login.passwordPlaceholderWithHint')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="confirm-password">Confirm Password</label>
+                <label htmlFor="confirm-password">{t('login.confirmPasswordLabel')}</label>
                 <input
                   type="password"
                   id="confirm-password"
                   name="confirmPassword"
                   value={formData.confirmPassword} // 仅注册字段
                   onChange={handleInputChange}
-                  placeholder="Confirm your password"
+                  placeholder={t('login.confirmPasswordPlaceholder')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="invite-code">Invite Code (optional)</label>
+                <label htmlFor="invite-code">{t('login.inviteCodeLabel')}</label>
                 <input
                   type="text"
                   id="invite-code"
                   name="inviteCode"
                   value={formData.inviteCode} // 仅注册字段
                   onChange={handleInputChange}
-                  placeholder="Enter invite code (if any)"
+                  placeholder={t('login.inviteCodePlaceholder')}
                 />
               </div>
             </>
@@ -298,7 +302,7 @@ const Login = () => {
               />
               <span className="checkmark"></span>
               <span className="privacy-text">
-                I have agreed with 
+                {t('login.privacyAgreement')}
                 <button 
                   type="button" 
                   className="privacy-link"
@@ -307,31 +311,31 @@ const Login = () => {
                     setShowPrivacyDialog(true);
                   }}
                 >
-                  TalkForum Privacy
+                  {t('login.privacyLink')}
                 </button>
               </span>
             </label>
           </div>
           
           <button type="submit" className="submit-btn">
-            {isLogin ? "Sign in" : "Sign up"}
+            {isLogin ? t('login.signInButton') : t('login.signUpButton')}
           </button>
         </form>
         <p className="toggle-form">
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
+          {isLogin ? t('login.toggleToSignUp') : t('login.toggleToSignIn')}
           <button
             type="button"
             onClick={toggleForm} // 调用切换逻辑（保留密码）
             className="toggle-btn"
           >
-            {isLogin ? "Sign up" : "Sign in"}
+            {isLogin ? t('login.signUpButton') : t('login.signInButton')}
           </button>
         </p>
       </div>
       
       {/* 版权声明 - 移到组件最外层 */}
       <div className="copyright-notice">
-        <p>© 2024 TalkForum. All rights reserved.</p>
+        <p>{t('login.copyright')}</p>
       </div>
       
       {/* 隐私政策对话框 - 挂载在body下 */}

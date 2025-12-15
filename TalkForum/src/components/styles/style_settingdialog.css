@@ -10,6 +10,9 @@
     line-height: 50px;
     font-size: large;
     padding: 0 9px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .setting-dialog-container li:hover {
@@ -28,8 +31,22 @@
     outline: none;
 }
 
-
 .setting-dialog-container li select option {
     outline: none;
     border: 0;
+}
+
+/* LanguageSwitcher组件在设置对话框中的样式 */
+.setting-language-switcher {
+    min-width: 150px;
+}
+
+.setting-language-switcher .language-select {
+    width: 100%;
+    padding: 5px;
+    border: none;
+    border-radius: 9px;
+    background-color: var(--neutral-bg);
+    color: var(--neutral-text-main);
+    outline: none;
 }

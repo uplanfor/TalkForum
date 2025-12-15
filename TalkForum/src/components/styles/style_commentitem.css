@@ -45,6 +45,13 @@
     color: var(--neutral-text-secondary);
 }
 
+.comment-item .comment-info .comment-content {
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
 .comment-item .comment-info .comment-footer {
     display: flex;
     margin: 0;

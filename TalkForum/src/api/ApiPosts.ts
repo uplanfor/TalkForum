@@ -25,6 +25,7 @@ export interface PostType {
     viewCount: number;        // 浏览量
     likeCount: number;        // 点赞数
     commentCount: number;     // 评论数
+    coverUrl: string | null;  // 帖子封面URL（可为空）
     tag1: string | null;      // 标签1（可为空）
     tag2: string | null;      // 标签2（可为空）
     tag3: string | null;      // 标签3（可为空）

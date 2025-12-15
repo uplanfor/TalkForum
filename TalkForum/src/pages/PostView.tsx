@@ -29,6 +29,7 @@ import { copyToClipboard } from "../utils/clipboard";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import NotFound from "./NotFound";
 import { ReportTargetConstant, ReportTypeEnum } from "../constants/report_constant";
+import { useTranslation } from "react-i18next";
 
 
 /**
@@ -54,6 +55,8 @@ export type CommentTargetCallback = (target: CommentTarget) => void;
  * 展示帖子详细内容和评论
  */
 const PostView = () => {
+  // 国际化钩子
+  const { t } = useTranslation();
   // 从URL参数中获取帖子ID
   const { postId } = useParams<{ postId: string }>();
   // 路由导航钩子
@@ -78,6 +81,7 @@ const PostView = () => {
     title: "",
     brief: "",
     content: "",
+    coverUrl: "",
     userId: 0,
     clubId: null,
     status: "PASS",
@@ -111,7 +115,7 @@ const PostView = () => {
     if (commentContentRef.current) {
       let content = commentContentRef.current.value.trim();
       if (content === "") {
-        Msg.error("Comment content cannot be empty!");
+        Msg.error(t('postView.commentEmpty'));
         return;
       }
 
@@ -233,27 +237,27 @@ const PostView = () => {
     ok ? 
     (<div className="post-view-cover">
       <div className="title">
-        Post Detail
+        {t('postView.title')}
         <ArrowLeftIcon onClick={handleClose} />
 
         <EllipsisHorizontalIcon onClick={async () => {
           let menus;
           if (isLoggedIn && role != UserType.USER) {
             menus = [
-            "Share Post",
-            "Report post",
-            "Edit post",
-            "Delete post",
+            t('postView.sharePost'),
+            t('postView.reportPost'),
+            t('postView.editPost'),
+            t('postView.deletePost'),
           ]} else {
             menus = [
-            "Share Post",
-            "Report post",
+            t('postView.sharePost'),
+            t('postView.reportPost'),
           ]}
           
-          await Msg.menu(menus, "What do you want to do with this post?").then(async res => {
+          await Msg.menu(menus, t('postView.menuTitle')).then(async res => {
             switch (res) {
             case 0:
-              Msg.success("Already copy the link to clipboard! send to your friends to share!");
+              Msg.success(t('postView.linkCopied'));
               copyToClipboard(`${window.location.origin}/post/${postId}`);
               break;
             case 1:
@@ -263,7 +267,7 @@ const PostView = () => {
               setShowPostDialog(true);
               break;
             case 3:
-              Msg.confirm("Are you sure to delete this post?").then(async res => {
+              Msg.confirm(t('postView.deleteConfirm')).then(async res => {
                 if (res) {
                   await postsDeletePostAuth(post.id).then(res => {
                     if (res.success) {
@@ -289,7 +293,7 @@ const PostView = () => {
       {/* 目录结构 - 桌面端 */}
       {tocNodeTree.length > 0 && (
         <div className="toc-desktop">
-          <h3 className="toc-title">Contents</h3>
+          <h3 className="toc-title">{t('postView.contents')}</h3>
           {renderTocTree(tocNodeTree)}
         </div>
       )}
@@ -301,7 +305,7 @@ const PostView = () => {
           onClick={() => setShowTocMenu(!showTocMenu)}
         >
           <ChevronRightIcon />
-          Contents
+          {t('postView.contents')}
         </button>
       )}
       
@@ -309,7 +313,7 @@ const PostView = () => {
       {showTocMenu && tocNodeTree.length > 0 && (
         <div className="toc-mobile-menu">
           <div className="toc-mobile-header">
-            <h3 className="toc-title">Contents</h3>
+            <h3 className="toc-title">{t('postView.contents')}</h3>
             <XMarkIcon 
               className="toc-mobile-close"
               onClick={() => setShowTocMenu(false)}
@@ -329,7 +333,7 @@ const PostView = () => {
             <div className="comment-reply-show">
               <p>
                 <span>
-                  Reply to {getSingleSimpleUserInfo(commentTarget.userId).name}: </span>
+                  {t('postView.replyTo')} {getSingleSimpleUserInfo(commentTarget.userId).name}: </span>
                 {commentTarget.commentToContent}
               </p>
               <XMarkIcon onClick={() => {
@@ -338,23 +342,22 @@ const PostView = () => {
             </div>
           )
         }
-        <textarea placeholder={isLoggedIn ? "Leave a comment" : "Please login to leave a comment"} ref={commentContentRef}></textarea>
-        <button onClick={handleCommentSend}>Send</button>
+        <textarea placeholder={isLoggedIn ? t('postView.leaveComment') : t('postView.loginToComment')} ref={commentContentRef}></textarea>
+        <button onClick={handleCommentSend}>{t('postView.send')}</button>
       </div>
 
       {showPostDialog && createPortal(
         <PostDialog 
-          notification="Edit post" 
+          notification={t('postView.editPost')} 
           title={post.title} content={post.content} 
           tag1={post.tag1} tag2={post.tag2} tag3={post.tag3}
           postId={post.id} onClose={() => setShowPostDialog(false)} />,
-        document.body
-      )}
+        document.body)}
       {showReportDialog && createPortal(
         <ReportDialog 
           onClose={() => setShowReportDialog(false)} 
           reportId={post.id} reportTargetType={ReportTargetConstant.POST} 
-          notification={`Report Post(id: ${post.id}) By author ${getSingleSimpleUserInfo(post.userId).name}(id: ${post.userId}): ${ post.brief.length > 16 ? post.brief.substring(0, 16) + "..." : post.brief }`}/>,
+          notification={t('postView.reportNotification', { postId: post.id, authorName: getSingleSimpleUserInfo(post.userId).name, authorId: post.userId, brief: post.brief.length > 16 ? post.brief.substring(0, 16) + "..." : post.brief })}/>,
         document.body)}
     </div>) : <NotFound />
   );

@@ -18,6 +18,8 @@ import { useDispatch } from 'react-redux';
 import { userLogout, userLogin } from './store/slices/userSlice';
 import { type AppDispatch } from './store';
 import { authGetLoginInfo } from "./api/ApiAuth";
+import './i18n'; // 导入i18n配置
+import { LanguageUtil } from "./utils/LanguageUtil";
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 
@@ -30,7 +32,7 @@ const CookieAbleCheck = () => {
   }
   // 阻止IE浏览器访问
   if (navigator.userAgent.indexOf("MSIE") > 0) {
-    alert("Please use a modern browser to use this website!")
+    alert("Please use a modern browser to use this website!No Internet Explorer, thank you!")
     window.location.href = "https://www.google.com/chrome/";
   }
   return null;
@@ -57,7 +59,6 @@ const RefreshLoginInfo = () => {
     const fetchAuthInfo = async () => {
       try {
         const res = await authGetLoginInfo();
-
         if (res.success) {
           // 确保数据结构匹配 UserState，缺失字段用默认值兜底
           dispatch(userLogin(res.data));
@@ -92,7 +93,13 @@ const RefreshLoginInfo = () => {
 
 
 const App = () => {
-  ThemeUtil.init();
+  useEffect(() => {
+    ThemeUtil.init();
+    
+    // 异步初始化语言系统
+    LanguageUtil.init()
+  }, []);
+
   return (
     <Provider store={store}>
       <NavigationScroll />

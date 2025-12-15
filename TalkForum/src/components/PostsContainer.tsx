@@ -15,6 +15,7 @@ import { clearCache, getCache, setCache } from "../utils/postsContainerCache";
 import type ApiResponse from "../api/ApiResponse";
 import { useDispatch, useSelector } from "react-redux";
 import { type RootState, type AppDispatch } from "../store";
+import { useTranslation } from "react-i18next";
 
 /**
  * 帖子容器组件的目标类型常量
@@ -61,6 +62,9 @@ const PostContainer = ({
   defaultTab = 0,
   searchParams,
 }: PostContainerProps) => {
+  // 国际化钩子
+  const { t } = useTranslation();
+  
   // Redux dispatch钩子
   const dispatch = useDispatch<AppDispatch>();
 
@@ -137,22 +141,22 @@ const PostContainer = ({
 
     switch (targetType) {
       case PostContainerTargetType.SELF:
-        newTabs = ["All", "Essence", "Likes"];
+        newTabs = [t('postsContainer.allTab'), t('postsContainer.essenceTab'), t('postsContainer.likesTab')];
         break;
       case PostContainerTargetType.HOME:
-        newTabs = ["Latest", "Essence", "Following"];
+        newTabs = [t('postsContainer.latestTab'), t('postsContainer.essenceTab'), t('postsContainer.followingTab')];
         break;
       case PostContainerTargetType.USER:
-        newTabs = ["All", "Essence"];
+        newTabs = [t('postsContainer.allTab'), t('postsContainer.essenceTab')];
         break;
       case PostContainerTargetType.CLUB:
-        newTabs = ["Latest", "Essence"];
+        newTabs = [t('postsContainer.latestTab'), t('postsContainer.essenceTab')];
         break;
       case PostContainerTargetType.TAG:
-        newTabs = ["Latest", "Essence"];
+        newTabs = [t('postsContainer.latestTab'), t('postsContainer.essenceTab')];
         break;
       case PostContainerTargetType.SEARCH:
-        newTabs = ["Latest", "Essence"];
+        newTabs = [t('postsContainer.latestTab'), t('postsContainer.essenceTab')];
         break;
       default:
         newTabs = [];
@@ -372,10 +376,10 @@ const PostContainer = ({
       const queryParams: any = { cursor: cursorRef.current, pageSize: 10 };
 
       // 根据当前标签设置过滤条件
-      if (currentTab === "Essence") {
+      if (currentTab === t('postsContainer.essenceTab')) {
         // 查询精华帖 - 确保传递isEssence参数
         queryParams.isEssence = 1;
-      } else if (currentTab === "Latest") {
+      } else if (currentTab === t('postsContainer.latestTab')) {
         // 查询最新帖子（默认就是按时间倒序，不需要额外参数）
       }
 
@@ -387,7 +391,7 @@ const PostContainer = ({
           break;
         case PostContainerTargetType.HOME:
           // HOME类型：查询首页帖子，可能需要根据标签过滤
-          if (currentTab === "Following") {
+          if (currentTab === t('postsContainer.followingTab')) {
             // 添加关注用户的ID到查询参数
             queryParams.userIds = [0, ...following];
           }
@@ -559,11 +563,11 @@ const PostContainer = ({
           ))}
 
           {/* 没有更多帖子提示 */}
-          {(!hasMoreRef.current && posts.length === 0) && <div style={{ textAlign: "center" }}>No posts found</div>}
-          {(!hasMoreRef.current && posts.length > 0) && <div style={{ textAlign: "center" }}>No more posts</div>}
+          {(!hasMoreRef.current && posts.length === 0) && <div style={{ textAlign: "center" }}>{t('postsContainer.noPostsFound')}</div>}
+          {(!hasMoreRef.current && posts.length > 0) && <div style={{ textAlign: "center" }}>{t('postsContainer.noMorePosts')}</div>}
 
           {/* 错误提示和重新加载按钮 */}
-          {isErrorRef.current && <div style={{ textAlign: "center" }}>Error occurred, hit <button onClick={handleReload}>ME</button> to reload.</div>}
+          {isErrorRef.current && <div style={{ textAlign: "center" }}>{t('postsContainer.errorOccurred')} <button onClick={handleReload}>{t('postsContainer.reloadButton')}</button> {t('postsContainer.reloadText')}</div>}
         </InfiniteScroll>
       </div>
     </div>

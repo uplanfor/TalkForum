@@ -23,6 +23,15 @@ export interface UserInfo {
     followingCount: number;        // 关注数量
 }
 
+export interface AdminHomeInfo {
+    totalUsers: number;            // 总用户数量
+    totalPosts: number;         // 总文章数量
+    totalReports: number;        // 总举报数量
+    postsNotHandled: number;     // 未处理文章数量
+    commentsNotHandled: number;  // 未处理评论数量
+    reportsNotHandled: number;   // 未处理举报数量
+}
+
 
 export interface AuthInfo extends UserInfo {
     following: number[];          // 关注列表
@@ -33,6 +42,9 @@ export interface AuthInfo extends UserInfo {
  * 扩展了ApiResponse接口，包含UserInfo类型的数据
  */
 export interface AuthResponse extends ApiResponse<AuthInfo> {}
+
+
+export interface AdminHomeResponse extends ApiResponse<AdminHomeInfo> {}
 
 /**
  * 用户登录
@@ -69,4 +81,12 @@ export const authGetLoginInfo = () : Promise<AuthResponse> => {
  */
 export const authGetAdminInfo = () : Promise<AuthResponse> => {
     return Request.get<AuthResponse>("/api/auth/admin");
+}
+
+
+/**
+ * 获取管理员首屏信息
+ */
+export const  authGetAdminHomeInfo = () : Promise<AdminHomeResponse> => {
+    return Request.get<AdminHomeResponse>("/api/auth/admin/home");
 }

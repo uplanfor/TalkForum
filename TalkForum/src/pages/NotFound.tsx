@@ -9,12 +9,16 @@ import "../assets/normalize.css"
 import Nav from "../components/Nav";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 /**
  * 404页面组件
  * 当用户访问不存在的页面时显示，并在5秒后自动跳转到首页
  */
 const NotFound = () => {
+    // 国际化钩子
+    const { t } = useTranslation();
+    
     // 倒计时总时长（秒）
     const time = 5;
     // 倒计时状态
@@ -56,8 +60,8 @@ const NotFound = () => {
             padding: '20px',
             textAlign: 'center'
         }}>
-            <h1>Page Not Found</h1>
-            <p>We will go to the home page in {countDown} seconds.</p>
+            <h1>{t('notFound.title')}</h1>
+            <p>{t('notFound.redirectMessage', { count: countDown })}</p>
         </div>
     </>;
 };

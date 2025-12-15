@@ -18,8 +18,10 @@ import dayjs from 'dayjs';
 import { throttle } from '../utils/debounce&throttle';
 import { HandThumbUpIcon, ChatBubbleBottomCenterIcon } from '@heroicons/react/24/outline';
 import AuditCommentDialog from './AuditCommentDialog';
+import { useTranslation } from 'react-i18next';
 
 const AdminComments = () => {
+  const { t } = useTranslation();
   const [comments, setComments] = useState<Comment[]>([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -84,7 +86,7 @@ const AdminComments = () => {
   // 处理批量审核评论
   const handleBatchAuditComments = async () => {
     const menus = [PostCommentStatusEnum.PASS, PostCommentStatusEnum.REJECT, PostCommentStatusEnum.DELETE];
-    const index = await Msg.menu(menus, `What do you want to deal with the selected ${selectedComments.length} comments?`);
+    const index = await Msg.menu(menus, t('adminComments.batchAuditMenu', { count: selectedComments.length }));
     if (index === -1) {
       return;
     }
@@ -94,7 +96,7 @@ const AdminComments = () => {
     // 调用管理员审核评论的API
     await commentAdminAuditComments(selectedComments, statusItem).then(res => {
       if (res.success) {
-        Msg.success(`${res.message}(${selectedComments.length} comments ${statusItem})`);
+        Msg.success(`${res.message}(${selectedComments.length} ${t('adminComments.comments')} ${statusItem})`);
 
         // 如果是删除操作，从列表中移除评论
         if (statusItem === PostCommentStatusEnum.DELETE) {
@@ -120,13 +122,13 @@ const AdminComments = () => {
         throw new Error(res.message);
       }
     }).catch(err => {
-      Msg.error(err.message || "Batch audit failed");
+      Msg.error(err.message || t('adminComments.batchAuditFailed'));
       console.error(err);
     });
   };
   const handleAuditComment = async (commentId: number) => {
     const menus = [PostCommentStatusEnum.PASS, PostCommentStatusEnum.REJECT, PostCommentStatusEnum.DELETE];
-    const index = await Msg.menu(menus, `What do you want to deal with the comment(id: ${commentId})?`);
+    const index = await Msg.menu(menus, t('adminComments.auditMenu', { commentId }));
     if (index === -1) {
       return;
     }
@@ -136,7 +138,7 @@ const AdminComments = () => {
     // 调用管理员审核评论的API
     await commentAdminAuditComments([commentId], statusItem).then(res => {
       if (res.success) {
-        Msg.success(`${res.message}(Comment ${statusItem})`);
+        Msg.success(`${res.message}(${t('adminComments.comment')} ${statusItem})`);
 
         // 如果是删除操作，从列表中移除该评论
         if (statusItem === PostCommentStatusEnum.DELETE) {
@@ -156,7 +158,7 @@ const AdminComments = () => {
         throw new Error(res.message);
       }
     }).catch(err => {
-      Msg.error(err.message || "Audit failed");
+      Msg.error(err.message || t('adminComments.auditFailed'));
       console.error(err);
     });
   };
@@ -168,7 +170,7 @@ const AdminComments = () => {
 
   // 创建节流刷新函数，每5秒最多执行一次
   const throttledRefresh = useCallback(throttle(() => {
-    Msg.success("Refreshing data...(5s)");
+    Msg.success(t('adminComments.refreshingMessage'));
     loadComments();
   }, 5000), []) ;
 
@@ -180,23 +182,23 @@ const AdminComments = () => {
 
   return (
     <div className="admin-comments-container">
-      <h1>Comments Management</h1>
+      <h1>{t('adminComments.title')}</h1>
 
       {/* 查询条件区域 */}
       <div className="admin-search-filters">
         <div className="filter-row">
           <div className="filter-item">
-            <label htmlFor="status">Status:</label>
+            <label htmlFor="status">{t('adminComments.statusLabel')}:</label>
             <select
               id="status"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
             >
-              <option value="">All Status</option>
-              <option value={PostCommentStatusEnum.PASS}>Pass</option>
-              <option value={PostCommentStatusEnum.REJECT}>Reject</option>
-              <option value={PostCommentStatusEnum.PENDING}>Pending</option>
-              <option value={PostCommentStatusEnum.DELETE}>Delete</option>
+              <option value="">{t('adminComments.allStatus')}</option>
+              <option value={PostCommentStatusEnum.PASS}>{t('adminComments.pass')}</option>
+              <option value={PostCommentStatusEnum.REJECT}>{t('adminComments.reject')}</option>
+              <option value={PostCommentStatusEnum.PENDING}>{t('adminComments.pending')}</option>
+              <option value={PostCommentStatusEnum.DELETE}>{t('adminComments.delete')}</option>
             </select>
           </div>
           
@@ -205,7 +207,7 @@ const AdminComments = () => {
               className="search-button"
               onClick={throttledSearch}
             >
-              Search
+              {t('adminComments.searchButton')}
             </button>
             <button
               className="reset-button"
@@ -215,7 +217,7 @@ const AdminComments = () => {
                 loadComments();
               }}
             >
-              Reset
+              {t('adminComments.resetButton')}
             </button>
           </div>
         </div>
@@ -228,24 +230,28 @@ const AdminComments = () => {
           onClick={handleBatchAuditComments}
           disabled={selectedComments.length === 0}
         >
-          Batch Audit {selectedComments.length > 0 && `(${selectedComments.length} selected)`}
+          {t('adminComments.batchAudit')} {selectedComments.length > 0 && `(${selectedComments.length} ${t('adminComments.selected')})`}
         </button>
         <button
           className="btn btn-primary audit-dialog-btn"
           onClick={() => setShowAuditDialog(true)}
         >
-          Quick Audit Comments
+          {t('adminComments.quickAuditComments')}
         </button>
       </div>
 
       <div className="pagination-info">
-        <span>Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of {total} entries</span>
+        <span>{t('adminComments.showingEntries', { 
+          start: (page - 1) * pageSize + 1, 
+          end: Math.min(page * pageSize, total), 
+          total: total 
+        })}</span>
         <button
           className="refresh-button"
           onClick={throttledRefresh}
-          title="Refresh data (throttled to once per 5 seconds)"
+          title={t('adminComments.refreshTooltip')}
         >
-          Refresh
+          {t('adminComments.refreshButton')}
         </button>
       </div>
 
@@ -291,7 +297,7 @@ const AdminComments = () => {
             <td>{dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss')}</td>
             <td>
               <button 
-                className="btn btn-secondary">More</button>
+                className="btn btn-secondary">{t('adminComments.moreButton')}</button>
             </td>
           </tr>
         )}
@@ -303,16 +309,16 @@ const AdminComments = () => {
               onChange={handleSelectAll}
             />
           </th>
-          <th>ID</th>
-          <th>Author</th>
-          <th>PostID</th>
-          <th>Content</th>
-          <th>Status</th>
-          <th>Interactions</th>
-          <th>Created At</th>
-          <th>Details</th>
+          <th>{t('adminComments.idHeader')}</th>
+          <th>{t('adminComments.authorHeader')}</th>
+          <th>{t('adminComments.postIdHeader')}</th>
+          <th>{t('adminComments.contentHeader')}</th>
+          <th>{t('adminComments.statusHeader')}</th>
+          <th>{t('adminComments.interactionsHeader')}</th>
+          <th>{t('adminComments.createdAtHeader')}</th>
+          <th>{t('adminComments.detailsHeader')}</th>
         </tr>)}
-        emptyContent={<div>No comments found</div>}
+        emptyContent={<div>{t('adminComments.noCommentsFound')}</div>}
       />
 
       <Pagination

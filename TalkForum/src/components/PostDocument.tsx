@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { type RootState } from "../store";
 import { interactionMakeInteractionWithPost } from "../api/ApiInteractions";
 import { INTERACT_POST } from "../api/ApiInteractions";
+import { useTranslation } from "react-i18next";
 
 export interface PostDocumentProps extends PostType {
   renderContent: string;
@@ -25,6 +26,7 @@ export interface PostDocumentProps extends PostType {
 }
 
 const PostDocument = (props: PostDocumentProps) => {
+  const { t } = useTranslation();
   const {
     content, renderContent, title, userId, clubId, status,
     isEssence, createdAt, updatedAt, viewCount, likeCount,
@@ -230,7 +232,7 @@ const PostDocument = (props: PostDocumentProps) => {
       }
     } catch (error) {
       updateIsError(true);
-      console.error("Failed to load comments:", error);
+      console.error(t('postDocument.loadCommentsError'), error);
     } finally {
       // 无论请求成功还是失败，都释放API请求锁
       isLoadingRef.current = false;
@@ -299,7 +301,7 @@ const PostDocument = (props: PostDocumentProps) => {
   const handleLike = async (id: number) => {
     // 检查用户是否登录
     if (!user.isLoggedIn) {
-      Msg.error("Please login first!");
+      Msg.error(t('postDocument.loginFirst'));
       return;
     }
 
@@ -341,7 +343,7 @@ const PostDocument = (props: PostDocumentProps) => {
   const handleDislike = async (id: number) => {
     // 检查用户是否登录
     if (!user.isLoggedIn) {
-      Msg.error("Please login first!");
+      Msg.error(t('postDocument.loginFirst'));
       return;
     }
 
@@ -410,16 +412,16 @@ const PostDocument = (props: PostDocumentProps) => {
             />
             <div className="author-combo">
               <span className="author-name">
-                {isUserInfoLoading ? "Loading..." : getSingleSimpleUserInfo(userId).name}
+                {isUserInfoLoading ? t('postDocument.loading') : getSingleSimpleUserInfo(userId).name}
               </span>
               <span className="post-date">
-                {(isEssence != 0) && <span className="badge">Essence</span>}
-                Last Edited at {dayjs(updatedAt).format("HH:mm:ss MM DD, YYYY")}
+                {(isEssence != 0) && <span className="badge">{t('postDocument.essence')}</span>}
+                {t('postDocument.lastEditedAt')} {dayjs(updatedAt).format("HH:mm:ss MM DD, YYYY")}
               </span>
             </div>
           </div>
           <div className="interaction">
-            {`${viewCount} Views ${likeCount} Likes ${commentCount} Comments`}
+            {`${viewCount} ${t('postDocument.views')} ${likeCount} ${t('postDocument.likes')} ${commentCount} ${t('postDocument.comments')}`}
           </div>
           <div className="belong">
 
@@ -430,18 +432,18 @@ const PostDocument = (props: PostDocumentProps) => {
         {/* 帖子互动区域 */}
         <div className="post-interaction">
           <div onClick={() => handleLike(id)}>
-            <p>Like</p>
+            <p>{t('postDocument.like')}</p>
             <HandThumbUpIcon className={isLiked ? "liked" : ""}></HandThumbUpIcon>
             <span>{curLikeCount}</span>
           </div>
           <div onClick={() => handleDislike(id)}>
-            <p>Dislike</p>
+            <p>{t('postDocument.dislike')}</p>
             <HandThumbDownIcon className={isDisliked ? "disliked" : ""}></HandThumbDownIcon>
           </div>
         </div>
         <div className="post-comment">
           <h2>
-            <div>Comments ({commentCount}) </div>
+            <div>{t('postDocument.comments')} ({commentCount}) </div>
             <button className="refresh-button" onClick={handleRefresh} disabled={isRefreshingRef.current}>
               {isRefreshingRef.current ? <ArrowPathIcon className="animate-spin" /> : <ArrowPathIcon />}
             </button>
@@ -451,7 +453,7 @@ const PostDocument = (props: PostDocumentProps) => {
             {/* 刷新指示器 */}
             {isRefreshingRef.current && (
               <div style={{ textAlign: "center", padding: "10px", color: "var(--neutral-text-secondary)" }}>
-                Refreshing...
+                {t('postDocument.refreshing')}
               </div>
             )}
 
@@ -466,27 +468,27 @@ const PostDocument = (props: PostDocumentProps) => {
 
             {isLoadingRef.current && (
               <div style={{ textAlign: "center", marginTop: "20px" }}>
-                Loading Comments...
+                {t('postDocument.loadingComments')}
               </div>
             )}
             
             {!isLoadingRef.current && hasMoreRef.current && (
               <div style={{ textAlign: "center", marginTop: "20px" }}>
-                Click <button onClick={loadMore} disabled={isLoadingRef.current} className="load-more-button">
-                  here
-                </button> to load more
+                {t('postDocument.click')} <button onClick={loadMore} disabled={isLoadingRef.current} className="load-more-button">
+                  {t('postDocument.here')}
+                </button> {t('postDocument.toLoadMore')}
               </div>
             )}
             
             {!hasMoreRef.current && comments.length > 0 && (
               <div style={{ textAlign: "center", marginTop: "20px" }}>
-                No more comments!
+                {t('postDocument.noMoreComments')}
               </div>
             )}
             
             {isErrorRef.current && (
               <div style={{ textAlign: "center", marginTop: "20px" }}>
-                Error loading comments, <button onClick={handleReload}>retry</button>
+                {t('postDocument.errorLoadingComments')} <button onClick={handleReload}>{t('postDocument.retry')}</button>
               </div>
             )}
           </div>

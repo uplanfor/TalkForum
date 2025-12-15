@@ -19,8 +19,10 @@ import dayjs from 'dayjs';
 import { throttle } from '../utils/debounce&throttle';
 import { EyeIcon, HandThumbUpIcon, ChatBubbleBottomCenterIcon } from '@heroicons/react/24/outline';
 import AuditPostDialog from "./AuditPostDialog";
+import { useTranslation } from 'react-i18next';
 
 const AdminPosts = () => {
+  const { t } = useTranslation();
   const [posts, setPosts] = useState<PostType[]>([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -107,7 +109,7 @@ const AdminPosts = () => {
   // 处理帖子审核
   const handleAuditPost = async (postId: number) => {
     const menus = [PostCommentStatusEnum.PASS, PostCommentStatusEnum.REJECT, PostCommentStatusEnum.DELETE];
-    const index = await Msg.menu(menus, `What do you want to deal with the post(id: ${postId})?`);
+    const index = await Msg.menu(menus, t('adminPosts.auditMenu', { postId }));
     if (index === -1) {
       return;
     }
@@ -139,7 +141,7 @@ const AdminPosts = () => {
         throw new Error(res.message);
       }
     }).catch(err => {
-      Msg.error(err.message || "Audit failed");
+      Msg.error(err.message || t('adminPosts.auditFailed'));
       console.error(err);
     })
   };
@@ -147,10 +149,10 @@ const AdminPosts = () => {
   // 切换帖子精华状态
   const handleToggleEssence = async (postId: number, currentEssence: number) => {
     const newEssence = currentEssence != 0 ? 0 : 1;
-    const action = newEssence == 1 ? "set as essence" : "remove essence status";
+    const action = newEssence == 1 ? t('adminPosts.setAsEssence') : t('adminPosts.removeEssence');
 
     const result = await Msg.confirm(
-      `Are you sure you want to ${action} for this post?`
+      t('adminPosts.essenceConfirm', { action })
     );
 
     if (result) {
@@ -160,9 +162,11 @@ const AdminPosts = () => {
 
   // 设置帖子精华状态
   const handleSetEssence = async (postId: number, isEssence: number) => {
+    const action = isEssence != 0 ? t('adminPosts.setAsEssence') : t('adminPosts.removeEssence');
+    
     await postsAdminSetPostAsEssence(postId, isEssence).then(res => {
       if (res.success) {
-        Msg.success(`Post ${isEssence != 0 ? "set as essence" : "essence removed"} successful`);
+        Msg.success(t('adminPosts.essenceSuccess', { action }));
 
         // 局部更新帖子的精华状态
         setPosts(prevPosts =>
@@ -188,7 +192,7 @@ const AdminPosts = () => {
 
   // 创建节流刷新函数，每5秒最多执行一次
   const throttledRefresh = useCallback(throttle(() => {
-    Msg.success("Refreshing data...(5s)");
+    Msg.success(t('adminPosts.refreshingMessage'));
     loadPosts();
   }, 5000), []) ;
 
@@ -200,39 +204,39 @@ const AdminPosts = () => {
 
   return (
     <div className="admin-posts-container">
-      <h1>Posts Management</h1>
+      <h1>{t('adminPosts.title')}</h1>
 
       {/* 查询条件区域 */}
       <div className="admin-search-filters">
         <div className="filter-row">
           <div className="filter-item">
-            <label htmlFor="keyword">Keyword:</label>
+            <label htmlFor="keyword">{t('adminPosts.keywordLabel')}</label>
             <input
               id="keyword"
               type="text"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
-              placeholder="Enter keyword"
+              placeholder={t('adminPosts.keywordLabel')}
             />
           </div>
           
           <div className="filter-item">
-            <label htmlFor="status">Status:</label>
+            <label htmlFor="status">{t('adminPosts.statusLabel')}</label>
             <select
               id="status"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
             >
-              <option value="">All Status</option>
-              <option value={PostCommentStatusEnum.PASS}>Pass</option>
-              <option value={PostCommentStatusEnum.REJECT}>Reject</option>
-              <option value={PostCommentStatusEnum.PENDING}>Pending</option>
-              <option value={PostCommentStatusEnum.DELETE}>Delete</option>
+              <option value="">{t('adminPosts.allStatus')}</option>
+              <option value={PostCommentStatusEnum.PASS}>{t('adminPosts.pass')}</option>
+              <option value={PostCommentStatusEnum.REJECT}>{t('adminPosts.reject')}</option>
+              <option value={PostCommentStatusEnum.PENDING}>{t('adminPosts.pending')}</option>
+              <option value={PostCommentStatusEnum.DELETE}>{t('adminPosts.delete')}</option>
             </select>
           </div>
           
           <div className="filter-item">
-            <label htmlFor="isEssence">Essence:</label>
+            <label htmlFor="isEssence">{t('adminPosts.essenceLabel')}</label>
             <select
               id="isEssence"
               value={isEssence === undefined ? '' : isEssence.toString()}
@@ -241,33 +245,33 @@ const AdminPosts = () => {
                 setIsEssence(value === '' ? undefined : parseInt(value));
               }}
             >
-              <option value="">All</option>
-              <option value="1">Essence</option>
-              <option value="0">Not Essence</option>
+              <option value="">{t('adminPosts.all')}</option>
+              <option value="1">{t('adminPosts.essence')}</option>
+              <option value="0">{t('adminPosts.notEssence')}</option>
             </select>
           </div>
         </div>
         
         <div className="filter-row">
           <div className="filter-item">
-            <label htmlFor="clubIds">Club IDs:</label>
+            <label htmlFor="clubIds">{t('adminPosts.clubIdsLabel')}</label>
             <input
               id="clubIds"
               type="text"
               value={clubIds}
               onChange={(e) => setClubIds(e.target.value)}
-              placeholder="Enter club IDs separated by commas"
+              placeholder={t('adminPosts.clubIdsLabel')}
             />
           </div>
           
           <div className="filter-item">
-            <label htmlFor="userIds">User IDs:</label>
+            <label htmlFor="userIds">{t('adminPosts.userIdsLabel')}</label>
             <input
               id="userIds"
               type="text"
               value={userIds}
               onChange={(e) => setUserIds(e.target.value)}
-              placeholder="Enter user IDs separated by commas"
+              placeholder={t('adminPosts.userIdsLabel')}
             />
           </div>
           
@@ -276,7 +280,7 @@ const AdminPosts = () => {
               className="search-button"
               onClick={throttledSearch}
             >
-              Search
+              {t('adminPosts.searchButton')}
             </button>
             <button
               className="reset-button"
@@ -290,7 +294,7 @@ const AdminPosts = () => {
                 loadPosts();
               }}
             >
-              Reset
+              {t('adminPosts.resetButton')}
             </button>
           </div>
         </div>
@@ -300,27 +304,31 @@ const AdminPosts = () => {
       <div className="action-buttons">
         <button
           className="btn btn-primary batch-audit-btn"
-          onClick={() => Msg.error("Cannot batch audit posts!")}
+          onClick={() => Msg.error(t('adminPosts.cannotBatchAudit'))}
           disabled={selectedPosts.length === 0}
         >
-          Batch Audit {selectedPosts.length > 0 && `(${selectedPosts.length} selected)`}
+          {t('adminPosts.batchAudit')} {selectedPosts.length > 0 && `(${selectedPosts.length} ${t('adminPosts.selected')})`}
         </button>
         <button
           className="btn btn-success"
           onClick={() => setShowAuditDialog(true)}
         >
-          Goto Audit View
+          {t('adminPosts.gotoAuditView')}
         </button>
       </div>
 
       <div className="pagination-info">
-        <span>Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of {total} entries</span>
+        <span>{t('adminPosts.showingEntries', { 
+          start: (page - 1) * pageSize + 1, 
+          end: Math.min(page * pageSize, total), 
+          total 
+        })}</span>
         <button
           className="refresh-button"
           onClick={throttledRefresh}
-          title="Refresh data (throttled to once per 5 seconds)"
+          title={t('adminPosts.refreshTooltip')}
         >
-          Refresh
+          {t('adminPosts.refreshButton')}
         </button>
       </div>
 
@@ -336,7 +344,7 @@ const AdminPosts = () => {
               />
             </td>
             <td>{item.id}</td>
-            <td>{item.title == "" ? "No Title" : item.title}</td>
+            <td>{item.title == "" ? t('adminPosts.noTitle') : item.title}</td>
             <td>{`${getSingleSimpleUserInfo(item.userId).name}(id: ${item.userId})`}</td>
             <td>
 
@@ -372,7 +380,7 @@ const AdminPosts = () => {
             </td>
             <td>
               <button 
-                className="btn btn-secondary">More</button>
+                className="btn btn-secondary">{t('adminPosts.moreButton')}</button>
             </td>
           </tr>
         )}
@@ -384,15 +392,15 @@ const AdminPosts = () => {
               onChange={handleSelectAll}
             />
           </th>
-          <th>PostID</th>
-          <th>Title</th>
-          <th>Author</th>
-          <th>Status</th>
-          <th>Essence</th>
-          <th>Interactions</th>
-          <th>Details</th>
+          <th>{t('adminPosts.postIdHeader')}</th>
+          <th>{t('adminPosts.titleHeader')}</th>
+          <th>{t('adminPosts.authorHeader')}</th>
+          <th>{t('adminPosts.statusHeader')}</th>
+          <th>{t('adminPosts.essenceHeader')}</th>
+          <th>{t('adminPosts.interactionsHeader')}</th>
+          <th>{t('adminPosts.detailsHeader')}</th>
         </tr>)}
-        emptyContent={<div>No posts found</div>}
+        emptyContent={<div>{t('adminPosts.noPostsFound')}</div>}
       />
 
       <Pagination

@@ -24,6 +24,7 @@ import { usersChangePasswordAuth, usersUpdateProfileAuth, type UserProfile } fro
 import { getMyInvitecodes } from "../api/ApiInvitecode";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * 个人资料对话框属性接口
@@ -45,6 +46,8 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
   const showState = useSelector((state: RootState) => state.user);
   // 路由导航钩子
   const navigate = useNavigate();
+  // 国际化钩子
+  const { t } = useTranslation();
   // 表单引用，用于获取表单数据
   const formRef = useRef<HTMLFormElement>(null);
   // 密码输入框引用，用于获取密码输入值
@@ -111,12 +114,12 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
     const backgroundLink = formData.get("backgroundLink") as string;
     
     if (!isValidImageUrl(avatarLink)) {
-      Msg.error("Invalid avatar URL. Please use https, http, or base64 format.");
+      Msg.error(t('profileDialog.invalidAvatarUrl'));
       return;
     }
     
     if (!isValidImageUrl(backgroundLink)) {
-      Msg.error("Invalid background URL. Please use https, http, or base64 format.");
+      Msg.error(t('profileDialog.invalidBackgroundUrl'));
       return;
     }
 
@@ -130,7 +133,7 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
     // 调用API更新用户资料
     await usersUpdateProfileAuth(submitData).then((res) => {
       if (res.success) {
-        Msg.success("Profile updated successfully!");
+        Msg.success(t('profileDialog.updateSuccess'));
         // 更新Redux store中的用户信息
         dispatch(userLogin({ ...showState, ...submitData }));
       } else {
@@ -173,13 +176,13 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
     const oldPassword = oldPasswordRef.current.value;
     const newPassword = newPasswordRef.current.value;
     if (!oldPassword || !newPassword) {
-      Msg.error("Please input your old and new password!");
+      Msg.error(t('profileDialog.passwordRequired'));
       return;
     }
     // 调用API修改密码
     const res = await usersChangePasswordAuth(oldPassword, newPassword);
     if (res.success) {
-      Msg.success("Successfully changed your password, please login again!");
+      Msg.success(t('profileDialog.passwordChangeSuccess'));
       // 跳转到登录页面并登出
       navigate("/login");
       dispatch(userLogout());
@@ -191,14 +194,14 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
   // 对话框底部按钮配置
   const bottomBtns: PopUpDialogButton[] = [
     {
-      text: "Cancel",
+      text: t('profileDialog.cancelButton'),
       onClick: () => {
         onClose();
       },
       type: "cancel"
     },
     {
-      text: "Commit Profile Changes",
+      text: t('profileDialog.commitButton'),
       onClick: debounceHandleSubmit,
       type: "submit"
     }
@@ -245,7 +248,7 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
 
   return (
     <PopUpDialogBase
-      title="My Profile"
+      title={t('profileDialog.title')}
       onClose={onClose}
       bottomBtns={bottomBtns}
     >
@@ -270,19 +273,19 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
           </div>
 
           {/* 基本信息编辑区域 */}
-          <h2>Basic Information</h2>
-          <p><label htmlFor="name">Name</label> <input type="text" placeholder="input your name" name="name" id="name" defaultValue={showState.name} /></p>
-          <p><label htmlFor="role">Role</label> <input type="text" placeholder="input your role" name="role" id="role" defaultValue={showState.role} disabled /></p>
-          <p><label htmlFor="email">Email</label> <input type="text" placeholder="input your email" name="email" id="email" defaultValue={showState.email} disabled /></p>
-          <p><label htmlFor="intro">Introduction</label></p> <textarea placeholder="input your intro" name="intro" id="intro" defaultValue={showState.intro} ></textarea>
+          <h2>{t('profileDialog.basicInfo')}</h2>
+          <p><label htmlFor="name">{t('profileDialog.name')}</label> <input type="text" placeholder={t('profileDialog.namePlaceholder')} name="name" id="name" defaultValue={showState.name} /></p>
+          <p><label htmlFor="role">{t('profileDialog.role')}</label> <input type="text" placeholder={t('profileDialog.rolePlaceholder')} name="role" id="role" defaultValue={showState.role} disabled /></p>
+          <p><label htmlFor="email">{t('profileDialog.email')}</label> <input type="text" placeholder={t('profileDialog.emailPlaceholder')} name="email" id="email" defaultValue={showState.email} disabled /></p>
+          <p><label htmlFor="introduction">{t('profileDialog.introduction')}</label></p> <textarea placeholder={t('profileDialog.introductionPlaceholder')} name="introduction" id="introduction" defaultValue={showState.intro} ></textarea>
 
           {/* 背景和头像编辑区域 */}
-          <h2>Background and Avatar</h2>
+          <h2>{t('profileDialog.backgroundAndAvatar')}</h2>
           <p>
-            <label htmlFor="avatarLink">Avatar</label> 
+            <label htmlFor="avatarLink">{t('profileDialog.avatar')}</label> 
             <input 
               type="text" 
-              placeholder="input your avatar link" 
+              placeholder={t('profileDialog.avatarPlaceholder')} 
               name="avatarLink" 
               id="avatarLink" 
               defaultValue={showState.avatarLink} 
@@ -293,14 +296,14 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
               onClick={() => setShowAvatarPopup(true)} 
               className="system-avatar-btn"
             >
-              Choose System Default
+              {t('profileDialog.chooseSystemAvatar')}
             </button>
           </p>
           <p>
-            <label htmlFor="backgroundLink">Background</label> 
+            <label htmlFor="backgroundLink">{t('profileDialog.background')}</label> 
             <input 
               type="text" 
-              placeholder="input your background link" 
+              placeholder={t('profileDialog.backgroundPlaceholder')} 
               name="backgroundLink" 
               id="backgroundLink" 
               defaultValue={showState.backgroundLink} 
@@ -312,7 +315,7 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
           {showAvatarPopup && (
             <div className="system-avatar-popup">
               <div className="system-avatar-popup-content">
-                <h3>Choose Avatar Frame</h3>
+                <h3>{t('profileDialog.chooseAvatarFrame')}</h3>
                 <div className="avatar-options">
                   {systemAvatars.map((avatarUrl, index) => (
                     <div 
@@ -329,21 +332,21 @@ const ProfileDialog = ({ onClose }: ProfileDialogProps) => {
                   onClick={() => setShowAvatarPopup(false)} 
                   className="close-btn"
                 >
-                  Close
+                  {t('profileDialog.close')}
                 </button>
               </div>
             </div>
           )}
 
           {/* 密码修改区域 */}
-          <h2>Change Password</h2>
-          <p><label htmlFor="oldPassword">Old One</label> <input type="password" placeholder="input your old password" name="oldPassword" id="oldPassword" ref={oldPasswordRef} /></p>
-          <p><label htmlFor="newPassword">New One</label> <input type="password" placeholder="input your new password" name="newPassword" id="newPassword" ref={newPasswordRef} /></p>
-          <button onClick={changePassword}>Change your password</button>
+          <h2>{t('profileDialog.changePassword')}</h2>
+          <p><label htmlFor="oldPassword">{t('profileDialog.oldPassword')}</label> <input type="password" placeholder={t('profileDialog.oldPasswordPlaceholder')} name="oldPassword" id="oldPassword" ref={oldPasswordRef} /></p>
+          <p><label htmlFor="newPassword">{t('profileDialog.newPassword')}</label> <input type="password" placeholder={t('profileDialog.newPasswordPlaceholder')} name="newPassword" id="newPassword" ref={newPasswordRef} /></p>
+          <button onClick={changePassword}>{t('profileDialog.changePasswordButton')}</button>
 
           {/* 邀请码区域*/}
-          <h2>Invite Codes</h2>
-          <button onClick={showMyInviteCodes}>See my invite codes</button>
+          <h2>{t('profileDialog.inviteCodes')}</h2>
+          <button onClick={showMyInviteCodes}>{t('profileDialog.seeInviteCodes')}</button>
         </div>
       </form>
     </PopUpDialogBase>

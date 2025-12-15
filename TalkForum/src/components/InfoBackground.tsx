@@ -13,6 +13,7 @@ import Msg from "../utils/msg";
 import { interactionsFollowOrUnfollowUser } from "../api/ApiInteractions";
 import { createPortal } from "react-dom";
 import ProfileDialog from "./ProfileDialog";
+import { useTranslation } from "react-i18next";
 
 /**
  * 信息背景组件属性接口
@@ -34,6 +35,9 @@ interface InfoBackgroundProps {
  * 用于显示用户或俱乐部的信息背景，包含头像、名称、角色、简介等信息
  */
 const InfoBackground = (props: InfoBackgroundProps) => {
+  // 国际化钩子
+  const { t } = useTranslation();
+  
   const dispatch = useDispatch<AppDispatch>();
   // 从Redux store中获取当前用户信息
   const { isLoggedIn, lastLoginAt, name, avatarLink,
@@ -87,7 +91,7 @@ const InfoBackground = (props: InfoBackgroundProps) => {
         });
       }
     } else {
-      Msg.error("Please sign in!");
+      Msg.error(t('infoBackground.signInRequired'));
     }
   }
 
@@ -147,17 +151,17 @@ const InfoBackground = (props: InfoBackgroundProps) => {
                 <span style={{ background: "var(--secondary-warm-1)" }}>
                   {defaultUserInfo.role}
                 </span>
-                {defaultUserInfo.name}
+                {t('infoBackground.guestUser')}
               </h4>
               {/* 默认用户详细信息 */}
-              <p>id: {defaultUserInfo.id}<br />
-                {defaultUserInfo.followingCount} Following {defaultUserInfo.fansCount} Followers
+              <p>{t('infoBackground.id')}: {defaultUserInfo.id}<br />
+                {defaultUserInfo.followingCount} {t('infoBackground.following')} {defaultUserInfo.fansCount} {t('infoBackground.followers')}
               </p>
             </div>
           </div>
           {/* 默认用户简介 */}
           <div className="intro">
-            {defaultUserInfo.intro}
+            {t('infoBackground.signInPrompt')}
           </div>
         </div>
       </BackgroundImg>
@@ -172,7 +176,7 @@ const InfoBackground = (props: InfoBackgroundProps) => {
         <div className="info-container">
           <div className="info">
             <div className="info-combo">
-              <h4>Club</h4>
+              <h4>{t('infoBackground.club')}</h4>
             </div>
           </div>
         </div>
@@ -187,7 +191,7 @@ const InfoBackground = (props: InfoBackgroundProps) => {
         <div className="info-container">
           <div className="info">
             <div className="info-combo">
-              <h4>loading...</h4>
+              <h4>{t('infoBackground.loading')}</h4>
             </div>
           </div>
         </div>
@@ -203,13 +207,13 @@ const InfoBackground = (props: InfoBackgroundProps) => {
           {/* 关注按钮 */}
           {targetType === InfoBackgroundType.SELF ? (
             <button
-              className="info-interact-button follow"
-              onClick={() => setShowProfileDialog(true)}
-            >
-              Edit
-            </button>
+                className="info-interact-button follow"
+                onClick={() => setShowProfileDialog(true)}
+              >
+                {t('infoBackground.edit')}
+              </button>
           ) : (
-            <button className={`info-interact-button ${following.includes(targetId) ? "following" : "follow"}`} onClick={handleFollow}>{following.includes(targetId) ? "Following" : "Follow"}</button>
+            <button className={`info-interact-button ${following.includes(targetId) ? "following" : "follow"}`} onClick={handleFollow}>{following.includes(targetId) ? t('infoBackground.following') : t('infoBackground.follow')}</button>
           )}
           {/* 用户头像 */}
           <img src={userInfo.avatarLink} alt="Avatar Image" />
@@ -227,14 +231,14 @@ const InfoBackground = (props: InfoBackgroundProps) => {
                 - 只有登录用户能看到自己的完整信息（包括邮箱）
                 - 只有登录用户能看到自己的最后登录时间
               */}
-            <p> id: {userInfo.id} {isSelf && `email: ${userInfo.email}`} <br />
+            <p> {t('infoBackground.id')}: {userInfo.id} {isSelf && `${t('infoBackground.email')}: ${userInfo.email}`} <br />
               {isLoggedIn && userInfo.lastLoginAt && (
                 <>
-                  Last Login At: {dayjs(userInfo.lastLoginAt).format("HH:mm:ss MMMM DD, YYYY")}
+                  {t('infoBackground.lastLoginAt')}: {dayjs(userInfo.lastLoginAt).format("HH:mm:ss MMMM DD, YYYY")}
                   <br />
                 </>
               )}
-              {userInfo.followingCount} Following {userInfo.fansCount} Followers
+              {userInfo.followingCount} {t('infoBackground.following')} {userInfo.fansCount} {t('infoBackground.followers')}
             </p>
           </div>
         </div>

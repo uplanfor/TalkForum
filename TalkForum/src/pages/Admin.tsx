@@ -87,6 +87,8 @@ const Admin = () => {
     const [loading, setLoading] = useState(user.role === "user" ? false : true);
     // 管理员权限验证结果
     const [ok, setOk] = useState(false);
+    // 管理员首页信息
+
 
     /**
      * 组件挂载时验证管理员权限
@@ -97,7 +99,7 @@ const Admin = () => {
        authGetAdminInfo()
           .then(res => {
                if (res.success) {
-                   setOk(true); // 验证成功
+                   setOk(true); // 验证成功，设置ok为true
                }
            })
           .catch(err => {

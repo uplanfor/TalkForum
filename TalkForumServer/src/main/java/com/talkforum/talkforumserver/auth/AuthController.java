@@ -4,12 +4,11 @@ import com.talkforum.talkforumserver.common.anno.LoginRequired;
 import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
 import com.talkforum.talkforumserver.common.dto.LoginDTO;
 import com.talkforum.talkforumserver.common.result.Result;
+import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.common.vo.AuthVO;
-import com.talkforum.talkforumserver.common.vo.UserVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
-import com.talkforum.talkforumserver.user.UserMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +25,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public Result login(@RequestBody LoginDTO loginDTO, HttpServletResponse response) {
-        return Result.success("Sign in successfully", authService.login(loginDTO, response));
+        return Result.success(I18n.t("auth.login.success"), authService.login(loginDTO, response));
     }
 
 
@@ -36,7 +35,7 @@ public class AuthController {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         long userId = ((Number)(information.get("id"))).longValue();
         authService.logout(userId, response);
-        return Result.success("Sign out successfully!");
+        return Result.success(I18n.t("auth.logout.success"));
     }
 
     @LoginRequired
@@ -47,9 +46,9 @@ public class AuthController {
         AuthVO result = authService.auth(userId, response);
         if (result == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return Result.error("Unknown user!", result);
+            return Result.error(I18n.t("auth.user.notfound"), result);
         }
-        return Result.success("Success to update information!", result);
+        return Result.success(I18n.t("auth.information.update"), result);
     }
 
 
@@ -61,8 +60,16 @@ public class AuthController {
         AuthVO result = authService.auth(userId, response);
         if (result == null || result.role.equals(UserConstant.ROLE_USER)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return Result.error("Unknown user!", result);
+            return Result.error(I18n.t("auth.admin.unauthorized"), result);
         }
-        return Result.success("Success to update information!", result);
+        return Result.success(I18n.t("auth.admin.update.success"), result);
+    }
+
+    @ModeratorRequired
+    @GetMapping("/admin/home")
+    public Result getAdminHome(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, HttpServletResponse response) {
+        Map<String, Object> information = jwtHelper.parseJWTToken(token);
+        long userId = ((Number)(information.get("id"))).longValue();
+        return Result.success(I18n.t("auth.admin.home.success"), authService.getAdminHomeInfo(userId, response));
     }
 }

@@ -5,8 +5,9 @@ import com.talkforum.talkforumserver.common.dto.PostCommitDTO;
 import com.talkforum.talkforumserver.common.dto.PostEditDTO;
 import com.talkforum.talkforumserver.common.dto.PostRequestDTO;
 import com.talkforum.talkforumserver.common.entity.Post;
-import com.talkforum.talkforumserver.common.result.Result;
-import com.talkforum.talkforumserver.common.util.MarkdownIntroHelper;
+import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
+import com.talkforum.talkforumserver.common.util.I18n;
+import com.talkforum.talkforumserver.common.util.MarkdownHelper;
 import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.common.vo.PostListVO;
 import com.talkforum.talkforumserver.common.vo.PostVO;
@@ -63,10 +64,14 @@ public class PostServiceImpl implements PostService {
                 postVO.setInteractContent(0);
             } else {
                 // 查询用户对该帖子的互动内容
-                List<Integer> interactContents = interactionMapper.queryInteractContentByPostOrComment(InteractionConstant.INTERACTION_TYPE_POST, new Long[]{postId}, userId);
+                List<Integer> interactContents = interactionMapper.queryInteractContentByPostOrComment(
+                        InteractionConstant.INTERACTION_TYPE_POST, new Long[]{postId}, userId);
                 postVO.setInteractContent(interactContents != null && !interactContents.isEmpty() ? interactContents.get(0) : 0);
             }
         }
+
+        // 增加帖子阅读数
+        postMapper.increaseViewCount(postId);
         
         return postVO;
     }
@@ -99,11 +104,17 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public Post commitPost(PostCommitDTO postCommitDTO, String role) {
+        // 生成帖子简介
+        String brief = MarkdownHelper.getIntro(postCommitDTO.content, PostConstant.MAX_POST_LENGTH);
+
+        // 提取封面图片URL
+        String coverUrl = MarkdownHelper.extractFirstImage(postCommitDTO.content);
         // 调用Mapper添加帖子，根据用户角色设置审核状态
         // 普通用户发布的帖子需要审核，管理员发布的帖子直接通过
+
         postMapper.addPost(postCommitDTO,
                 role.equals(UserConstant.ROLE_USER) ? PostConstant.PENDING : PostConstant.PASS,
-                MarkdownIntroHelper.getIntro(postCommitDTO.content, PostConstant.MAX_POST_LENGTH));
+                brief, coverUrl);
         // 返回发布后的帖子信息
         return postMapper.getPost(postCommitDTO.id);
     }
@@ -115,11 +126,17 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public void editPost(PostEditDTO postEditDTO,  String role) {
+        // 生成帖子简介
+        String brief = MarkdownHelper.getIntro(postEditDTO.content, PostConstant.MAX_POST_LENGTH);
+        
+        // 提取封面图片URL
+        String coverUrl = MarkdownHelper.extractFirstImage(postEditDTO.content);
+        
         // 调用Mapper更新帖子，根据用户角色设置审核状态
         // 普通用户编辑的帖子需要重新审核，管理员编辑的帖子直接通过
         postMapper.updatePost(postEditDTO,
                 role.equals(UserConstant.ROLE_USER) ? PostConstant.PENDING : PostConstant.PASS,
-                MarkdownIntroHelper.getIntro(postEditDTO.content, PostConstant.MAX_POST_LENGTH));
+                brief, coverUrl);
     }
 
     /**
@@ -134,7 +151,7 @@ public class PostServiceImpl implements PostService {
         // 查询帖子信息，检查帖子是否存在
         Post post = postMapper.getPostCheck(postId);
         if (post == null) {
-            throw new RuntimeException("the post is null!");
+            throw new BusinessRuntimeException(I18n.t("post.not.exist"));
         }
         // 如果是帖子作者，可以直接删除
         if (post.userId == userId) {
@@ -144,7 +161,7 @@ public class PostServiceImpl implements PostService {
             if (!role.equals(UserConstant.ROLE_USER)) {
                 postMapper.deletePost(postId);
             } else {
-                throw new RuntimeException("You are not allowed to delete this post!");
+                throw new BusinessRuntimeException(I18n.t("post.delete.denied"));
             }
         }
     }

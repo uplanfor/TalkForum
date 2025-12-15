@@ -8,6 +8,7 @@ import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
 import com.talkforum.talkforumserver.common.dto.*;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
 import com.talkforum.talkforumserver.common.result.Result;
+import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
@@ -44,7 +45,7 @@ public class UserController {
     @PostMapping("/")
     @Validated
     public Result registerUser(@Valid @RequestBody UserDTO user) {
-        return Result.success("Sign up successfully", userService.registerUser(user));
+        return Result.success(I18n.t("user.register.success"), userService.registerUser(user));
     }
 
     /**
@@ -54,7 +55,7 @@ public class UserController {
      */
     @GetMapping("/{userId}")
     public Result getUser(@PathVariable long userId) {
-        return Result.success("Success to get user information", userService.getUserById(userId));
+        return Result.success(I18n.t("user.get.success"), userService.getUserById(userId));
     }
 
     /**
@@ -64,7 +65,7 @@ public class UserController {
      */
     @GetMapping("/simple")
     public Result getSimpleUsersInfo(long[] userIds) {
-        return Result.success("Success to get user simple information", userService.getSimpleUsersInfo(userIds));
+        return Result.success(I18n.t("user.getSimple.success"), userService.getSimpleUsersInfo(userIds));
     }
 
     /**
@@ -80,7 +81,7 @@ public class UserController {
         Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
         user.id = ((Number)(information.get("id"))).longValue(); // 设置用户ID
         userService.setUserProfile(user); // 更新用户资料
-        return  Result.success("Success to edit user profile!");
+        return  Result.success(I18n.t("user.profile.update.success"));
     }
 
     /**
@@ -100,7 +101,7 @@ public class UserController {
         long userId = ((Number)(information.get("id"))).longValue(); // 获取用户ID
         userService.changePassword(userId, dto.getOldPassword(), dto.getNewPassword()); // 修改密码
         authService.logout(userId, httpServletResponse); // 退出登录，清除Cookie
-        return Result.success("Success to change password!");
+        return Result.success(I18n.t("user.password.change.success"));
     }
 
     /**
@@ -112,7 +113,7 @@ public class UserController {
    @ModeratorRequired
    @GetMapping("/admin")
    public Result getUsersByPage(int page, int pageSize) {
-       return Result.success("Success to get users!", userService.getUsersByPage( page, pageSize));
+       return Result.success(I18n.t("user.admin.get.success"), userService.getUsersByPage( page, pageSize));
    }
 
     /**
@@ -128,10 +129,10 @@ public class UserController {
         String role = dto.getRole();
         // 验证角色是否合法
         if (!UserConstant.ROLE_MODERATOR.equals(role) && !UserConstant.ROLE_USER.equals(role)) {
-            throw new BusinessRuntimeException("Unknown role!");
+            throw new BusinessRuntimeException(I18n.t("user.role.unknown"));
         }
         userService.setUserRole(userId, dto.getRole()); // 设置用户角色
-        return Result.success("Success to change role!");
+        return Result.success(I18n.t("user.admin.role.change.success"));
     }
 
     /**
@@ -143,7 +144,7 @@ public class UserController {
     @PutMapping("/admin/{userId}/reset")
     public Result resetUserPassword(@PathVariable long userId) {
         userService.resetUserPassword(userId); // 重置用户密码
-        return Result.success("Success to reset password! Default password is " + ServerConstant.DEFAULT_PASSWORD);
+        return Result.success(I18n.t("user.admin.password.reset.success", ServerConstant.DEFAULT_PASSWORD));
     }
 
     /**
@@ -157,6 +158,6 @@ public class UserController {
     @Validated
     public Result updateUserStatus(@PathVariable long userId, @RequestBody UserStatusDTO dto) {
          userService.updateStatus(userId, dto.getStatus());
-         return Result.success("Success to update user status!");
+         return Result.success(I18n.t("user.admin.status.update.success"));
     }
 }

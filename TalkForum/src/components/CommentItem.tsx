@@ -24,6 +24,7 @@ import { copyToClipboard } from "../utils/clipboard";
 import ReportDialog from "./ReportDialog";
 import ReplyItem from "./ReplyItem";
 import { createPortal } from 'react-dom';
+import { useTranslation } from "react-i18next";
 
 /**
  * 评论项组件属性接口
@@ -40,6 +41,9 @@ export interface CommentItemProps extends Comment {
  * @param {CommentItemProps} props - 组件属性
  */
 const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount, commentCount, postId, interactContent, onInteractionChange, onCommentDelete }: CommentItemProps) => {
+    // 国际化钩子
+    const { t } = useTranslation();
+    
     // 路由导航钩子
     const navigate = useNavigate();
     // 当前路由信息钩子
@@ -238,18 +242,18 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
      */
     const handleMenuClick = useCallback(async () => {
         // 构建菜单选项
-        const menuOptions = ["Copy", "Report"];
+        const menuOptions = [t('commentItem.copy'), t('commentItem.report')];
         
         // 检查是否显示删除选项
         const canDelete = user.isLoggedIn && 
                          (user.role !== UserRoleEnum.USER || userId === user.id);
         
         if (canDelete) {
-            menuOptions.push("Delete");
+            menuOptions.push(t('commentItem.delete'));
         }
         
         // 显示菜单
-        const selectedIndex = await Msg.menu(menuOptions, "Comment Options");
+        const selectedIndex = await Msg.menu(menuOptions, t('commentItem.commentOptions'));
         
         // 处理用户选择
         switch (selectedIndex) {
@@ -274,9 +278,9 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
     const handleCopy = useCallback(() => {
         try {
             copyToClipboard(content);
-            Msg.success("Comment copied to clipboard");
+            Msg.success(t('commentItem.copySuccess'));
         } catch (error) {
-            Msg.error("Failed to copy comment");
+            Msg.error(t('commentItem.copyFailed'));
         }
     }, [content]);
     
@@ -285,7 +289,7 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
      */
     const handleDelete = useCallback(async () => {
         // 显示确认对话框
-        const isConfirmed = await Msg.confirm("Are you sure you want to delete this comment?");
+        const isConfirmed = await Msg.confirm(t('commentItem.deleteConfirm'));
         
         if (isConfirmed) {
             try {
@@ -293,7 +297,7 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
                 const res = await commentDeleteComment(id);
                 
                 if (res.success) {
-                    Msg.success("Comment deleted successfully");
+                    Msg.success(t('commentItem.deleteSuccess'));
                     // 通知父组件更新评论列表
                     if (onCommentDelete) {
                         onCommentDelete(id);
@@ -303,7 +307,7 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
                 }
             } catch (error) {
                 console.error(error);
-                Msg.error("Failed to delete comment");
+                Msg.error(t('commentItem.deleteFailed'));
             }
         }
     }, [id, onCommentDelete]);
@@ -335,7 +339,7 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
                         onClick={() => { 
                             // 设置评论目标，用于回复当前评论
                             setCommentTarget({ parentId: id, rootId: id, userId, commentToContent: content }) 
-                        }}> Reply</span>
+                        }}> {t('commentItem.reply')}</span>
                     <span className="comment-footer-like" onClick={() => handleLike(id)}>
                         <HandThumbUpIcon className={isLiked ? "liked" : ""}/> {curLikeCount}
                     </span>
@@ -362,11 +366,11 @@ const CommentItem = ({ content, createdAt, userId, setCommentTarget, id, likeCou
                         )}
                         
                         {/* 回复总数和操作按钮 */}
-                        <p className="reply-total">{commentCount} Replies
+                        <p className="reply-total">{commentCount} {t('commentItem.replies')}
                             {/* 展开/折叠按钮 */}
-                            {<span onClick={changeFoldReplyList}>{notFoldReplyList ? "Fold" : "Unfold"}</span>}
+                            {<span onClick={changeFoldReplyList}>{notFoldReplyList ? t('commentItem.fold') : t('commentItem.unfold')}</span>}
                             {/* 加载更多按钮（如果还有更多回复） */}
-                            {hasMore && <span onClick={throttleLoadMoreReplies}>See More</span>} </p>
+                            {hasMore && <span onClick={throttleLoadMoreReplies}>{t('commentItem.seeMore')}</span>} </p>
                     </div>)}
             </div>
             

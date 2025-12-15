@@ -22,6 +22,7 @@ import ReportDialog from "./ReportDialog";
 import { useNavigate, useLocation } from "react-router-dom";
 import { SpaceViewType } from "../constants/default";
 import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
 
 /**
  * 回复项组件属性接口
@@ -39,6 +40,9 @@ export interface ReplyItemProps extends Comment {
  * @param {ReplyItemProps} props - 组件属性
  */
 const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount, interactContent, rootId, onInteractionChange, onCommentDelete }: ReplyItemProps) => {
+    // 国际化钩子
+    const { t } = useTranslation();
+    
     // 路由导航钩子
     const navigate = useNavigate();
     // 当前路由信息钩子
@@ -190,18 +194,18 @@ const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount
      */
     const handleMenuClick = useCallback(async () => {
         // 构建菜单选项
-        const menuOptions = ["Copy", "Report"];
+        const menuOptions = [t('replyItem.copy'), t('replyItem.report')];
         
         // 检查是否显示删除选项
         const canDelete = user.isLoggedIn && 
                          (user.role !== UserRoleEnum.USER || userId === user.id);
         
         if (canDelete) {
-            menuOptions.push("Delete");
+            menuOptions.push(t('replyItem.delete'));
         }
         
         // 显示菜单
-        const selectedIndex = await Msg.menu(menuOptions, "Reply Options");
+        const selectedIndex = await Msg.menu(menuOptions, t('replyItem.replyOptions'));
         
         // 处理用户选择
         switch (selectedIndex) {
@@ -226,9 +230,9 @@ const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount
     const handleCopy = useCallback(() => {
         try {
             copyToClipboard(content);
-            Msg.success("Reply copied to clipboard");
+            Msg.success(t('replyItem.copySuccess'));
         } catch (error) {
-            Msg.error("Failed to copy reply");
+            Msg.error(t('replyItem.copyFailed'));
         }
     }, [content]);
     
@@ -237,7 +241,7 @@ const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount
      */
     const handleDelete = useCallback(async () => {
         // 显示确认对话框
-        const isConfirmed = await Msg.confirm("Are you sure you want to delete this reply?");
+        const isConfirmed = await Msg.confirm(t('replyItem.deleteConfirm'));
         
         if (isConfirmed) {
             try {
@@ -245,7 +249,7 @@ const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount
                 const res = await commentDeleteComment(id);
                 
                 if (res.success) {
-                    Msg.success("Reply deleted successfully");
+                    Msg.success(t('replyItem.deleteSuccess'));
                     // 通知父组件更新评论列表
                     if (onCommentDelete) {
                         onCommentDelete(id);
@@ -255,7 +259,7 @@ const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount
                 }
             } catch (error) {
                 console.error(error);
-                Msg.error("Failed to delete reply");
+                Msg.error(t('replyItem.deleteFailed'));
             }
         }
     }, [id, onCommentDelete]);
@@ -279,7 +283,7 @@ const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount
                         onClick={() => { 
                             // 设置评论目标，用于回复当前回复
                             setCommentTarget({ parentId: id, rootId: rootId, userId, commentToContent: content }) 
-                        }}> Reply</span>
+                        }}> {t('replyItem.reply')}</span>
                     <span className="comment-footer-like" onClick={() => handleLike(id)}>
                         <HandThumbUpIcon className={isLiked ? "liked" : ""}/> {curLikeCount}
                     </span>

@@ -8,6 +8,7 @@
  */
 import PostContainer, { PostContainerTargetType } from "../components/PostsContainer";
 import Nav from "../components/Nav";
+import { useTranslation } from "react-i18next";
 import "../assets/normalize.css"
 import "./styles/style_club.css"
 
@@ -16,6 +17,8 @@ import "./styles/style_club.css"
  * 展示用户关注的俱乐部和相关内容
  */
 const Club = () => {
+    const { t } = useTranslation();
+    
     return <>
         {/* 导航栏组件 */}
         <Nav />
@@ -23,26 +26,26 @@ const Club = () => {
         {/* 功能卡片区域 */}
         <div className="functions">
             <div className="function-card">
-                <h1>Apps</h1>
-                <p>Explore Fun</p>
+                <h1>{t('club.appsTitle')}</h1>
+                <p>{t('club.appsDescription')}</p>
             </div>
             <div className="function-card">
-                <h1>Clubs</h1>
-                <p>Meet more like-minded people</p>
+                <h1>{t('club.clubsTitle')}</h1>
+                <p>{t('club.clubsDescription')}</p>
             </div>
         </div>
         
         {/* 关注的俱乐部区域 */}
         <div className="followed-clubs">
-            <h2>Followed Clubs</h2>
+            <h2>{t('club.followedClubsTitle')}</h2>
             <ul className="club-list">
                 {/* <li className="club-info">
                     <img src="https://pic1.imgdb.cn/item/6905cbfa3203f7be00bf6e98.webp" alt="Not Found" />
                     <p>Chicken Club</p>
                 </li> */}
-                <p className="center-text">You haven't followed any club yet.</p>
+                <p className="center-text">{t('club.noFollowedClubs')}</p>
             </ul>
-            <h2>Club Latest</h2>
+            <h2>{t('club.clubLatestTitle')}</h2>
         </div>
         
         {/* 帖子容器组件，展示俱乐部最新帖子 */}

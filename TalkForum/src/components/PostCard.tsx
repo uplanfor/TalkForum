@@ -17,6 +17,7 @@ import { copyToClipboard } from "../utils/clipboard";
 import { postsAdminSetPostAsEssence, postsDeletePostAuth } from "../api/ApiPosts";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Msg from "../utils/msg";
 import { INTERACT_POST, interactionMakeInteractionWithPost } from "../api/ApiInteractions";
 
@@ -26,7 +27,7 @@ import { INTERACT_POST, interactionMakeInteractionWithPost } from "../api/ApiInt
 export interface PostCardProps {
     title?: string;          // 帖子标题（可选）
     brief: string;           // 帖子简介
-    coverLink?: string;      // 封面图链接（可选）
+    coverUrl?: string;      // 封面图链接（可选）
     userId: number;          // 发布者ID
     id: number;              // 帖子ID
     clubId?: number;         // 所属圈子ID（可选）
@@ -47,11 +48,14 @@ export interface PostCardProps {
  */
 const PostCard = (props: PostCardProps) => {
     // 解构组件属性
-    const { title, brief, coverLink,
+    const { title, brief, coverUrl,
         userId, id, clubId, createdAt, isEssence,
         viewCount, likeCount, commentCount, interactContent,
         tag1, tag2, tag3
     } = props;
+
+    // 国际化钩子
+    const { t } = useTranslation();
 
     // 路由导航钩子
     const navigate = useNavigate();
@@ -82,7 +86,7 @@ const PostCard = (props: PostCardProps) => {
                 if (res.success) {
                     // 更新本地状态
                     setCurEssence(targetEssence);
-                    Msg.success("Set essence successfully!");
+                    Msg.success(t('postCard.setEssenceSuccess'));
                 } else {
                     throw new Error(res.message);
                 }
@@ -112,7 +116,7 @@ const PostCard = (props: PostCardProps) => {
     const handleLike = async (id: number) => {
         // 检查用户是否登录
         if (!user.isLoggedIn) {
-            Msg.error("Please login first!");
+            Msg.error(t('postCard.loginRequired'));
             return;
         }
 
@@ -126,7 +130,7 @@ const PostCard = (props: PostCardProps) => {
                 setIsLiked(!isLiked);
                 // 更新点赞数
                 setCurLikeCount(prev => isLiked ? prev - 1 : prev + 1);
-                Msg.success(isLiked ? "Like removed successfully!" : "Liked successfully!");
+                Msg.success(isLiked ? t('postCard.likeRemovedSuccess') : t('postCard.likeSuccess'));
             } else {
                 throw new Error(res.message);
             }
@@ -143,11 +147,11 @@ const PostCard = (props: PostCardProps) => {
      */
     const deletePost = async (id: number) => {
         try {
-            const result = await Msg.confirm("Are you sure to delete this post?");
+            const result = await Msg.confirm(t('postCard.deleteConfirm'));
             if (result) {
                 postsDeletePostAuth(id).then(res => {
                     if (res.success) {
-                        Msg.success("Delete post successfully!");
+                        Msg.success(t('postCard.deleteSuccess'));
                     } else {
                         throw new Error(res.message);
                     }
@@ -155,7 +159,7 @@ const PostCard = (props: PostCardProps) => {
             }
         } catch (error) {
             console.log(error);
-            Msg.error("Failed to delete post!");
+            Msg.error(t('postCard.deleteFailed'));
         }
     }
 
@@ -211,10 +215,10 @@ const PostCard = (props: PostCardProps) => {
                 {title && <h2>{title}</h2>}
 
                 {/* 帖子简介和精华标记 */}
-                <p>{(curEssence != 0) && <span className="badge">Essence</span>} {brief}</p>
+                <p>{(curEssence != 0) && <span className="badge">{t('postCard.essenceBadge')}</span>} {brief}</p>
 
                 {/* 帖子封面图 */}
-                {coverLink && <img src={coverLink} alt="Cover Not Found" />}
+                {coverUrl && <img src={coverUrl} alt="Cover Not Found" />}
             </div>
 
         </div>
@@ -245,23 +249,23 @@ const PostCard = (props: PostCardProps) => {
             <ul>
                 {/* 分享功能 */}
                 <li onClick={() => {
-                    Msg.success("Already copy the link to clipboard! send to your friends to share!");
+                    Msg.success(t('postCard.shareSuccess'));
                     copyToClipboard(`${window.location.origin}/?postId=${id}`)
-                }}>Share</li>
+                }}>{t('postCard.share')}</li>
 
                 {/* 编辑和删除功能（仅作者或管理员/版主可见） */}
                 {(user.id === userId || user.role != UserType.USER) && (
                     <>
-                        <li onClick={() => openPost(id, PostViewType.EDIT)}>Edit</li>
-                        <li onClick={() => deletePost(id)}>Delete</li>
+                        <li onClick={() => openPost(id, PostViewType.EDIT)}>{t('postCard.edit')}</li>
+                        <li onClick={() => deletePost(id)}>{t('postCard.delete')}</li>
                     </>
                 )}
 
                 {/* 设置精华功能（仅管理员/版主可见） */}
-                {(user.role != UserType.USER && <li onClick={() => essencePost(id)}>{curEssence != 0 ? "Unset Essence" : "Set Essence"}</li>)}
+                {(user.role != UserType.USER && <li onClick={() => essencePost(id)}>{curEssence != 0 ? t('postCard.unsetEssence') : t('postCard.setEssence')}</li>)}
 
                 {/* 举报功能 */}
-                <li onClick={() => reportPost(id)}>Report</li>
+                <li onClick={() => reportPost(id)}>{t('postCard.report')}</li>
             </ul>
         </div>
     </div>

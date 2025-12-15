@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import ShowTable from './ShowTable';
 import Pagination from './Pagination';
 import AuditReportDialog from './AuditReportDialog';
@@ -14,13 +15,14 @@ import { ReportTargetConstant, ReportProcessConstant } from '../constants/report
 import "./styles/style_admin_common.css"
 
 const AdminReports = () => {
+    const { t } = useTranslation();
     // 从Redux获取当前用户信息
     const { id: currentUserId } = useSelector((state: RootState) => state.user);
     // const dispatch = useDispatch<AppDispatch>();
     // const navigate = useNavigate();
     const [reports, setReports] = useState<Report[]>([]);
     const [page, setPage] = useState<number>(1);
-    const [pageSize] = useState<number>(1);
+    const [pageSize] = useState<number>(10);
     const [total, setTotal] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedReports, setSelectedReports] = useState<Set<number>>(new Set());
@@ -82,7 +84,7 @@ const AdminReports = () => {
 
     // Create throttled refresh function, maximum once per 5 seconds
     const throttledRefresh = useCallback(throttle(() => {
-        Msg.success("Refreshing data...(5s)");
+        Msg.success(t('adminReports.refreshingMessage'));
         loadReports(page);
     }, 5000), [page]);
 
@@ -90,13 +92,13 @@ const AdminReports = () => {
     const getTargetTypeLabel = (type: string) => {
         switch (type) {
             case ReportTargetConstant.POST:
-                return "Post";
+                return t('adminReports.post');
             case ReportTargetConstant.COMMENT:
-                return "Comment";
+                return t('adminReports.comment');
             case ReportTargetConstant.USER:
-                return "User";
+                return t('adminReports.user');
             case ReportTargetConstant.CLUB:
-                return "Club";
+                return t('adminReports.club');
             default:
                 return type;
         }
@@ -159,7 +161,7 @@ const AdminReports = () => {
     // Handle selected reports audit
     const handleAuditSelected = async () => {
         if (selectedReports.size === 0) {
-            Msg.error("Please select reports to audit");
+            Msg.error(t('adminReports.selectReportsToAudit'));
             return;
         }
 
@@ -167,11 +169,8 @@ const AdminReports = () => {
             const reportIds = Array.from(selectedReports);
             const res = await reportsAdminHandleReport(reportIds, "HANDLED");
             if (res.success) {
-
                 Msg.success(res.message);
             } else {
-
-
                 Msg.error(res.message);
             }
             // Clear selection and refresh the list
@@ -180,7 +179,7 @@ const AdminReports = () => {
             loadReports(page, queryConditions);
         } catch (error) {
             console.error('Failed to handle reports:', error);
-            Msg.error("Failed to handle reports");
+            Msg.error(t('adminReports.handleReportsFailed'));
         }
     };
 
@@ -189,18 +188,15 @@ const AdminReports = () => {
         try {
             const res = await reportsAdminHandleReport([reportId], "HANDLED");
             if (res.success) {
-
                 Msg.success(res.message);
             } else {
-
-
                 Msg.error(res.message);
             }
             // Refresh the list
             loadReports(page, queryConditions);
         } catch (error) {
             console.error('Failed to handle report:', error);
-            Msg.error("failed to handle report");
+            Msg.error(t('adminReports.handleReportFailed'));
         }
     };
 
@@ -222,42 +218,42 @@ const AdminReports = () => {
 
     return (
         <div className="admin-reports-container">
-            <h1>Report Management</h1>
+            <h1>{t('adminReports.title')}</h1>
 
             {/* Search filters area */}
             <div className="admin-search-filters">
                 <div className="filter-row">
                     <div className="filter-item">
-                        <label>Target Type: </label>
+                        <label>{t('adminReports.targetTypeLabel')} </label>
                         <select
                             value={queryConditions.reportTargetType}
                             onChange={(e) => handleQueryChange('reportTargetType', e.target.value)}
                         >
-                            <option value="">All Types</option>
-                            <option value={ReportTargetConstant.POST}>Post</option>
-                            <option value={ReportTargetConstant.COMMENT}>Comment</option>
-                            <option value={ReportTargetConstant.USER}>User</option>
-                            <option value={ReportTargetConstant.CLUB}>Club</option>
+                            <option value="">{t('adminReports.allTypes')}</option>
+                            <option value={ReportTargetConstant.POST}>{t('adminReports.post')}</option>
+                            <option value={ReportTargetConstant.COMMENT}>{t('adminReports.comment')}</option>
+                            <option value={ReportTargetConstant.USER}>{t('adminReports.user')}</option>
+                            <option value={ReportTargetConstant.CLUB}>{t('adminReports.club')}</option>
                         </select>
                     </div>
                 </div>
                 <div className="filter-row">
                     <div className="filter-item">
-                        <label>Status: </label>
+                        <label>{t('adminReports.statusLabel')} </label>
                         <select
                             value={queryConditions.status}
                             onChange={(e) => handleQueryChange('status', e.target.value)}
                         >
-                            <option value="">All Status</option>
-                            <option value={ReportProcessConstant.PENDING}>Pending</option>
-                            <option value={ReportProcessConstant.HANDLED}>Handled</option>
+                            <option value="">{t('adminReports.allStatus')}</option>
+                            <option value={ReportProcessConstant.PENDING}>{t('adminReports.pending')}</option>
+                            <option value={ReportProcessConstant.HANDLED}>{t('adminReports.handled')}</option>
                         </select>
                     </div>
                 </div>
                 <div className="filter-row">
                     <div className="filter-item">
-                        <button onClick={applyQuery} className="search-button">Search</button>
-                        <button onClick={resetQuery} className="reset-button">Reset</button>
+                        <button onClick={applyQuery} className="search-button">{t('adminReports.searchButton')}</button>
+                        <button onClick={resetQuery} className="reset-button">{t('adminReports.resetButton')}</button>
                     </div>
                 </div>
             </div>
@@ -269,18 +265,22 @@ const AdminReports = () => {
                     onClick={handleAuditSelected}
                     disabled={selectedReports.size === 0}
                 >
-                    Audit Selected ({selectedReports.size})
+                    {t('adminReports.auditSelected')} ({selectedReports.size})
                 </button>
             </div>
 
             <div className="pagination-info">
-                <span>Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of {total} entries</span>
+                <span>{t('adminReports.showingEntries', { 
+                    start: (page - 1) * pageSize + 1, 
+                    end: Math.min(page * pageSize, total), 
+                    total 
+                })}</span>
                 <button
                     className="refresh-button"
                     onClick={throttledRefresh}
-                    title="Refresh data (throttled to once per 5 seconds)"
+                    title={t('adminReports.refreshTooltip')}
                 >
-                    Refresh
+                    {t('adminReports.refreshButton')}
                 </button>
             </div>
 
@@ -319,7 +319,7 @@ const AdminReports = () => {
                                 className="btn btn-sm btn-primary"
                                 onClick={() => handleAuditReport(item.id)}
                             >
-                                Audit
+                                {t('adminReports.auditButton')}
                             </button>
                         </td>
                     </tr>
@@ -333,17 +333,17 @@ const AdminReports = () => {
                                 onChange={handleSelectAll}
                             />
                         </th>
-                        <th>ID</th>
-                        <th>Report By</th>
-                        <th>Target</th>
-                        <th>Reason</th>
-                        <th>Status</th>
-                        <th>Created At</th>
-                        <th>Handled At</th>
-                        <th>Actions</th>
+                        <th>{t('adminReports.idHeader')}</th>
+                        <th>{t('adminReports.reportByHeader')}</th>
+                        <th>{t('adminReports.targetHeader')}</th>
+                        <th>{t('adminReports.reasonHeader')}</th>
+                        <th>{t('adminReports.statusHeader')}</th>
+                        <th>{t('adminReports.createdAtHeader')}</th>
+                        <th>{t('adminReports.handledAtHeader')}</th>
+                        <th>{t('adminReports.actionsHeader')}</th>
                     </tr>
                 )}
-                emptyContent={<div>No reports found</div>}
+                emptyContent={<div>{t('adminReports.noReportsFound')}</div>}
             />
 
             <Pagination

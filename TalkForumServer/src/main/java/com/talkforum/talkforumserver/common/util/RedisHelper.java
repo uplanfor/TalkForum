@@ -33,7 +33,7 @@ public class RedisHelper {
 
     // 用于设置登录令牌
     public void setLoginToken(Long userId, String token, Long expireTime, TimeUnit timeUnit) {
-        redisTemplate.opsForValue().set(
+        stringSet(
                 RedisKeyConstant.TOKEN_USER + userId, token, expireTime, timeUnit);
     }
 

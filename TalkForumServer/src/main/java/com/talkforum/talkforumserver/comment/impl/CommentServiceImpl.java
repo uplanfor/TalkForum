@@ -6,6 +6,7 @@ import com.talkforum.talkforumserver.common.dto.AdminAuditCommentsDTO;
 import com.talkforum.talkforumserver.common.dto.AdminGetCommentsDTO;
 import com.talkforum.talkforumserver.common.entity.Comment;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
+import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.vo.CommentListVO;
 import com.talkforum.talkforumserver.common.vo.CommentVO;
 import com.talkforum.talkforumserver.common.vo.PageVO;
@@ -98,7 +99,7 @@ public class CommentServiceImpl implements CommentService {
     public Comment getComment(Long commentId) {
         Comment ret = commentMapper.getComment(commentId);
         if (ret == null) {
-            throw new BusinessRuntimeException("Comment not found!");
+            throw new BusinessRuntimeException(I18n.t("comment.not.found"));
         }
         return ret;
     }
@@ -119,7 +120,7 @@ public class CommentServiceImpl implements CommentService {
         // 检查帖子是否存在
         long count = postMapper.countPassPost(postId);
         if (count == 0) {
-            throw new BusinessRuntimeException("The post did not exist!");
+            throw new BusinessRuntimeException(I18n.t("comment.post.not.exist"));
         }
         
         // 创建评论对象，根据用户角色设置审核状态
@@ -130,7 +131,7 @@ public class CommentServiceImpl implements CommentService {
         if (rootId != null || parentId != null) {
             int count2 = commentMapper.countExistComment(postId, rootId, parentId);
             if (count2 == 0) {
-                throw new BusinessRuntimeException("You cannot reply to the invalid comment!");
+                throw new BusinessRuntimeException(I18n.t("comment.reply.invalid"));
             }
         }
         
@@ -151,7 +152,7 @@ public class CommentServiceImpl implements CommentService {
         // 检查评论是否存在
         Comment commentCheck = commentMapper.checkDeleteComment(commentId);
         if (commentCheck == null) {
-            throw new BusinessRuntimeException("Comment not found!");
+            throw new BusinessRuntimeException(I18n.t("comment.not.found"));
         }
         
         // 如果是评论作者或管理员/版主，可以删除评论
@@ -162,7 +163,7 @@ public class CommentServiceImpl implements CommentService {
                 commentMapper.auditComment(commentId, CommentConstant.DELETED);
             }
             else {
-                throw new BusinessRuntimeException("You cannot delete other's comments!");
+                throw new BusinessRuntimeException(I18n.t("comment.delete.denied"));
             }
         }
     }
@@ -277,7 +278,7 @@ public class CommentServiceImpl implements CommentService {
     public List<Comment> adminGetCommentsContent(List<Long> commentIds) {
         List<Comment> comments = commentMapper.adminGetCommentsContent(commentIds);
         if (comments == null || comments.size() != commentIds.size()) {
-            throw new BusinessRuntimeException("Invalid number of comments!");
+            throw new BusinessRuntimeException(I18n.t("comment.invalid.count"));
         }
         return comments;
     }

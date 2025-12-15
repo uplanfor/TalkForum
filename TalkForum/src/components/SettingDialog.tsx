@@ -11,6 +11,7 @@ import { THEMES } from "../config/ThemeConfig"
 import ThemeUtil from "../utils/ThemeUtil"
 import { type ThemeKey } from "../config/ThemeConfig"
 import Msg from "../utils/msg"
+import { useTranslation } from "react-i18next"
 
 /**
  * 设置对话框属性接口
@@ -27,19 +28,22 @@ interface SettingDialogProps {
  * 用于用户配置应用的语言和主题设置
  */
 const SettingDialog = ({ onClose }: SettingDialogProps) => {
+  // 国际化钩子
+  const { t } = useTranslation();
+  
   /**
    * 对话框底部按钮配置
    */
   const bottomBtns: PopUpDialogButton[] = [
     {
-      text: "Cancel",
+      text: t('settingDialog.cancel'),
       onClick: () => {
         onClose();
       },
       type: "cancel"
     },
     {
-      text: "Apply",
+      text: t('settingDialog.apply'),
       onClick: () => {
         // formRef.current?.dispatchEvent(new Event('submit'));
         formRef.current?.requestSubmit();
@@ -64,24 +68,16 @@ const SettingDialog = ({ onClose }: SettingDialogProps) => {
     // collect form data
     const formData = new FormData(formRef.current);
     const submitData = {
-      language: formData.get("language") as string,
       theme: formData.get("theme") as string,
     };
 
-    // 保存语言设置到localStorage
-    localStorage.setItem("language", submitData.language);
     // 切换主题
     ThemeUtil.switchTheme(submitData.theme as ThemeKey);
 
     // 显示成功消息
-    Msg.success("Settings applied successfully!");
+    Msg.success(t('settingDialog.settingsApplied'));
   };
 
-  /**
-   * 获取默认语言设置，优先使用localStorage中的值，否则使用默认值
-   */
-  const defaultLanguage = localStorage.getItem("language") || "English(US)";
-  
   /**
    * 获取默认主题设置，优先使用当前主题，否则使用默认主题
    */
@@ -89,7 +85,7 @@ const SettingDialog = ({ onClose }: SettingDialogProps) => {
 
   return (
     <PopUpDialogBase
-      title="Settings"
+      title={t('settingDialog.title')}
       onClose={onClose}
       bottomBtns={bottomBtns}
     >
@@ -97,15 +93,14 @@ const SettingDialog = ({ onClose }: SettingDialogProps) => {
       <form ref={formRef} onSubmit={handleSubmit}>
         <ul className="setting-dialog-container">
           {/* 语言选择 */}
-          <li>Language: 
-          <select name="language" defaultValue={defaultLanguage}>
-            <option value="English(US)">English(US)</option>
-            <option value="English(UK)">English(UK)</option>
-          </select>
+          <li>
+            <span>{t('settingDialog.language')}:</span>
+            <select name="language" className="setting-language-switcher" >
+            </select>
           </li>
           
           {/* 主题选择 */}
-          <li>Theme:
+          <li>{t('settingDialog.theme')}:
             <select name="theme" defaultValue={defaultTheme}>
               <option key="default" value="default">default</option>
 

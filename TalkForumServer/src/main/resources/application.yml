@@ -16,7 +16,7 @@ spring:
       max-request-size: 10MB
 
   jackson:
-    # 1. 禁止返回“数字时间戳”（确保返回字符串格式）
+    # 1. 禁止返回"数字时间戳"（确保返回字符串格式）
     serialization:
       write-dates-as-timestamps: false
     # 2. 后端统一用UTC时区（避免后端时区干扰，前端按自己时区转）
@@ -31,6 +31,13 @@ spring:
       host: localhost
       port: 6379
       password: 16729438
+      lettuce:
+        #只有自动配置连接池的依赖,连接池才会生效
+        pool:
+          max-active: 8 #最大连接
+          max-idle: 8 #最大空闲连接
+          min-idle: 0 #最小空闲连接
+          max-wait: 100 #连接等待时间
 
 
 mybatis:
@@ -42,3 +49,14 @@ mybatis:
 jwt:
   secret-key: "XyvhaihdoehEF+gaosfcotynyogmeltoehsshlrybghsbschsb="
   expire: 5400000  # 1.5 hr
+
+# 限流配置
+rate-limit:
+  enabled: true
+  default-type: "FIXED_WINDOW"
+  default-limit: 100
+  default-window-seconds: 60
+  default-bucket-capacity: 100
+  default-token-rate: 1.0
+  default-dimension: "IP"
+  redis-key-prefix: "rate_limit:"

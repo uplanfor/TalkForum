@@ -1,21 +1,14 @@
 package com.talkforum.talkforumserver.interceptor;
 
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
-import com.talkforum.talkforumserver.common.entity.User;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
 import com.talkforum.talkforumserver.common.util.CookieHelper;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.common.util.RedisHelper;
-import com.talkforum.talkforumserver.common.vo.UserVO;
-import com.talkforum.talkforumserver.constant.RedisKeyConstant;
 import com.talkforum.talkforumserver.constant.ServerConstant;
-import com.talkforum.talkforumserver.constant.UserConstant;
-import com.talkforum.talkforumserver.user.UserService;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;

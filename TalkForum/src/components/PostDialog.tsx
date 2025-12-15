@@ -8,6 +8,7 @@ import "./styles/style_postdialog.css"
 import PopUpDialogBase from "./PopUpDialogBase"
 import { type PopUpDialogButton } from "./PopUpDialogBase"
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import Msg from "../utils/msg";
 import { postsCommitPostAuth, postsModifyPostAuth } from "../api/ApiPosts";
 import { throttle, debounce } from "../utils/debounce&throttle";
@@ -32,9 +33,12 @@ interface PostDialogProps {
  * @param {PostDialogProps} props - 组件属性
  */
 const PostDialog = ({ 
-  onClose, notification = "Create New Post", title = "", clubInputId = 0, content = "", postId = null, 
+  onClose, notification = "", title = "", clubInputId = 0, content = "", postId = null, 
   tag1 = "", tag2 = "", tag3 = ""
 }: PostDialogProps) => {
+  // 国际化钩子
+  const { t } = useTranslation();
+  
   // 标题输入框引用
   const titleRef = useRef<HTMLInputElement>(null);
 
@@ -209,7 +213,7 @@ const PostDialog = ({
           }}
           onBlur={() => handleTagBlur(index)}
           onKeyDown={(e) => handleTagKeyDown(index, e)}
-          placeholder="Tag"
+          placeholder={t('postDialog.tagPlaceholder')}
         />
       </div>
     )),
@@ -223,7 +227,7 @@ const PostDialog = ({
         className="post-dialog-tag-add-btn"
         onClick={handleAddTag}
       >
-        + Add Tag
+        {t('postDialog.addTag')}
       </button>
     ) : null,
     [tags.length, handleAddTag]
@@ -289,14 +293,14 @@ const PostDialog = ({
   // 底部按钮配置
   const bottomBtns: PopUpDialogButton[] = [
     {
-      text: "Cancel",
+      text: t('postDialog.cancel'),
       onClick: () => {
         onClose();
       },
       type: "cancel"
     },
     {
-      text: "Post",
+      text: t('postDialog.post'),
       onClick: () => {
         throttleCommitPost();
       },
@@ -307,7 +311,7 @@ const PostDialog = ({
   // 底部左侧内容（俱乐部选择按钮）
   const footerLeft = (
     <button className="post-dialog-select-club">
-      #Club
+      {t('postDialog.selectClub')}
     </button>
   );
 
@@ -343,7 +347,7 @@ const PostDialog = ({
 
   return (
     <PopUpDialogBase
-      title={notification}
+      title={notification || t('postDialog.createPost')}
       onClose={onClose}
       footerLeft={footerLeft}
       bottomBtns={bottomBtns}
@@ -355,7 +359,7 @@ const PostDialog = ({
         <input
           type="text"
           className="post-dialog-input"
-          placeholder="Post title (optional)"
+          placeholder={t('postDialog.titlePlaceholder')}
           ref={titleRef}
         />
 
@@ -373,7 +377,7 @@ const PostDialog = ({
         {/* 帖子内容输入框 */}
         <textarea
           className="post-dialog-textarea"
-          placeholder="What's on your mind?"
+          placeholder={t('postDialog.contentPlaceholder')}
           ref={contentRef}
         ></textarea>
       </div>

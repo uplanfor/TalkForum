@@ -12,4 +12,14 @@
 <!--    <update id="removeToken">-->
 <!--        UPDATE user_token SET valid = false WHERE token = #{token}-->
 <!--    </update>-->
+
+    <select id="getAdminHomeInfo" resultType="com.talkforum.talkforumserver.common.vo.AdminHomeVO">
+        SELECT
+            (SELECT COUNT(*) FROM `user`) AS totalUsers,
+            (SELECT COUNT(*) FROM `post`) AS totalPosts,
+            (SELECT COUNT(*) FROM `report`) AS totalReports,
+            (SELECT COUNT(*) FROM `post` WHERE status = 'PENDING') AS postsNotHandled,
+            (SELECT COUNT(*) FROM `comment` WHERE status = 'PENDING') AS commentsNotHandled,
+            (SELECT COUNT(*) FROM `report` WHERE status = 'PENDING') AS reportsNotHandled
+    </select>
 </mapper>

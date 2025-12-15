@@ -11,6 +11,7 @@ public class PostVO {
     public Long userId;
     public Long clubId;
     public String content;
+    public String coverUrl;
     public String brief;
     public String status;
     public Character isEssence;

@@ -15,12 +15,14 @@ import {
 import { requestSimpleUserInfoCache, getSingleSimpleUserInfo } from "../utils/simpleUserInfoCache";
 import { throttle } from '../utils/debounce&throttle';
 import InviteCodeDialog, { type InviteCodeDialogType } from "./InviteCodeDialog";
+import { useTranslation } from "react-i18next";
 
 /**
  * 管理员邀请码管理组件
  * 用于管理员生成、管理和分发邀请码
  */
 const AdminInviteCodes = () => {
+  const { t } = useTranslation();
   const [inviteCodes, setInviteCodes] = useState<any[]>([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -58,7 +60,7 @@ const AdminInviteCodes = () => {
 
   // 创建节流刷新函数，每5秒最多执行一次
   const throttledRefresh = useCallback(throttle(() => {
-    Msg.success("Refreshing data...(5s)");
+    Msg.success(t('adminInviteCodes.refreshingMessage'));
     loadInviteCodes(page, pageSize);
   }, 5000), [page, pageSize]);
 
@@ -98,7 +100,7 @@ const AdminInviteCodes = () => {
   // 打开更新邀请码对话框
   const handleOpenUpdateDialog = () => {
     if (selectedCodes.length === 0) {
-      Msg.error("Please select invite codes to update");
+      Msg.error(t('adminInviteCodes.selectCodesToUpdate'));
       return;
     }
     setDialogType("update");
@@ -115,14 +117,14 @@ const AdminInviteCodes = () => {
   // 删除选中的邀请码
   const handleDeleteCodes = async () => {
     if (selectedCodes.length === 0) {
-      Msg.error("Please select invite codes to delete");
+      Msg.error(t('adminInviteCodes.selectCodesToDelete'));
       return;
     }
     
     try {
       const res = await adminDeleteInviteCodes(selectedCodes);
       if (res.success) {
-        Msg.success(`Successfully deleted ${selectedCodes.length} invite code(s)`);
+        Msg.success(t('adminInviteCodes.deleteSuccess', { count: selectedCodes.length }));
         setSelectedCodes([]);
         setSelectAll(false);
         loadInviteCodes(page, pageSize);
@@ -130,7 +132,7 @@ const AdminInviteCodes = () => {
         throw new Error(res.message);
       }
     } catch (err: any) {
-      Msg.error(err.message || "Failed to delete invite codes");
+      Msg.error(err.message || t('adminInviteCodes.deleteFailed'));
       console.error(err);
     }
   };
@@ -139,7 +141,7 @@ const AdminInviteCodes = () => {
 
   return (
     <div className="admin-invite-codes-container">
-      <h1>Invite Codes</h1>
+      <h1>{t('adminInviteCodes.title')}</h1>
 
       {/* 操作按钮区域 */}
       <div className="action-buttons">
@@ -147,32 +149,36 @@ const AdminInviteCodes = () => {
           className="btn btn-primary"
           onClick={handleOpenCreateDialog}
         >
-          Create New Invite Codes
+          {t('adminInviteCodes.createNewButton')}
         </button>
         <button
           className="btn btn-primary"
           onClick={handleOpenUpdateDialog}
           disabled={selectedCodes.length === 0}
         >
-          Update Selected ({selectedCodes.length})
+          {t('adminInviteCodes.updateSelected')} ({selectedCodes.length})
         </button>
         <button
           className="btn btn-danger"
           onClick={handleDeleteCodes}
           disabled={selectedCodes.length === 0}
         >
-          Delete Selected ({selectedCodes.length})
+          {t('adminInviteCodes.deleteSelected')} ({selectedCodes.length})
         </button>
       </div>
 
       <div className="pagination-info">
-        <span>Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of {total} entries</span>
+        <span>{t('adminInviteCodes.showingEntries', { 
+          start: (page - 1) * pageSize + 1, 
+          end: Math.min(page * pageSize, total), 
+          total 
+        })}</span>
         <button
           className="refresh-button"
           onClick={throttledRefresh}
-          title="Refresh data (throttled to once per 5 seconds)"
+          title={t('adminInviteCodes.refreshTooltip')}
         >
-          Refresh
+          {t('adminInviteCodes.refreshButton')}
         </button>
       </div>
 
@@ -202,13 +208,13 @@ const AdminInviteCodes = () => {
               onChange={handleSelectAll}
             />
           </th>
-          <th>Code</th>
-          <th>Creator</th>
-          <th>Created At</th>
-          <th>Used/Max Use</th>
-          <th>Expired At</th>
+          <th>{t('adminInviteCodes.codeHeader')}</th>
+          <th>{t('adminInviteCodes.creatorHeader')}</th>
+          <th>{t('adminInviteCodes.createdAtHeader')}</th>
+          <th>{t('adminInviteCodes.usedMaxHeader')}</th>
+          <th>{t('adminInviteCodes.expiredAtHeader')}</th>
         </tr>)}
-        emptyContent={<div>No invite codes found</div>}
+        emptyContent={<div>{t('adminInviteCodes.noCodesFound')}</div>}
       />
 
       <Pagination

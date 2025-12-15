@@ -17,14 +17,15 @@ public interface PostMapper {
     Post getPostCheck(Long postId);
     List<PostVO> getPosts(PostRequestDTO postRequestDTO);
     long countPassPost(Long postId);
-    int addPost(PostCommitDTO postCommitDTO, String status, String brief);
-    int updatePost(PostEditDTO postEditDTO, String status, String brief);
+    int addPost(PostCommitDTO postCommitDTO, String status, String brief, String coverUrl);
+    int updatePost(PostEditDTO postEditDTO, String status, String brief, String coverUrl);
     int deletePost(Long postId);
 
     List<PostVO> adminGetPosts(AdminPostRequestDTO adminPostRequestDTO);
     long adminCountPosts(AdminPostRequestDTO adminPostRequestDTO);
     int auditPost(Long postId, String status);
     int essencePost(Long postId, int isEssence);
+    void increaseViewCount(Long postId);
 
     String getContent(Long postId);
 }

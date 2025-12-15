@@ -4,6 +4,7 @@ import com.talkforum.talkforumserver.common.anno.LoginRequired;
 import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
 import com.talkforum.talkforumserver.common.dto.*;
 import com.talkforum.talkforumserver.common.result.Result;
+import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.common.vo.PostListVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
@@ -41,7 +42,7 @@ public class PostController {
             userId = ((Number)information.get("id")).longValue();
         }
         
-        return Result.success("Success to get post information!", postService.getPost(postId, userId));
+        return Result.success(I18n.t("post.get.success"), postService.getPost(postId, userId));
     }
 
     /**
@@ -64,7 +65,7 @@ public class PostController {
             e.printStackTrace();
         }
         PostListVO postListVO = postService.getPosts(postRequestDTO, userId);
-        return Result.success("Success to get post list!", postListVO);
+        return Result.success(I18n.t("post.list.success"), postListVO);
     }
 
     /**
@@ -82,7 +83,7 @@ public class PostController {
         String role = (String) information.get("role");
         return Result.success(
                 role.equals(UserConstant.ROLE_USER) ?
-                        "Success!Your post will be seen after the moderators' auditing!" : "Success to commit your post! Refresh to see your post!"
+                        I18n.t("post.commit.user.success") : I18n.t("post.commit.admin.success")
                 ,postService.commitPost(postCommitDTO, role));
     }
 
@@ -103,7 +104,7 @@ public class PostController {
         String role = (String) information.get("role");
         postService.editPost(postEditDTO, role); // 调用服务层编辑帖子
         return Result.success(role.equals(UserConstant.ROLE_USER) ?
-                "Success!The new version will be seen after the moderators' auditing!" : "Success to edit your post! Refresh to see it!");
+                I18n.t("post.edit.user.success") : I18n.t("post.edit.admin.success"));
     }
 
     /**
@@ -119,7 +120,7 @@ public class PostController {
         long userId = ((Number)(information.get("id"))).longValue(); // 获取用户ID
         String role = (String)(information.get("role")); // 获取用户角色
         postService.deletePost(postId, userId, role); // 调用服务层删除帖子
-        return Result.success("Success to delete post!");
+        return Result.success(I18n.t("post.delete.success"));
     }
 
     /**
@@ -133,7 +134,7 @@ public class PostController {
     @Validated
     public Result getPostsWithAdminRight(AdminPostRequestDTO adminPostRequestDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         // 管理员状态下不传递userId，不进行互动内容赋值
-        return Result.success("Success to get post list!", postService.getPostsWithAdminRight(adminPostRequestDTO));
+        return Result.success(I18n.t("post.admin.list.success"), postService.getPostsWithAdminRight(adminPostRequestDTO));
     }
 
     /**
@@ -146,7 +147,7 @@ public class PostController {
     @PutMapping("/admin/{postId}/audit")
     public Result auditPost(@PathVariable Long postId, @RequestBody PostAuditDTO postAuditDTO) {
         postService.auditPost(postId, postAuditDTO.getStatus()); // 调用服务层审核帖子
-        return Result.success("Success to audit post!");
+        return Result.success(I18n.t("post.audit.success"));
     }
 
     /**
@@ -160,7 +161,7 @@ public class PostController {
     public Result essencePost(@PathVariable Long postId, @RequestBody EssenceDTO essenceDTO) {
         System.out.println(essenceDTO.getIsEssence()); // 打印日志
         postService.essencePost(postId, essenceDTO.getIsEssence()); // 调用服务层设置精华
-        return Result.success("Success to modify!");
+        return Result.success(I18n.t("post.essence.success"));
     }
 
     /**
@@ -170,6 +171,6 @@ public class PostController {
     @ModeratorRequired
     @GetMapping("/admin/{postId}/content")
     public Result getContent(@PathVariable Long postId) {
-        return Result.success("Success to get post!", postService.getContent(postId));
+        return Result.success(I18n.t("post.admin.get.success"), postService.getContent(postId));
     }
 }

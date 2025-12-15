@@ -11,6 +11,7 @@ import Pagination from './Pagination';
 import Msg from '../utils/msg';
 import dayjs from 'dayjs';
 import "./styles/style_admin_common.css"
+import { useTranslation } from 'react-i18next';
 
 // 定义用户角色选项
 const userRoles: UserRole[] = Object.values(UserRoleEnum);
@@ -19,6 +20,7 @@ const userRoles: UserRole[] = Object.values(UserRoleEnum);
 const userStatuses: UserStatus[] = Object.values(UsersStatusEnum);
 
 const AdminUser: React.FC = () => {
+  const { t } = useTranslation();
   // 状态定义
   const [users, setUsers] = useState<UserVO[]>([]);
   const [page, setPage] = useState(1);
@@ -65,10 +67,10 @@ const AdminUser: React.FC = () => {
       if (now - lastRefreshTime >= 5000) {
         loadUsers(page, pageSize);
         lastRefreshTime = now;
-        Msg.success('Data refreshed');
+        Msg.success(t('adminUsers.dataRefreshed'));
       } else {
         const remainingTime = Math.ceil((5000 - (now - lastRefreshTime)) / 1000);
-        Msg.success(`Please wait ${remainingTime} seconds before refreshing again`);
+        Msg.success(t('adminUsers.pleaseWait', { seconds: remainingTime }));
       }
     };
   })();
@@ -103,16 +105,16 @@ const AdminUser: React.FC = () => {
 
   // 重置用户密码
   const handleResetPassword = async (userId: number, userName: string) => {
-    const confirmed = await Msg.confirm(`Are you sure you want to reset password for user "${userName}"?`);
+    const confirmed = await Msg.confirm(t('adminUsers.resetPasswordConfirm', { userName }));
     if (confirmed) {
       await usersAdminResetUserPassword(userId).then(res => {
         if (res.success) {
-          Msg.success(res.message || `Password reset successfully for user "${userName}"`);
+          Msg.success(res.message || t('adminUsers.passwordResetSuccess', { userName }));
         } else {
           throw new Error(res.message);
         }
       }).catch(err => {
-        Msg.error(err || 'Failed to reset password');
+        Msg.error(err || t('adminUsers.passwordResetFailed'));
         console.error(err);
       });
     }
@@ -121,16 +123,16 @@ const AdminUser: React.FC = () => {
   // 设置用户状态
   const handleSetStatus = async (userId: number, userName: string) => {
     const menu = [UsersStatusEnum.NORMAL, UsersStatusEnum.UNABLE];
-    const result = await Msg.menu(menu, `Set status for user "${userName}(${userId})"`);
+    const result = await Msg.menu(menu, t('adminUsers.setStatusTitle', { userName, userId }));
     if (result !== -1) {
       await usersAdminSetUserStatus(userId, menu[result]).then(res => {
         if (res.success) {
-          Msg.success(res.message || `Status set successfully for user "${userName}"`);
+          Msg.success(res.message || t('adminUsers.setStatusSuccess', { userName }));
         } else {
           throw new Error(res.message);
         }
       }).catch(err => {
-        Msg.error(err || 'Failed to set status');
+        Msg.error(err || t('adminUsers.setStatusFailed'));
         console.error(err);
       });
     }
@@ -139,20 +141,20 @@ const AdminUser: React.FC = () => {
   // 设置用户角色
   const handleSetRole = async (userId: number, userName: string, role: string) => {
     if (role === UserRoleEnum.ADMIN) {
-      Msg.error("Cannot change administator's role!")
+      Msg.error(t('adminUsers.cannotChangeAdminRole'));
       return;
     } 
     const menu = [UserRoleEnum.USER, UserRoleEnum.MODERATOR];
-    const result = await Msg.menu(menu, `Set role for user "${userName}(${userId}"`);
+    const result = await Msg.menu(menu, t('adminUsers.setRoleTitle', { userName, userId }));
     if (result !== -1) {
       await usersAdminSetUserRole(userId, menu[result]).then(res => {
         if (res.success) {
-          Msg.success(res.message || `Role set successfully for user "${userName}"`);
+          Msg.success(res.message || t('adminUsers.setRoleSuccess', { userName }));
         } else {
           throw new Error(res.message);
         }
     }).catch(err => {
-        Msg.error(err || 'Failed to set role');
+        Msg.error(err || t('adminUsers.setRoleFailed'));
         console.error(err);
       });
     }
@@ -160,16 +162,24 @@ const AdminUser: React.FC = () => {
   
   // 处理详情
   const handleDetail = (item: UserVO) => {
-    Msg.confirm(`Name ${item.name} ID: ${item.id}\n
-      Email: ${item.email} Created At: ${item.createdAt} Last Login At: ${item.lastLoginAt}\n
-      Role: ${item.role} Status: ${item.status} Followers Count: ${item.fansCount} Following Count: ${item.followingCount}\n`);
+    Msg.confirm(t('adminUsers.userDetails', {
+      name: item.name,
+      id: item.id,
+      email: item.email,
+      createdAt: dayjs(item.createdAt).format("HH:mm MMM DD, YYYY"),
+      lastLoginAt: dayjs(item.lastLoginAt).format("HH:mm MMM DD, YYYY"),
+      role: item.role,
+      status: item.status,
+      fansCount: item.fansCount,
+      followingCount: item.followingCount
+    }));
   }
 
   const totalPages = Math.ceil(total / pageSize);
 
   return (
     <div className="admin-users-container">
-      <h1>Users Management</h1>
+      <h1>{t('adminUsers.title')}</h1>
 
       {/* 操作按钮区域 */}
       {/* <div className="action-buttons">
@@ -188,13 +198,19 @@ const AdminUser: React.FC = () => {
       </div> */}
 
       <div className="pagination-info">
-        <span>Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of {total} entries</span>
+        <span>
+          {t('adminUsers.showingEntries', { 
+            start: (page - 1) * pageSize + 1,
+            end: Math.min(page * pageSize, total),
+            total: total
+          })}
+        </span>
         <button
           className="refresh-button"
           onClick={throttledRefresh}
-          title="Refresh data (throttled to once per 5 seconds)"
+          title={t('adminUsers.refreshTooltip')}
         >
-          Refresh
+          {t('adminUsers.refreshButton')}
         </button>
       </div>
 
@@ -229,13 +245,13 @@ const AdminUser: React.FC = () => {
                 className="btn btn-secondary"
                 onClick={() => handleResetPassword(item.id, item.name)}
               >
-                Reset
+                {t('adminUsers.resetPassword')}
               </button>
             </td>
             <td>{item.email}</td>
             <td>{dayjs(item.createdAt).format("HH:mm MMM DD, YYYY")}</td>
             <td>{dayjs(item.lastLoginAt).format("HH:mm MMM DD, YYYY")}</td>
-            <td><button className="btn btn-secondary" onClick={()=>handleDetail(item)}>More</button></td>
+            <td><button className="btn btn-secondary" onClick={()=>handleDetail(item)}>{t('adminUsers.moreButton')}</button></td>
           </tr>
         )}
         renderHeader={() => (<tr>
@@ -246,14 +262,14 @@ const AdminUser: React.FC = () => {
               onChange={handleSelectAll}
             />
           </th>
-          <th>Name(ID)</th>
-          <th>Status</th>
-          <th>Role</th>
-          <th>Password</th>
-          <th>Email</th>
-          <th>Created At</th>
-          <th>Last Login</th>
-          <th>Details</th>
+          <th>{t('adminUsers.nameIdHeader')}</th>
+          <th>{t('adminUsers.statusHeader')}</th>
+          <th>{t('adminUsers.roleHeader')}</th>
+          <th>{t('adminUsers.passwordHeader')}</th>
+          <th>{t('adminUsers.emailHeader')}</th>
+          <th>{t('adminUsers.createdAtHeader')}</th>
+          <th>{t('adminUsers.lastLoginHeader')}</th>
+          <th>{t('adminUsers.detailsHeader')}</th>
         </tr>)}
         emptyContent={<div>No users found</div>}
       />

@@ -8,6 +8,7 @@ import com.talkforum.talkforumserver.common.dto.AdminAuditCommentsDTO;
 import com.talkforum.talkforumserver.common.dto.AdminGetCommentsDTO;
 import com.talkforum.talkforumserver.common.entity.Comment;
 import com.talkforum.talkforumserver.common.result.Result;
+import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
@@ -57,7 +58,7 @@ public class CommentController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Result.success("Successfully get comment list!",
+        return Result.success(I18n.t("comment.list.success"),
                 commentService.getComments(postId, cursor, pageSize, userId));
     }
 
@@ -86,7 +87,7 @@ public class CommentController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Result.success("Successfully get comment replies",
+        return Result.success(I18n.t("comment.reply.list.success"),
                 commentService.getCommentReplyList(postId, cursor, pageSize, rootId, parentId, userId));
     }
 
@@ -113,9 +114,9 @@ public class CommentController {
                 userId, role);
         if (comment.id != null) {
             return Result.success(role.equals(UserConstant.ROLE_USER) ?
-                    "Success! Your comment will be seen after the moderators' auditing!" : "Success to comment!Refresh to see it!", comment);
+                    I18n.t("comment.add.user.success") : I18n.t("comment.add.admin.success"), comment);
         }
-        return Result.error("Fail to add comment!");
+        return Result.error(I18n.t("comment.add.failed"));
     }
 
     /**
@@ -131,7 +132,7 @@ public class CommentController {
         long userId = ((Number)(information.get("id"))).longValue(); // 获取用户ID
         String role = (String)(information.get("role")); // 获取用户角色
         commentService.deleteComment(commentId, userId, role); // 删除评论
-        return Result.success("Successfully delete comment!");
+        return Result.success(I18n.t("comment.delete.success"));
     }
 
     /**
@@ -142,7 +143,7 @@ public class CommentController {
     @ModeratorRequired
     @GetMapping("/admin")
     public Result adminGetCommentsByPage(AdminGetCommentsDTO adminGetCommentsDTO) {
-        return Result.success("Successfully get comments!", commentService.adminGetCommentsByPage(adminGetCommentsDTO));
+        return Result.success(I18n.t("comment.admin.list.success"), commentService.adminGetCommentsByPage(adminGetCommentsDTO));
     }
 
     /**
@@ -153,7 +154,7 @@ public class CommentController {
     @ModeratorRequired
     @PutMapping("/admin/audit")
     public Result adminAuditComments(@RequestBody AdminAuditCommentsDTO adminAuditCommentsDTO) {
-        return Result.success("Successfully audit comments!", commentService.adminAuditComments(adminAuditCommentsDTO));
+        return Result.success(I18n.t("comment.admin.audit.success"), commentService.adminAuditComments(adminAuditCommentsDTO));
     }
 
     /**
@@ -164,7 +165,7 @@ public class CommentController {
     @ModeratorRequired
     @GetMapping("/admin/content")
     public Result adminGetCommentsContent(List<Long> commentIds) {
-        return Result.success("Successfully get comments content", commentService.adminGetCommentsContent(commentIds));
+        return Result.success(I18n.t("comment.admin.get.success"), commentService.adminGetCommentsContent(commentIds));
     }
 
 

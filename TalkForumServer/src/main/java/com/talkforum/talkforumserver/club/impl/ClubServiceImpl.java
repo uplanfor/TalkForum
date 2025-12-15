@@ -5,6 +5,7 @@ import com.talkforum.talkforumserver.club.ClubMemberMapper;
 import com.talkforum.talkforumserver.club.ClubService;
 import com.talkforum.talkforumserver.common.dto.ClubProfileDTO;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
+import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.vo.ClubShortInfoVO;
 import com.talkforum.talkforumserver.common.vo.UserVO;
 import com.talkforum.talkforumserver.user.UserMapper;
@@ -36,14 +37,14 @@ public class ClubServiceImpl implements ClubService {
     @Override
     public void updateClub(long clubId, ClubProfileDTO clubProfileDTO) {
         if (clubMapper.updateClub(clubId, clubProfileDTO) == 0) {
-            throw new BusinessRuntimeException("The club is not exist");
+            throw new BusinessRuntimeException(I18n.t("club.not.exist"));
         }
     }
 
     @Override
     public void deleteClub(long clubId) {
         if (clubMapper.deleteClub(clubId) == 0) {
-            throw new BusinessRuntimeException("The club is not exist");
+            throw new BusinessRuntimeException(I18n.t("club.not.exist"));
         }
     }
 
@@ -53,7 +54,7 @@ public class ClubServiceImpl implements ClubService {
         UserVO userCheck = userMapper.getUserVOById(userId);
         ClubProfileDTO clubProfileDTO = clubMapper.getClubById(clubId);
         if (userCheck == null || clubProfileDTO == null) {
-            throw new BusinessRuntimeException("The user or club is not exist");
+            throw new BusinessRuntimeException(I18n.t("club.user.or.club.not.exist"));
         }
         clubMemberMapper.addClubMember(clubId, userId);
     }
@@ -61,7 +62,7 @@ public class ClubServiceImpl implements ClubService {
     @Override
     public void removeMember(long clubId, long userId) {
         if (clubMemberMapper.deleteClubMember(clubId, userId) == 0) {
-            throw new BusinessRuntimeException("The user is not exist in the club");
+            throw new BusinessRuntimeException(I18n.t("club.user.not.member"));
         }
     }
 }

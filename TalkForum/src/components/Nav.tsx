@@ -16,6 +16,7 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { useSelector } from "react-redux";
 import { type RootState } from "../store";
+import { useTranslation } from "react-i18next";
 
 /**
  * 导航栏组件属性接口
@@ -34,6 +35,9 @@ const Nav = ({
     hasFooter = true,                // 是否显示底部导航，默认true
     changeColorTarget = null         // 颜色变化目标，默认null
 }: NavProps) => {
+    // 国际化钩子
+    const { t } = useTranslation();
+    
     // 路由导航钩子
     const navigate = useNavigate();
     // 从Redux获取用户信息
@@ -65,7 +69,7 @@ const Nav = ({
         if (user.isLoggedIn) {
             setPostDialogVisible(true);
         } else {
-            Msg.error("Please sign in first to write your post!");
+            Msg.error(t('nav.signInPrompt'));
             navigate("/login");
         }
     }
@@ -81,14 +85,14 @@ const Nav = ({
             {/* 网站logo */}
             <img src={logoLink} alt="Talk Forum" />
             {/* 网站标题 */}
-            <span className="title">Talk Forum</span>
+            <span className="title">{t('nav.title')}</span>
             
             {/* 导航链接 */}
             <ul>
-                <li><Link to="/">Home</Link></li>
+                <li><Link to="/">{t('nav.home')}</Link></li>
                 {/* <li><Link to="/club">Club</Link></li>
                 <li><Link to="/mail">Mail</Link></li> */}
-                <li><Link to="/me">Me</Link></li>
+                <li><Link to="/me">{t('nav.me')}</Link></li>
             </ul>
             
             {/* 搜索框 */}
@@ -96,7 +100,7 @@ const Nav = ({
                 <MagnifyingGlassIcon />
                 <input 
                     type="text" 
-                    placeholder="search for others' posts!" 
+                    placeholder={t('nav.searchPlaceholder')} 
                     onClick={showSearchDialog}
                     value={searchKeyword}
                     onChange={(e) => setSearchKeyword(e.target.value)}
@@ -117,11 +121,11 @@ const Nav = ({
         {hasFooter &&(<footer>
             {/* 底部导航链接 */}
             <ul>
-                <li><Link to="/">Home</Link></li>
+                <li><Link to="/">{t('nav.home')}</Link></li>
                 {/* <li><Link to="/club">Club</Link></li> */}
                 <li>{/* 占位 */}</li>
                 {/* <li><Link to="/mail">Mail</Link></li> */}
-                <li><Link to="/me">Me</Link></li>
+                <li><Link to="/me">{t('nav.me')}</Link></li>
             </ul>
             {/* 发布帖子按钮 */}
             <div className="post" onClick={tryShowPostDialog}>

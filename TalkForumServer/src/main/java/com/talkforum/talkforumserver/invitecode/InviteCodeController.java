@@ -8,6 +8,7 @@ import com.talkforum.talkforumserver.common.dto.InviteCodeDTO;
 import com.talkforum.talkforumserver.common.dto.UpdateInviteCodeDTO;
 import com.talkforum.talkforumserver.common.entity.InviteCode;
 import com.talkforum.talkforumserver.common.result.Result;
+import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
@@ -41,7 +42,7 @@ public class InviteCodeController {
     public Result getInviteCodes(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         Long userId = ((Number)(information.get("id"))).longValue();
-        return Result.success("Success to get invite code!", inviteCodeService.getInviteCodes(userId));
+        return Result.success(I18n.t("invitecode.get.success"), inviteCodeService.getInviteCodes(userId));
     }
 
     /**
@@ -53,7 +54,7 @@ public class InviteCodeController {
     @AdminRequired
     @GetMapping("/admin")
     public Result adminGetInviteCodes(int page, int pageSize) {
-        return Result.success("Success to get invite codes!", inviteCodeService.adminGetInviteCodes(page, pageSize));
+        return Result.success(I18n.t("invitecode.admin.get.success"), inviteCodeService.adminGetInviteCodes(page, pageSize));
     }
 
     /**
@@ -70,7 +71,7 @@ public class InviteCodeController {
         Long userId = ((Number)(information.get("id"))).longValue();
         List<InviteCode> codes = inviteCodeService.generateInviteCodes(userId, inviteCodeDTO);
 
-        return Result.success("Success to generate " + codes.size() + " invite codes!",
+        return Result.success(I18n.t("invitecode.generate.success", codes.size()),
                codes);
     }
 
@@ -84,8 +85,8 @@ public class InviteCodeController {
     public Result deleteInviteCode(@PathVariable String code) {
         boolean success = inviteCodeService.deleteInviteCode(code);
         return success ? 
-            Result.success("Invite code deleted successfully") :
-            Result.error("Failed to delete invite code");
+            Result.success(I18n.t("invitecode.delete.success")) :
+            Result.error(I18n.t("invitecode.delete.failed"));
     }
     
     /**
@@ -98,8 +99,8 @@ public class InviteCodeController {
     public Result updateInviteCodes(@RequestBody UpdateInviteCodeDTO updateInviteCodeDTO) {
         int updatedCount = inviteCodeService.updateInviteCodes(updateInviteCodeDTO);
         return updatedCount > 0 ? 
-            Result.success("Invite code updated successfully, updated count: " + updatedCount) :
-            Result.error("Failed to update invite code");
+            Result.success(I18n.t("invitecode.update.success", updatedCount)) :
+            Result.error(I18n.t("invitecode.update.failed"));
     }
     
     /**
@@ -111,6 +112,6 @@ public class InviteCodeController {
     @DeleteMapping("/admin")
     public Result deleteInviteCodes(DeleteInviteCodesDTO deleteInviteCodesDTO) {
         int count = inviteCodeService.deleteInviteCodes(deleteInviteCodesDTO);
-        return  Result.success("Success to delete " + count + "invite codes!");
+        return  Result.success(I18n.t("invitecode.batchDelete.success", count));
     }
 }

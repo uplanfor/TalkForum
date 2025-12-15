@@ -4,6 +4,7 @@ import com.talkforum.talkforumserver.common.dto.UserDTO;
 import com.talkforum.talkforumserver.common.dto.UserProfileDTO;
 import com.talkforum.talkforumserver.common.entity.User;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
+import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.util.PasswordHelper;
 import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.common.vo.SimpleUserVO;
@@ -46,11 +47,11 @@ public class UserServiceImpl implements UserService {
         }
         // 验证邮箱格式
         if (!user.email.matches("^\\w+@\\w+\\.\\w+$")) {
-            throw new BusinessRuntimeException("Invalid email format");
+            throw new BusinessRuntimeException(I18n.t("user.email.invalid"));
         }
         // 检查用户名或邮箱是否已存在
         if (userMapper.countUserByNameOrEmail(user.name, user.email) > 0) {
-            throw new BusinessRuntimeException("The user already exists. Please choose other name or email!");
+            throw new BusinessRuntimeException(I18n.t("user.exists"));
         }
         // 加密密码
         user.password = PasswordHelper.encryptPassword(user.password);
@@ -60,12 +61,11 @@ public class UserServiceImpl implements UserService {
         } else {
             // 普通用户需要邀请码
             if (user.inviteCode == null) {
-                throw new BusinessRuntimeException("Only with invite code can you register!");
+                throw new BusinessRuntimeException(I18n.t("user.invitecode.required"));
             }
             // 验证邀请码是否有效
             if (inviteCodeMapper.checkInviteCodeValid(user.inviteCode) == 0) {
-                throw new BusinessRuntimeException(
-                        "The invite code cannot be used because it does not exist, has expired, or has reached its maximum usage limit");
+                throw new BusinessRuntimeException(I18n.t("user.invitecode.invalid"));
             }
             user.role = UserConstant.ROLE_USER;
         }
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
                 inviteCodeMapper.updateUsedCount(user.inviteCode);
             }
         } catch (Exception e) {
-            throw new BusinessRuntimeException("Failed to add user!Maybe your invite code is invalid!");
+            throw new BusinessRuntimeException(I18n.t("user.add.failed"));
         }
         // 返回注册成功的用户信息
         return getUserById(user.id);
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
     public UserVO getUserById(Long userId) {
         UserVO userVO = userMapper.getUserVOById(userId);
         if (userVO == null) {
-            throw new BusinessRuntimeException("User not found!");
+            throw new BusinessRuntimeException(I18n.t("user.not.found"));
         }
         return userVO;
     }
@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService {
     public UserVO getUserByEmail(String email) {
         UserVO userVO = userMapper.getUserVOByEmail(email);
         if (userVO == null) {
-            throw new BusinessRuntimeException("User not found!");
+            throw new BusinessRuntimeException(I18n.t("user.not.found"));
         }
         return userVO;
     }
@@ -156,7 +156,7 @@ public class UserServiceImpl implements UserService {
             String encryptedPassword = PasswordHelper.encryptPassword(newPassword);
             userMapper.resetUserPassword(userId, encryptedPassword);
         } else {
-            throw new BusinessRuntimeException("Your login password is wrong!");
+            throw new BusinessRuntimeException(I18n.t("user.password.wrong"));
         }
     }
 

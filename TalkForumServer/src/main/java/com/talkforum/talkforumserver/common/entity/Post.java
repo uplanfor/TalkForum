@@ -35,6 +35,10 @@ public class Post {
      */
     public String brief;
     /**
+     * 帖子封面图片URL
+     */
+    public String coverUrl;
+    /**
      * 帖子状态，如待审核、已发布、已删除等
      */
     public String status;

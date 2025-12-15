@@ -1,14 +1,21 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, type AxiosError } from 'axios';
-
+import axios, {
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+  type AxiosError,
+  type InternalAxiosRequestConfig
+} from 'axios';
+import ThemeUtil from './ThemeUtil';
+import { LanguageUtil } from './LanguageUtil';
 // 扩展Axios请求配置
 interface RequestConfig extends AxiosRequestConfig {
   headers?: {
     'X-Auth-Required'?: boolean;
+    'Accept-Language'?: string;
     [key: string]: any;
   };
 }
-
-// 扩展AxiosError类型，增加自定义message
+// 扩展AxiosError类型
 interface CustomAxiosError extends AxiosError {
   customMessage?: string;
 }
@@ -24,16 +31,29 @@ class Request {
       withCredentials: true, // 自动发送cookie
       headers: {
         'Content-Type': 'application/json;charset=utf-8',
+        // 初始时先带上默认语言（后续请求拦截器会覆盖）
+        'Accept-Language': LanguageUtil.getCurrentLanguage(),
       },
     });
+    this.instance.interceptors.request.use(
+      (config: InternalAxiosRequestConfig) => { // 使用 InternalAxiosRequestConfig
+        const currentLang = LanguageUtil.getCurrentLanguage();
+        config.headers = config.headers || {};
+        config.headers['Accept-Language'] = currentLang;
+        return config;
+      },
+      (error: CustomAxiosError) => {
+        return Promise.reject(error);
+      }
+    );
 
     // 响应拦截器：直接返回数据 + 统一处理错误信息
     this.instance.interceptors.response.use(
       (response: AxiosResponse) => response,
       (error: CustomAxiosError) => {
         // 1. 处理认证失败（401）
-        if (error.config?.headers?.['X-Auth-Required'] === true && 
-            error.response?.status === 401) {
+        if (error.config?.headers?.['X-Auth-Required'] === true &&
+          error.response?.status === 401) {
           if (typeof window !== 'undefined') {
             window.location.href = '/';
           }
@@ -46,10 +66,10 @@ class Request {
         // 有响应数据的情况（接口返回了错误状态码）
         if (error.response) {
           // 优先取接口返回的message
-          errorMessage = (error.response.data as any)?.message || 
-                          // 备用：HTTP状态文本（如404 Not Found）
-                          error.response.statusText || 
-                          defaultMessage;
+          errorMessage = (error.response.data as any)?.message ||
+            // 备用：HTTP状态文本（如404 Not Found）
+            error.response.statusText ||
+            defaultMessage;
         }
         // 无响应数据的情况（网络错误、超时等）
         else if (error.request) {
@@ -60,7 +80,7 @@ class Request {
           errorMessage = `Request Configuration Error:${error.message}` || defaultMessage;
         }
 
-        // 将处理后的错误信息挂载到error对象上
+        // 将处理后的错误信息挂载到error上
         error.customMessage = errorMessage;
         // 也可以直接覆盖原始message（根据需求二选一）
         error.message = errorMessage;

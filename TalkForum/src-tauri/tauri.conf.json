@@ -1,0 +1,38 @@
+{
+  "productName": "talkforum",
+  "version": "0.1.0",
+  "identifier": "com.talkforum.top",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "pnpm run dev",
+    "beforeBuildCommand": "pnpm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Talk Forum",
+        "width": 800,
+        "height": 600,
+        "minWidth": 300,
+        "minHeight": 200,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true,
+        "decorations": true,
+        "transparent": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src *; img-src * data:; font-src 'self' data:;"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "nsis",
+    "windows": {
+      "nsis": {}
+    },
+    "icon": ["icons/icon.ico", "icons/icon.png"]
+  }
+}
