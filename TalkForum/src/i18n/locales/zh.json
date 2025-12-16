@@ -4,7 +4,8 @@
         "home": "首页",
         "me": "我的",
         "searchPlaceholder": "搜索他人的帖子！",
-        "signInPrompt": "请先登录再发布帖子！"
+        "signInPrompt": "请先登录再发布帖子！",
+        "login": "登录"
     },
     "home": {
         "title": "随时随地，畅所欲言！",
@@ -36,6 +37,10 @@
         "signUpLink": "注册",
         "signInLink": "登录",
         "copyright": "© 2025 聊吧. 保留所有权利。",
+        "nameOrEmailRequired": "请输入用户名或邮箱",
+        "emailRequired": "请输入邮箱",
+        "passwordRequired": "请输入密码",
+        "privacyAgreementRequired": "同意《聊吧 隐私政策》以继续登录",
         "cookiesRequired": "请启用 cookies 以使用 聊吧！",
         "usernameEmptyError": "用户名或邮箱不能为空！",
         "passwordEmptyError": "密码不能为空！",

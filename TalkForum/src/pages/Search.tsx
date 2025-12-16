@@ -147,7 +147,10 @@ const Search = ()=> {
                 </div>
                 
                 {/* 搜索按钮 */}
-                <button onClick={handleSearch}>{t('search.searchButton')}</button>
+                <button onClick={handleSearch}>
+                    <span className="search-button-text">{t('search.searchButton')}</span>
+                    <span className="search-button-icon">🔍</span>
+                </button>
             </div>
             
             {/* 遮罩层 */}

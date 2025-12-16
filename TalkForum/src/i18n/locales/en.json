@@ -4,7 +4,8 @@
         "home": "Home",
         "me": "Me",
         "searchPlaceholder": "search for others' posts!",
-        "signInPrompt": "Please sign in first to write your post!"
+        "signInPrompt": "Please sign in first to write your post!",
+        "login": "Login"
     },
     "home": {
         "title": "Talk anywhere!",
@@ -36,6 +37,10 @@
         "signUpLink": "Sign up",
         "signInLink": "Sign in",
         "copyright": "© 2025 TalkForum. All rights reserved.",
+        "nameOrEmailRequired": "Username or Email is required!",
+        "emailRequired": "Email is required!",
+        "passwordRequired": "Password is required!",
+        "privacyAgreementRequired": "Please agree to the TalkForum Privacy Policy!",
         "cookiesRequired": "Please enable cookies to use TalkForum!",
         "usernameEmptyError": "Username or Email cannot be empty!",
         "passwordEmptyError": "Password cannot be empty!",

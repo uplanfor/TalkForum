@@ -118,7 +118,7 @@ const Login = () => {
     // 登录表单校验（用户名/邮箱 + 密码非空 + 隐私协议）
     if (isLogin) {
       if (!username.trim()) {
-        Msg.error(t('login.usernameEmailRequired'), 3000);
+        Msg.error(t('login.nameOrEmailRequired'), 3000);
         return false;
       }
       if (!password.trim()) {

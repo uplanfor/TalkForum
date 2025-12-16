@@ -80,6 +80,9 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .search-header button:hover {
@@ -88,6 +91,15 @@
 
 .search-header button:active {
   background-color: var(--secondary-warm-1);
+}
+
+/* 搜索按钮内的图标默认隐藏 */
+.search-button-icon {
+  display: none;
+}
+
+.search-button-text {
+  display: inline;
 }
 
 /* 遮罩层样式 */
@@ -212,6 +224,99 @@
   .search-header button {
     height: 36px;
     padding: 0 12px;
+    font-size: 14px;
+  }
+}
+
+/* 针对300px以下宽度的特殊处理 */
+@media screen and (max-width: 300px) {
+  .search-header {
+    padding: 6px 8px;
+    flex-wrap: nowrap; /* 防止换行 */
+  }
+  
+  .search-header svg:first-child {
+    width: 18px;
+    height: 18px;
+    margin-right: 6px;
+    flex-shrink: 0; /* 防止返回按钮被压缩 */
+  }
+  
+  .search-combo {
+    height: 32px;
+    padding: 0 8px;
+    margin-right: 6px;
+    min-width: 0; /* 允许搜索框收缩 */
+    flex: 1; /* 占据剩余空间 */
+  }
+  
+  .search-combo svg {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    flex-shrink: 0; /* 防止搜索图标被压缩 */
+  }
+  
+  .search-combo input {
+    font-size: 12px;
+    min-width: 60px; /* 设置最小宽度确保可用性 */
+  }
+  
+  .search-header button {
+    height: 32px;
+    padding: 0 8px;
+    font-size: 12px;
+    white-space: nowrap; /* 防止文字换行 */
+    flex-shrink: 0; /* 防止搜索按钮被压缩 */
+  }
+  
+  /* 隐藏筛选按钮文字，只显示图标 */
+  .search-combo svg:last-child {
+    margin-left: 4px;
+  }
+}
+
+/* 针对更小屏幕的极端处理 */
+@media screen and (max-width: 250px) {
+  .search-header {
+    padding: 4px 6px;
+  }
+  
+  .search-header svg:first-child {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+  }
+  
+  .search-combo {
+    height: 28px;
+    padding: 0 6px;
+    margin-right: 4px;
+  }
+  
+  .search-combo svg {
+    width: 14px;
+    height: 14px;
+    margin-right: 3px;
+  }
+  
+  .search-combo input {
+    font-size: 11px;
+    min-width: 50px;
+  }
+  
+  .search-header button {
+    padding: 0 6px;
+    font-size: 11px;
+  }
+  
+  /* 在250px以下显示图标，隐藏文字 */
+  .search-button-text {
+    display: none;
+  }
+  
+  .search-button-icon {
+    display: inline;
     font-size: 14px;
   }
 }

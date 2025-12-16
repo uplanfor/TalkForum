@@ -2,7 +2,11 @@ package com.talkforum.talkforumserver.common.anno;
 
 import java.lang.annotation.*;
 
-@Target({ElementType.METHOD, ElementType.TYPE}) // 可标记方法/类（类下所有方法生效）
+
+/**
+ * 标记接口不限流
+ */
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface NoRateLimit {

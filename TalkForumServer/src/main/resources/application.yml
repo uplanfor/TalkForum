@@ -50,13 +50,3 @@ jwt:
   secret-key: "XyvhaihdoehEF+gaosfcotynyogmeltoehsshlrybghsbschsb="
   expire: 5400000  # 1.5 hr
 
-# 限流配置
-rate-limit:
-  enabled: true
-  default-type: "FIXED_WINDOW"
-  default-limit: 100
-  default-window-seconds: 60
-  default-bucket-capacity: 100
-  default-token-rate: 1.0
-  default-dimension: "IP"
-  redis-key-prefix: "rate_limit:"

@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
         // 判断密码长度是否在8-32之间，且符合字母数字和.和_的规则，验证邮箱格式
         if (user.password.length() < 8 || user.password.length() > 32 ||
                 !user.password.matches(ServerConstant.USER_PASSWORD_RULE)) {
-            throw new BusinessRuntimeException(ServerConstant.PASSWORD_RULE_WARNING);
+            throw new BusinessRuntimeException(I18n.t("user.password.invalid"));
         }
         // 验证邮箱格式
         if (!user.email.matches("^\\w+@\\w+\\.\\w+$")) {
@@ -145,7 +145,7 @@ public class UserServiceImpl implements UserService {
         // 验证新密码格式
         if (newPassword.length() < 8 || newPassword.length() > 32 ||
                 !newPassword.matches(ServerConstant.USER_PASSWORD_RULE)) {
-            throw new BusinessRuntimeException(ServerConstant.PASSWORD_RULE_WARNING);
+            throw new BusinessRuntimeException(I18n.t("user.password.invalid"));
         }
 
         // 获取用户登录信息

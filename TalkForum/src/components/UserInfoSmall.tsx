@@ -16,6 +16,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import Msg from "../utils/msg"
 import { authSignOut } from "../api/ApiAuth";
+import { useTranslation } from "react-i18next";
 
 /**
  * 用户信息小型组件属性接口
@@ -34,6 +35,9 @@ interface UserInfoSmallProps {
 const UserInfoSmall = ({style}: UserInfoSmallProps) => {
   // Redux dispatch钩子
   const dispatch = useDispatch<AppDispatch>();
+  
+  // 国际化钩子
+  const { t } = useTranslation();
   
   // 从Redux获取用户信息
   const { isLoggedIn, name, avatarLink } = useSelector((state: RootState) => state.user);
@@ -72,7 +76,7 @@ const UserInfoSmall = ({style}: UserInfoSmallProps) => {
         {isLoggedIn ? (
           <span>{name}</span>
         ) : (
-          <button className="login-button" onClick={toLogin}>Login</button>
+          <button className="login-button" onClick={toLogin}>{t('nav.login')}</button>
         )}
         
         {/* 用户头像 */}

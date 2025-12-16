@@ -151,7 +151,7 @@ const PostCard = (props: PostCardProps) => {
             if (result) {
                 postsDeletePostAuth(id).then(res => {
                     if (res.success) {
-                        Msg.success(t('postCard.deleteSuccess'));
+                        Msg.success(t('postCard.deletePostSuccess'));
                     } else {
                         throw new Error(res.message);
                     }
@@ -159,7 +159,7 @@ const PostCard = (props: PostCardProps) => {
             }
         } catch (error) {
             console.log(error);
-            Msg.error(t('postCard.deleteFailed'));
+            Msg.error(t('postCard.deletePostFailed'));
         }
     }
 
