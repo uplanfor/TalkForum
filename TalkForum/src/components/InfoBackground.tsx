@@ -140,7 +140,7 @@ const InfoBackground = (props: InfoBackgroundProps) => {
     };
 
     return (
-      <BackgroundImg src={backgroundLink} style={{ height: 430 }}>
+      <BackgroundImg src={backgroundLink} >
         <div className="info-container">
           <div className="info">
             {/* 默认用户头像 */}
@@ -172,7 +172,7 @@ const InfoBackground = (props: InfoBackgroundProps) => {
   if (targetType === InfoBackgroundType.CLUB) {
     // TODO: 实现俱乐部信息显示
     return (
-      <BackgroundImg src={backgroundLink} style={{ height: 430 }}>
+      <BackgroundImg src={backgroundLink} >
         <div className="info-container">
           <div className="info">
             <div className="info-combo">
@@ -187,7 +187,7 @@ const InfoBackground = (props: InfoBackgroundProps) => {
   // 如果是用户类型，但用户信息未加载完成
   if (!userInfo) {
     return (
-      <BackgroundImg src={backgroundLink} style={{ height: 430 }}>
+      <BackgroundImg src={backgroundLink} >
         <div className="info-container">
           <div className="info">
             <div className="info-combo">
@@ -200,7 +200,7 @@ const InfoBackground = (props: InfoBackgroundProps) => {
   }
 
   return (
-    <BackgroundImg src={userInfo.backgroundLink} style={{ height: 430 }}>
+    <BackgroundImg src={userInfo.backgroundLink} >
       {/* 信息容器 */}
       <div className="info-container">
         <div className="info">

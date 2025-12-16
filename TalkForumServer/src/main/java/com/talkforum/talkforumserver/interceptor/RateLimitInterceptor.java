@@ -84,7 +84,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
         // 6. 判断结果：1=放行，0=限流
         if (result == null || result == 0) {
-            returnJson(response, I18n.t(""));
+            returnJson(response, I18n.t("common.tomanyrequest"));
             return false;
         }
         return true;
@@ -119,16 +119,35 @@ public class RateLimitInterceptor implements HandlerInterceptor {
      * （可选）获取客户端IP
      */
     private String getIpAddress(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
+// 优先从反向代理头获取
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip.trim())) {
+            // 多个IP时取第一个（X-Forwarded-For 格式：clientIp, proxyIp1, proxyIp2）
+            String[] ipArray = ip.split(",");
+            for (String tempIp : ipArray) {
+                String trimIp = tempIp.trim();
+                if (!"unknown".equalsIgnoreCase(trimIp)) {
+                    ip = trimIp;
+                    break;
+                }
+            }
+            return ip;
         }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
+
+        // 备选：Proxy-Client-IP（部分代理服务器使用）
+        ip = request.getHeader("Proxy-Client-IP");
+        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip.trim())) {
+            return ip.trim();
         }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
+
+        // 备选：WL-Proxy-Client-IP（WebLogic 代理）
+        ip = request.getHeader("WL-Proxy-Client-IP");
+        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip.trim())) {
+            return ip.trim();
         }
-        return ip.split(",")[0];
+
+        // 最后取原生 RemoteAddr（本地环境可能是 0:0:0:0:0:0:0:1，转为 127.0.0.1）
+        ip = request.getRemoteAddr();
+        return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;
     }
 }

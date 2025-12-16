@@ -186,15 +186,38 @@ template {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease, font-size 0;
 }
 
+html {
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 14px; /* 1rem = 14px，全局字体缩小 */
+  }
+}
+
+/* 小屏幕2：小屏手机（≤480px） */
+@media (max-width: 480px) {
+  html {
+    font-size: 13px; /* 1rem = 12px，进一步缩小 */
+  }
+}
+
+/* 通用元素：用rem设置字体（自动适配根元素基准） */
+body {
+  font-family: "Microsoft Yahei", sans-serif;
+}
 
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--neutral-bg);
   color: var(--neutral-text-main);
+  font-size: 1rem; /* 桌面端16px → 768px下14px → 480px下12px */
+  line-height: 1.5; /* 行高随字体同步适配，保证可读性 */
 }
 
 .theme-card {

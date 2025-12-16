@@ -278,7 +278,7 @@ const ReplyItem = ({ content, createdAt, userId, setCommentTarget, id, likeCount
                 </div>
                 <p className="comment-content">{content}</p>
                 <p className="comment-footer">
-                    <span className="comment-footer-time">{dayjs(createdAt).format("HH:mm, MMM DD, YYYY")} </span>
+                    <span className="comment-footer-time">{dayjs(createdAt).format("MMM DD, YYYY")} </span>
                     <span className="comment-footer-reply"
                         onClick={() => { 
                             // 设置评论目标，用于回复当前回复

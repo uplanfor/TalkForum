@@ -457,7 +457,7 @@ const PostDocument = (props: PostDocumentProps) => {
               </div>
             )}
 
-            {comments.map(comment => (
+            {comments.length == 0? <div style={{height: 100, textAlign: "center", lineHeight: "100px"}}>{t('postDocument.noComments')}</div>: comments.map(comment => (
               <CommentItem 
                 key={comment.id} 
                 {...comment} 

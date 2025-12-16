@@ -1,7 +1,7 @@
 .info-container {
     position: absolute;
     width: 90%;
-    height: 81%;
+    height: 70%;
     padding: 18px;
     top: 50%;
     left: 50%;
@@ -69,7 +69,7 @@
 
 
 .info .info-combo p, .info-container .intro {
-    font-size: large;
+    font-size: medium;
 }
 
 .info-container .intro {
@@ -102,4 +102,5 @@
         height: calc(100% - 150px);
     }
 }
+
 

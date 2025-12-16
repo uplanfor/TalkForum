@@ -3,13 +3,13 @@
 }
 
 .comment-item .comment-user-avatar {
-    width: 40px;
+    width: 35px;
 }
 
 .comment-item .comment-user-avatar img {
     display: block;
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
     background-color: var(--neutral-module);
     border: 1px solid var(--neutral-border);
@@ -122,12 +122,12 @@
 }
 
 .comment-reply-item .comment-user-avatar {
-    width: 30px;
+    width: 25px;
 }
 
 .comment-reply-item .comment-user-avatar img {
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
 }
 
 .comment-reply-item .comment-header .comment-menu .menu-icon {

@@ -1,7 +1,7 @@
 import "./assets/normalize.css"
 import { Route, Routes, useLocation } from "react-router-dom";
 import { Provider } from "react-redux";
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import store from "./store"
 import Admin from './pages/Admin';
 import Login from './pages/Login';
@@ -11,9 +11,9 @@ import NotFound from "./pages/NotFound";
 import ThemeUtil from './utils/ThemeUtil';
 import Mail from './pages/Mail';
 import Club from './pages/Club';
-import PostView from './pages/PostView';
-import SpaceView from './pages/SpaceView';
-import Search from "./pages/Search";
+const PostView = lazy(() => import('./pages/PostView'));
+const SpaceView = lazy(() => import('./pages/SpaceView'));
+const Search = lazy(() => import('./pages/Search'));
 import { useDispatch } from 'react-redux';
 import { userLogout, userLogin } from './store/slices/userSlice';
 import { type AppDispatch } from './store';

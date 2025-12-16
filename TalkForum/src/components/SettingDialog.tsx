@@ -12,6 +12,8 @@ import ThemeUtil from "../utils/ThemeUtil"
 import { type ThemeKey } from "../config/ThemeConfig"
 import Msg from "../utils/msg"
 import { useTranslation } from "react-i18next"
+import { LanguageUtil } from "../utils/LanguageUtil"
+
 
 /**
  * 设置对话框属性接口
@@ -69,10 +71,13 @@ const SettingDialog = ({ onClose }: SettingDialogProps) => {
     const formData = new FormData(formRef.current);
     const submitData = {
       theme: formData.get("theme") as string,
+      language: formData.get("language") as string,
     };
 
     // 切换主题
     ThemeUtil.switchTheme(submitData.theme as ThemeKey);
+    // 切换语言
+    LanguageUtil.switchLanguage(submitData.language as string);
 
     // 显示成功消息
     Msg.success(t('settingDialog.settingsApplied'));
@@ -96,6 +101,9 @@ const SettingDialog = ({ onClose }: SettingDialogProps) => {
           <li>
             <span>{t('settingDialog.language')}:</span>
             <select name="language" className="setting-language-switcher" >
+              {(LanguageUtil.getAllAvailableLanguages().map(item=>(
+                <option key={item.value} value={item.value}>{item.label}</option>
+              )))}
             </select>
           </li>
           

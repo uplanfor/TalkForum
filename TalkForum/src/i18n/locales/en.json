@@ -133,7 +133,8 @@
         "toLoadMore": "to load more",
         "noMoreComments": "No more comments!",
         "errorLoadingComments": "Error loading comments,",
-        "retry": "retry"
+        "retry": "retry",
+        "noComments": "No Comments"
     },
     "commentItem": {
         "reply": "Reply",

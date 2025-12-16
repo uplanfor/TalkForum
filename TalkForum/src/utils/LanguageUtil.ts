@@ -82,7 +82,7 @@ export const LanguageUtil = {
       
       // 确保触发语言变化事件
       console.log(`语言切换完成: ${targetLang}, i18n.language: ${i18n.language}`);
-      
+      await i18n.changeLanguage(targetLang);
       return true;
     } catch (err) {
       console.error(`切换 ${targetLang} 语言失败`, err);

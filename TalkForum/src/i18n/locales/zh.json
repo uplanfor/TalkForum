@@ -133,7 +133,8 @@
         "toLoadMore": "加载更多",
         "noMoreComments": "没有更多评论了！",
         "errorLoadingComments": "加载评论出错，",
-        "retry": "重试"
+        "retry": "重试",
+        "noComments": "没有评论"
     },
     "commentItem": {
         "reply": "回复",

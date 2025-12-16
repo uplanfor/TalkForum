@@ -1,5 +1,4 @@
 import { ArrowLeftIcon, MagnifyingGlassIcon, FunnelIcon } from "@heroicons/react/20/solid";
-import BackgroundImg from "../components/BackgroundImg";
 import PostsContainer, { PostContainerTargetType, type PostsContainerSearchParams } from "../components/PostsContainer";
 import { DefaultBackgroundUrl } from "../constants/default";
 import {useNavigate, useSearchParams, useLocation} from 'react-router-dom';
@@ -46,10 +45,6 @@ const Search = ()=> {
 
         // // 替换当前页面url，重新加载
         navigate(`/search?${newParams.toString()}`, { replace: true });
-
-        // // TODO: 真不会了，只能这样修了
-        // window.location.reload();
-        // location.search = newParams.toString();
     };
 
     
@@ -149,7 +144,6 @@ const Search = ()=> {
                 {/* 搜索按钮 */}
                 <button onClick={handleSearch}>
                     <span className="search-button-text">{t('search.searchButton')}</span>
-                    <span className="search-button-icon">🔍</span>
                 </button>
             </div>
             
