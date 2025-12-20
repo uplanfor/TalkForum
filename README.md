@@ -39,7 +39,7 @@ pnpm build
 mvn clean package -Dmaven.test.skip=true
 ```
 
-使用`MySQL`作为数据库，[数据库表参考规范请点击](./聊吧论坛数据库表规范.md)，执行`init_database.sql`一键构建数据库
+使用`MySQL`作为数据库，[数据库表参考规范请点击](./聊吧论坛数据库表规范.md)，执行`init_database.sql`一键构建数据库`test_data.sql`构建默认数据，所有用户密码均为Qu123456!
 
 ## 简要细节
 

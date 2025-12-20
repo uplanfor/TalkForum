@@ -1,5 +1,6 @@
 package com.talkforum.talkforumserver.post;
 
+import com.talkforum.talkforumserver.common.anno.CustomRateLimit;
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
 import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
 import com.talkforum.talkforumserver.common.dto.*;
@@ -21,6 +22,8 @@ import java.util.Map;
  */
 @RequestMapping("/posts")
 @RestController
+@Validated
+@CustomRateLimit(window=2000, threefold = 1)
 public class PostController {
     @Autowired
     PostService postService; // 帖子服务层
@@ -77,6 +80,7 @@ public class PostController {
     @LoginRequired
     @PostMapping("/")
     @Validated
+    @CustomRateLimit(window=5000, threefold = 1)
     public Result commitPost(@RequestBody PostCommitDTO postCommitDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
         postCommitDTO.userId = ((Number)(information.get("id"))).longValue(); // 设置用户ID
@@ -97,6 +101,7 @@ public class PostController {
     @LoginRequired
     @PutMapping("/{postId}")
     @Validated
+    @CustomRateLimit(window=5000, threefold = 1)
     public Result editPost(@PathVariable Long postId, @RequestBody PostEditDTO postEditDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
         postEditDTO.userId = ((Number)(information.get("id"))).longValue(); // 设置用户ID

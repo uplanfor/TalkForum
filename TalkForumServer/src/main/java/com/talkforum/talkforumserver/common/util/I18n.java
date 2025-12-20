@@ -96,7 +96,7 @@ public class I18n {
         } catch (Exception e) {
             // 忽略异常，使用默认Locale
         }
-        return Locale.SIMPLIFIED_CHINESE; // 默认中文
+        return Locale.ENGLISH; // 默认英文
     }
 
     /**

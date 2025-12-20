@@ -100,10 +100,12 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 //            return userId;
 //        }
         // 示例2：备用方案 - 取IP（IP维度限流）
-         return getIpAddress(request);
+//         return getIpAddress(request);
         // 示例3：接口维度（接口路径）
         // return request.getRequestURI();
 //        return null;
+
+        return getIpAddress(request) + ":" + request.getRequestURI();
     }
 
     /**

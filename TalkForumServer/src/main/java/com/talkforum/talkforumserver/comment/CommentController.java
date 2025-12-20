@@ -1,6 +1,7 @@
 package com.talkforum.talkforumserver.comment;
 
 import com.sun.istack.NotNull;
+import com.talkforum.talkforumserver.common.anno.CustomRateLimit;
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
 import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
 import com.talkforum.talkforumserver.common.dto.AddCommentDTO;
@@ -26,6 +27,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/comments")
+@CustomRateLimit(window=5000, threefold = 1)
 public class CommentController {
     @Autowired
     private CommentService commentService; // 评论服务层

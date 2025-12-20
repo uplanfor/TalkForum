@@ -330,14 +330,14 @@
     "noUsersFound": "No users found",
     "resetButton": "Reset",
     "moreButton": "More",
-    "resetPasswordConfirm": "Are you sure you want to reset password for user \"{userName}\"?",
-    "resetPasswordSuccess": "Password reset successfully for user \"{userName}\"",
+    "resetPasswordConfirm": "Are you sure you want to reset password for user \"{{userName}}\"?",
+    "resetPasswordSuccess": "Password reset successfully for user \"{{userName}}\"",
     "resetPasswordFailed": "Failed to reset password",
-    "setStatusMenu": "Set status for user \"{userName}({userId})\"",
-    "setStatusSuccess": "Status set successfully for user \"{userName}\"",
+    "setStatusMenu": "Set status for user \"{{userName}}({{userId}})\"",
+    "setStatusSuccess": "Status set successfully for user \"{{userName}}\"",
     "setStatusFailed": "Failed to set status",
-    "setRoleMenu": "Set role for user \"{userName}({userId})\"",
-    "setRoleSuccess": "Role set successfully for user \"{userName}\"",
+    "setRoleMenu": "Set role for user \"{{userName}}({{userId}})\"",
+    "setRoleSuccess": "Role set successfully for user \"{{userName}}\"",
     "setRoleFailed": "Failed to set role",
     "cannotChangeAdminRole": "Cannot change administrator's role!",
     "dataRefreshed": "Data refreshed",
@@ -408,5 +408,9 @@
      "selectCodesToDelete": "Please select invite codes to delete",
      "deleteSuccess": "Successfully deleted {{count}} invite code(s)",
      "deleteFailed": "Failed to delete invite codes"
-   }
+   },
+    "notFound": {
+        "title": "404 Not Found",
+        "redirectMessage": "{{countDown}} seconds later, you will be redirected to the home page"
+    }
 }

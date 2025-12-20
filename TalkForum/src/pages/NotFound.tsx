@@ -61,7 +61,7 @@ const NotFound = () => {
             textAlign: 'center'
         }}>
             <h1>{t('notFound.title')}</h1>
-            <p>{t('notFound.redirectMessage', { count: countDown })}</p>
+            <p>{t('notFound.redirectMessage', { countDown })}</p>
         </div>
     </>;
 };

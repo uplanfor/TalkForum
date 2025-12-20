@@ -105,16 +105,18 @@ const AdminUser: React.FC = () => {
 
   // 重置用户密码
   const handleResetPassword = async (userId: number, userName: string) => {
+    console.log(userName);
+    
     const confirmed = await Msg.confirm(t('adminUsers.resetPasswordConfirm', { userName }));
     if (confirmed) {
       await usersAdminResetUserPassword(userId).then(res => {
         if (res.success) {
-          Msg.success(res.message || t('adminUsers.passwordResetSuccess', { userName }));
+          Msg.success(res.message);
         } else {
           throw new Error(res.message);
         }
       }).catch(err => {
-        Msg.error(err || t('adminUsers.passwordResetFailed'));
+        Msg.error(err);
         console.error(err);
       });
     }
@@ -123,7 +125,7 @@ const AdminUser: React.FC = () => {
   // 设置用户状态
   const handleSetStatus = async (userId: number, userName: string) => {
     const menu = [UsersStatusEnum.NORMAL, UsersStatusEnum.UNABLE];
-    const result = await Msg.menu(menu, t('adminUsers.setStatusTitle', { userName, userId }));
+    const result = await Msg.menu(menu, t('adminUsers.setStatusMenu', { userName, userId }));
     if (result !== -1) {
       await usersAdminSetUserStatus(userId, menu[result]).then(res => {
         if (res.success) {
@@ -145,7 +147,7 @@ const AdminUser: React.FC = () => {
       return;
     } 
     const menu = [UserRoleEnum.USER, UserRoleEnum.MODERATOR];
-    const result = await Msg.menu(menu, t('adminUsers.setRoleTitle', { userName, userId }));
+    const result = await Msg.menu(menu, t('adminUsers.setRoleMenu', { userName, userId }));
     if (result !== -1) {
       await usersAdminSetUserRole(userId, menu[result]).then(res => {
         if (res.success) {
@@ -245,7 +247,7 @@ const AdminUser: React.FC = () => {
                 className="btn btn-secondary"
                 onClick={() => handleResetPassword(item.id, item.name)}
               >
-                {t('adminUsers.resetPassword')}
+                {t('adminUsers.resetButton')}
               </button>
             </td>
             <td>{item.email}</td>

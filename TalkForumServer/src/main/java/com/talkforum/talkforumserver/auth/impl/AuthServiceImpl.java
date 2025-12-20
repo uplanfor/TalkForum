@@ -80,8 +80,13 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(long userId, HttpServletResponse response) {
         // 移除Cookie
-        redisHelper.removeLoginToken(userId);
+        logout(userId);
         CookieHelper.removeCookie(response, ServerConstant.LOGIN_COOKIE);
+    }
+
+    @Override
+    public void logout(long userId) {
+        redisHelper.removeLoginToken(userId);
     }
 
 

@@ -331,14 +331,14 @@
         "noUsersFound": "未找到用户",
         "resetButton": "重置",
         "moreButton": "更多",
-        "resetPasswordConfirm": "您确定要重置用户 \"{userName}\" 的密码吗？",
-        "resetPasswordSuccess": "用户 \"{userName}\" 的密码重置成功",
+        "resetPasswordConfirm": "您确定要重置用户 \"{{userName}}\" 的密码吗？",
+        "resetPasswordSuccess": "用户 \"{{userName}}\" 的密码重置成功",
         "resetPasswordFailed": "重置密码失败",
-        "setStatusMenu": "为用户 \"{userName}({userId})\" 设置状态",
-        "setStatusSuccess": "用户 \"{userName}\" 的状态设置成功",
+        "setStatusMenu": "为用户 \"{{userName}}({{userId}})\" 设置状态",
+        "setStatusSuccess": "用户 \"{{userName}}\" 的状态设置成功",
         "setStatusFailed": "设置状态失败",
-        "setRoleMenu": "为用户 \"{userName}({userId})\" 设置角色",
-        "setRoleSuccess": "用户 \"{userName}\" 的角色设置成功",
+        "setRoleMenu": "为用户 \"{{userName}}({{userId}})\" 设置角色",
+        "setRoleSuccess": "用户 \"{{userName}}\" 的角色设置成功",
         "setRoleFailed": "设置角色失败",
         "cannotChangeAdminRole": "无法更改管理员的角色！",
         "dataRefreshed": "数据已刷新",
@@ -409,5 +409,9 @@
         "selectCodesToDelete": "请选择要删除的邀请码",
         "deleteSuccess": "成功删除 {{count}} 个邀请码",
         "deleteFailed": "删除邀请码失败"
+    },
+    "notFound": {
+        "title": "404 页面不存在",
+        "redirectMessage": "{{countDown}}秒后自动跳转到首页"
     }
 }

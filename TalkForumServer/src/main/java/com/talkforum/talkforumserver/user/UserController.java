@@ -144,6 +144,7 @@ public class UserController {
     @PutMapping("/admin/{userId}/reset")
     public Result resetUserPassword(@PathVariable long userId) {
         userService.resetUserPassword(userId); // 重置用户密码
+        authService.logout(userId);  // 使响应用户登出
         return Result.success(I18n.t("user.admin.password.reset.success", ServerConstant.DEFAULT_PASSWORD));
     }
 
@@ -157,7 +158,9 @@ public class UserController {
     @PutMapping("/admin/{userId}/status")
     @Validated
     public Result updateUserStatus(@PathVariable long userId, @RequestBody UserStatusDTO dto) {
+        // 更新状态并踢出用户
          userService.updateStatus(userId, dto.getStatus());
+         authService.logout(userId);
          return Result.success(I18n.t("user.admin.status.update.success"));
     }
 }
