@@ -15,7 +15,7 @@ public class UserConstant {
      */
     public static final String ROLE_USER = "USER";
     /**
-     * 版主角色
+     * 风纪角色
      */
     public static final String ROLE_MODERATOR = "MODERATOR";
     

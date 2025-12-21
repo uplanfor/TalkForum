@@ -33,7 +33,6 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     // Lua脚本
     private DefaultRedisScript<Long> rateLimitScript;
 
-
     /**
      * 初始化Lua脚本
      */
@@ -70,7 +69,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         String limitId = extractLimitId(request);
         if (StringUtils.isBlank(limitId)) {
             // 无ID时默认拦截（或根据业务调整）
-            returnJson(response, "限流ID不能为空");
+            returnJson(response, I18n.t("common.equestrianism"));
             return false;
         }
         String redisKey = RedisConstant.RATE_LIMIT_PREFIX + limitId; // RedisKey前缀
@@ -84,7 +83,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
         // 6. 判断结果：1=放行，0=限流
         if (result == null || result == 0) {
-            returnJson(response, I18n.t("common.tomanyrequest"));
+            returnJson(response, I18n.t("common.equestrianism"));
             return false;
         }
         return true;

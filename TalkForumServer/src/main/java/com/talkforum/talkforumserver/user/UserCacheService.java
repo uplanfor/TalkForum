@@ -43,7 +43,7 @@ public class UserCacheService {
         // 1.检查参数
         if (userId == null) {
             log.error("【getUserVO-缓存路径-参数错误】userId为空，无法查询缓存");
-            throw new BusinessRuntimeException(I18n.t("common.invalidparams"));
+            throw new BusinessRuntimeException(I18n.t("common.invalid-params"));
         }
         
         log.debug("【getUserVO-缓存路径-开始】开始获取用户缓存，userId: {}", userId);

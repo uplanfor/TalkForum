@@ -25,7 +25,7 @@ public class PostCacheService {
         // 1.检查参数
         if (postId == null) {
             log.error("【getPost-缓存路径-参数错误】postId为空，无法查询缓存");
-            throw new BusinessRuntimeException(I18n.t("common.invalidparams"));
+            throw new BusinessRuntimeException(I18n.t("common.invalid-params"));
         }
         
         log.debug("【getPost-缓存路径-开始】开始获取帖子缓存，postId: {}", postId);

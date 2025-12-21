@@ -178,9 +178,9 @@
                     <encoding>UTF-8</encoding> <!-- 避免中文乱码，必加 -->
 
                     <!-- 可选：若使用JDK25的预览特性，需开启 -->
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
+<!--                    <compilerArgs>-->
+<!--                        <arg>&#45;&#45;enable-preview</arg>-->
+<!--                    </compilerArgs>-->
                 </configuration>
             </plugin>
         </plugins>
