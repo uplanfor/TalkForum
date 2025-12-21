@@ -14,7 +14,6 @@ import java.util.List;
 public interface UserMapper {
     int addUser(UserDTO user);
     UserVO getUserVOById(long userId);
-    UserVO getUserVOByEmail(String email);
     User getUserLoginInfoByNameOrEmail(String nameOrEmail);
     User getUserLoginInfoById(long userId);
     List<SimpleUserVO> getSimpleUsersInfo(long[] userIds);

@@ -29,12 +29,11 @@
     left: 50%;
     padding: 9px;
     transform: translate(-50%, -50%);
-    background-color: rgba(255, 255, 255, .1);
+    background-color: rgba(255, 255, 255, 0.1);
     -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
     border-radius: 18px;
 }
-
 
 .background-view .info-card img {
     display: block;
@@ -47,17 +46,14 @@
     background-color: var(--neutral-bg);
 }
 
-
 .background-view .info-card .combination {
     flex: 1;
     padding-left: 9px;
 }
 
-
 .background-view .info-card .combination h4 {
     font-size: larger;
 }
-
 
 .background-view .info-card .combination span {
     display: inline-block;
@@ -67,10 +63,8 @@
     font-size: medium;
 }
 
-
-
-
-.profile-dialog-container>p, .profile-dialog-container>h2 {
+.profile-dialog-container > p,
+.profile-dialog-container > h2 {
     height: 45px;
     line-height: 45px;
     display: flex;
@@ -79,24 +73,25 @@
     margin: 10px 0;
 }
 
-.profile-dialog-container>p {
+.profile-dialog-container > p {
     min-height: 45px;
     height: fit-content;
     display: flex;
 }
 
-.profile-dialog-container>p>label {
+.profile-dialog-container > p > label {
     width: 100px;
     height: 100%;
     /* text-align: center; */
 }
 
-.profile-dialog-container>p>input {
+.profile-dialog-container > p > input {
     display: block;
     flex: 1;
 }
 
-.profile-dialog-container input, .profile-dialog-container textarea {
+.profile-dialog-container input,
+.profile-dialog-container textarea {
     /* margin: 0 3px; */
     padding: 9px;
     border: none;
@@ -117,19 +112,15 @@
     resize: none;
 }
 
-.profile-dialog-container>p>span {
+.profile-dialog-container > p > span {
     font-weight: bold;
     min-width: 120px;
 }
 
-
-
-
-.profile-dialog-container input:disabled, textarea:disabled {
+.profile-dialog-container input:disabled,
+textarea:disabled {
     background-color: var(--neutral-text-secondary);
 }
-
-
 
 .profile-dialog-container input:focus,
 .profile-dialog-container textarea:focus {
@@ -138,124 +129,123 @@
     box-shadow: 0 0 0 2px var(--neutral-shadow);
 }
 
-
 .profile-dialog-container button {
-  background-color: var(--primary);
-  color: white;
-  border: none;
-  padding: 0.7rem 1.2rem;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
 /* 系统头像选择按钮 */
 .system-avatar-btn {
-  margin-left: 10px;
-  padding: 6px 12px;
-  background-color: var(--primary);
-  color: var(--neutral-text-main);
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
+    margin-left: 10px;
+    padding: 6px 12px;
+    background-color: var(--primary);
+    color: var(--neutral-text-main);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
 }
 
 .system-avatar-btn:hover {
-  background-color: var(--secondary-warm-2);
+    background-color: var(--secondary-warm-2);
 }
 
 /* 系统头像选择弹窗 */
 .system-avatar-popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
 .system-avatar-popup-content {
-  background-color: var(--neutral-bg);
-  border-radius: 8px;
-  padding: 20px;
-  width: 90%;
-  max-width: 800px;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background-color: var(--neutral-bg);
+    border-radius: 8px;
+    padding: 20px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .system-avatar-popup-content h3 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  color: var(--neutral-text-main);
-  font-size: 18px;
-  text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--neutral-text-main);
+    font-size: 18px;
+    text-align: center;
 }
 
 /* 头像选项网格 */
 .avatar-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 15px;
-  margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
 .avatar-option {
-  padding: 10px;
-  border: 2px solid var(--neutral-border);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-align: center;
+    padding: 10px;
+    border: 2px solid var(--neutral-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
 }
 
 .avatar-option:hover {
-  border-color: var(--primary);
-  background-color: var(--secondary-warm-1);
-  transform: translateY(-2px);
+    border-color: var(--primary);
+    background-color: var(--secondary-warm-1);
+    transform: translateY(-2px);
 }
 
 .avatar-option img {
-  width: 100%;
-  height: auto;
-  border-radius: 4px;
-  object-fit: cover;
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    object-fit: cover;
 }
 
 /* 关闭按钮 */
 .close-btn {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  background-color: var(--primary);
-  color: var(--neutral-text-main);
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: var(--primary);
+    color: var(--neutral-text-main);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
 }
 
 .close-btn:hover {
-  background-color: var(--secondary-warm-2);
+    background-color: var(--secondary-warm-2);
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .avatar-options {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 10px;
-  }
-  
-  .system-avatar-popup-content {
-    width: 95%;
-    padding: 15px;
-  }
+    .avatar-options {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 10px;
+    }
+
+    .system-avatar-popup-content {
+        width: 95%;
+        padding: 15px;
+    }
 }

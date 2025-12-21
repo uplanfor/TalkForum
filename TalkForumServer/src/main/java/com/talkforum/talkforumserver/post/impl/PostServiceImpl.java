@@ -15,6 +15,7 @@ import com.talkforum.talkforumserver.constant.InteractionConstant;
 import com.talkforum.talkforumserver.constant.PostConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
 import com.talkforum.talkforumserver.interaction.InteractionMapper;
+import com.talkforum.talkforumserver.post.PostCacheService;
 import com.talkforum.talkforumserver.post.PostMapper;
 import com.talkforum.talkforumserver.post.PostService;
 import com.talkforum.talkforumserver.user.UserMapper;
@@ -38,14 +39,14 @@ public class PostServiceImpl implements PostService {
      */
     @Autowired
     private PostMapper postMapper;
+    @Autowired
+    private PostCacheService postCacheService;
     
     /**
      * 互动数据访问层接口
      */
     @Autowired
     private InteractionMapper interactionMapper;
-    @Autowired
-    private UserMapper userMapper;
 
     /**
      * 根据帖子ID获取帖子信息
@@ -56,10 +57,12 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostVO getPost(Long postId, Long userId) {
         // 查询帖子VO
-        PostVO postVO = postMapper.getPostVO(postId);
+        PostVO postVO = postCacheService.getPostVO(postId);
         
         // 为帖子设置互动内容
-        if (postVO != null) {
+        if (postVO == null) {
+            throw new BusinessRuntimeException(I18n.t("post.not.exist"));
+        } else {
             if (userId == null) {
                 postVO.setInteractContent(0);
             } else {
@@ -134,9 +137,14 @@ public class PostServiceImpl implements PostService {
         
         // 调用Mapper更新帖子，根据用户角色设置审核状态
         // 普通用户编辑的帖子需要重新审核，管理员编辑的帖子直接通过
+        boolean isUser = role.equals(UserConstant.ROLE_USER);
         postMapper.updatePost(postEditDTO,
-                role.equals(UserConstant.ROLE_USER) ? PostConstant.PENDING : PostConstant.PASS,
-                brief, coverUrl);
+                isUser? PostConstant.PENDING : PostConstant.PASS, brief, coverUrl);
+        
+        // 对立即通过审核的帖子，更新缓存
+        if (!isUser) {
+            postCacheService.editPost(postEditDTO.id);
+        }
     }
 
     /**
@@ -156,10 +164,14 @@ public class PostServiceImpl implements PostService {
         // 如果是帖子作者，可以直接删除
         if (post.userId == userId) {
             postMapper.deletePost(postId);
+            // 删除缓存中的帖子数据
+            postCacheService.evictCache(postId);
         } else {
-            // 不是作者，需要管理员或版主权限才能删除
+            // 不是作者，需要管理员或风纪权限才能删除
             if (!role.equals(UserConstant.ROLE_USER)) {
                 postMapper.deletePost(postId);
+                // 删除缓存中的帖子数据
+                postCacheService.evictCache(postId);
             } else {
                 throw new BusinessRuntimeException(I18n.t("post.delete.denied"));
             }
@@ -192,6 +204,11 @@ public class PostServiceImpl implements PostService {
     public void auditPost(Long postId, String status) {
         // 调用Mapper更新帖子审核状态
         postMapper.auditPost(postId, status);
+        
+        // 如果审核状态为DELETED，删除对应的缓存数据
+        if (PostConstant.DELETED.equals(status)) {
+            postCacheService.evictCache(postId);
+        }
     }
 
     /**

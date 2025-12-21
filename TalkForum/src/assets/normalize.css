@@ -10,49 +10,49 @@ body {
 }
 
 main {
-    display: block
+    display: block;
 }
 
 h1 {
     font-size: 2em;
-    margin: .67em 0
+    margin: 0.67em 0;
 }
 
 hr {
     box-sizing: content-box;
     height: 0;
-    overflow: visible
+    overflow: visible;
 }
 
 pre {
     font-family: monospace, monospace;
-    font-size: 1em
+    font-size: 1em;
 }
 
 a {
-    background-color: transparent
+    background-color: transparent;
 }
 
 abbr[title] {
     border-bottom: none;
     text-decoration: underline;
-    text-decoration: underline dotted
+    text-decoration: underline dotted;
 }
 
 b,
 strong {
-    font-weight: bolder
+    font-weight: bolder;
 }
 
 code,
 kbd,
 samp {
     font-family: monospace, monospace;
-    font-size: 1em
+    font-size: 1em;
 }
 
 small {
-    font-size: 80%
+    font-size: 80%;
 }
 
 sub,
@@ -60,19 +60,19 @@ sup {
     font-size: 75%;
     line-height: 0;
     position: relative;
-    vertical-align: baseline
+    vertical-align: baseline;
 }
 
 sub {
-    bottom: -.25em
+    bottom: -0.25em;
 }
 
 sup {
-    top: -.5em
+    top: -0.5em;
 }
 
 img {
-    border-style: none
+    border-style: none;
 }
 
 button,
@@ -83,43 +83,43 @@ textarea {
     font-family: inherit;
     font-size: 100%;
     line-height: 1.15;
-    margin: 0
+    margin: 0;
 }
 
 button,
 input {
-    overflow: visible
+    overflow: visible;
 }
 
 button,
 select {
-    text-transform: none
+    text-transform: none;
 }
 
-[type=button],
-[type=reset],
-[type=submit],
+[type='button'],
+[type='reset'],
+[type='submit'],
 button {
-    -webkit-appearance: button
+    -webkit-appearance: button;
 }
 
-[type=button]::-moz-focus-inner,
-[type=reset]::-moz-focus-inner,
-[type=submit]::-moz-focus-inner,
+[type='button']::-moz-focus-inner,
+[type='reset']::-moz-focus-inner,
+[type='submit']::-moz-focus-inner,
 button::-moz-focus-inner {
     border-style: none;
-    padding: 0
+    padding: 0;
 }
 
-[type=button]:-moz-focusring,
-[type=reset]:-moz-focusring,
-[type=submit]:-moz-focusring,
+[type='button']:-moz-focusring,
+[type='reset']:-moz-focusring,
+[type='submit']:-moz-focusring,
 button:-moz-focusring {
-    outline: 1px dotted ButtonText
+    outline: 1px dotted ButtonText;
 }
 
 fieldset {
-    padding: .35em .75em .625em
+    padding: 0.35em 0.75em 0.625em;
 }
 
 legend {
@@ -128,65 +128,65 @@ legend {
     display: table;
     max-width: 100%;
     padding: 0;
-    white-space: normal
+    white-space: normal;
 }
 
 progress {
-    vertical-align: baseline
+    vertical-align: baseline;
 }
 
 textarea {
-    overflow: auto
+    overflow: auto;
 }
 
-[type=checkbox],
-[type=radio] {
+[type='checkbox'],
+[type='radio'] {
     box-sizing: border-box;
-    padding: 0
+    padding: 0;
 }
 
-[type=number]::-webkit-inner-spin-button,
-[type=number]::-webkit-outer-spin-button {
-    height: auto
+[type='number']::-webkit-inner-spin-button,
+[type='number']::-webkit-outer-spin-button {
+    height: auto;
 }
 
-[type=search] {
+[type='search'] {
     -webkit-appearance: textfield;
-    outline-offset: -2px
+    outline-offset: -2px;
 }
 
-[type=search]::-webkit-search-decoration {
-    -webkit-appearance: none
+[type='search']::-webkit-search-decoration {
+    -webkit-appearance: none;
 }
 
 ::-webkit-file-upload-button {
     -webkit-appearance: button;
-    font: inherit
+    font: inherit;
 }
 
 details {
-    display: block
+    display: block;
 }
 
 summary {
-    display: list-item
+    display: list-item;
 }
 
 template {
-    display: none
+    display: none;
 }
 
 [hidden] {
-    display: none
+    display: none;
 }
 
-
-
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  transition: all 0.3s ease, font-size 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    transition:
+        all 0.3s ease,
+        font-size 0;
 }
 
 html {
@@ -194,79 +194,85 @@ html {
 }
 
 @media (max-width: 768px) {
-  html {
-    font-size: 14px; /* 1rem = 14px，全局字体缩小 */
-  }
+    html {
+        font-size: 14px; /* 1rem = 14px，全局字体缩小 */
+    }
 }
 
 /* 小屏幕2：小屏手机（≤480px） */
 @media (max-width: 480px) {
-  html {
-    font-size: 13px; /* 1rem = 12px，进一步缩小 */
-  }
+    html {
+        font-size: 13px; /* 1rem = 12px，进一步缩小 */
+    }
 }
 
 /* 通用元素：用rem设置字体（自动适配根元素基准） */
 body {
-  font-family: "Microsoft Yahei", sans-serif;
+    font-family: 'Microsoft Yahei', sans-serif;
 }
 
-
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--neutral-bg);
-  color: var(--neutral-text-main);
-  font-size: 1rem; /* 桌面端16px → 768px下14px → 480px下12px */
-  line-height: 1.5; /* 行高随字体同步适配，保证可读性 */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--neutral-bg);
+    color: var(--neutral-text-main);
+    font-size: 1rem; /* 桌面端16px → 768px下14px → 480px下12px */
+    line-height: 1.5; /* 行高随字体同步适配，保证可读性 */
 }
 
 .theme-card {
-  background-color: var(--neutral-module);
-  border: 1px solid var(--neutral-border);
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 8px var(--neutral-shadow);
+    background-color: var(--neutral-module);
+    border: 1px solid var(--neutral-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 8px var(--neutral-shadow);
 }
 
 .btn-primary {
-  background-color: var(--primary);
-  color: white;
-  border: none;
-  padding: 0.7rem 1.2rem;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-a, a::after, a::before {
+a,
+a::after,
+a::before {
     color: var(--neutral-text-main);
     text-decoration: none;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     color: var(--neutral-text-main);
 }
 
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 6px;
+    width: 7px;
+    height: 6px;
 }
 
 /* 全局滚动条轨道 */
 ::-webkit-scrollbar-track {
-  /* background-color: var(--neutral-bg); */
-  background-color: rgba(0, 0, 0, .2);
-  border-radius: 3px;
+    /* background-color: var(--neutral-bg); */
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
 }
 
 /* 全局滚动条滑块 */
 ::-webkit-scrollbar-thumb {
-  background-color: var(--primary);
-  border-radius: 3px;
-  transition: background-color 0.2s ease;
+    background-color: var(--primary);
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
 }
 
 /* 全局滑块 hover 效果 */
 ::-webkit-scrollbar-thumb:hover {
-  background-color: color-mix(in srgb, var(--primary), white 10%);
+    background-color: color-mix(in srgb, var(--primary), white 10%);
 }

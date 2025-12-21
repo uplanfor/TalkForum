@@ -5,11 +5,11 @@
  * - 404错误信息
  * - 自动跳转到首页的倒计时功能
  */
-import "../assets/normalize.css"
-import Nav from "../components/Nav";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"
-import { useTranslation } from "react-i18next"
+import '../assets/normalize.css';
+import Nav from '../components/Nav';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 /**
  * 404页面组件
@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next"
 const NotFound = () => {
     // 国际化钩子
     const { t } = useTranslation();
-    
+
     // 倒计时总时长（秒）
     const time = 5;
     // 倒计时状态
@@ -36,9 +36,10 @@ const NotFound = () => {
         // 创建定时器，每秒执行一次
         const timer = setInterval(() => {
             setCountDown(prev => {
-                if (prev === 1) { // 当倒计时到1时，下一秒直接跳转
+                if (prev === 1) {
+                    // 当倒计时到1时，下一秒直接跳转
                     clearInterval(timer); // 清除定时器
-                    navigate("/"); // 跳转到首页
+                    navigate('/'); // 跳转到首页
                     return 0;
                 }
                 return prev - 1;
@@ -49,21 +50,25 @@ const NotFound = () => {
         return () => clearInterval(timer);
     }, [navigate]);
 
-    return <>
-        <Nav />
-        <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: 'calc(100vh - 100px)',
-            padding: '20px',
-            textAlign: 'center'
-        }}>
-            <h1>{t('notFound.title')}</h1>
-            <p>{t('notFound.redirectMessage', { countDown })}</p>
-        </div>
-    </>;
+    return (
+        <>
+            <Nav />
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: 'calc(100vh - 100px)',
+                    padding: '20px',
+                    textAlign: 'center',
+                }}
+            >
+                <h1>{t('notFound.title')}</h1>
+                <p>{t('notFound.redirectMessage', { countDown })}</p>
+            </div>
+        </>
+    );
 };
 
-export default NotFound;    
+export default NotFound;

@@ -33,7 +33,9 @@
 }
 
 /* 标签样式 */
-.post-tag1, .post-tag2, .post-tag3 {
+.post-tag1,
+.post-tag2,
+.post-tag3 {
     display: inline-flex;
     align-items: center;
     padding: 8px 16px;
@@ -53,8 +55,10 @@
 }
 
 /* 标签容器前添加#符号 */
-.post-tag1::before, .post-tag2::before, .post-tag3::before {
-    content: "#";
+.post-tag1::before,
+.post-tag2::before,
+.post-tag3::before {
+    content: '#';
     position: absolute;
     left: 12px;
     color: var(--primary);
@@ -161,9 +165,6 @@
     min-height: 0;
     /* 解决flex子元素最小高度问题 */
 }
-
-
-
 
 /* 工具条内容样式 */
 .post-dialog-toolbox-content {

@@ -1,5 +1,6 @@
 package com.talkforum.talkforumserver.auth.impl;
 
+import com.talkforum.talkforumserver.auth.AuthCacheService;
 import com.talkforum.talkforumserver.auth.AuthService;
 import com.talkforum.talkforumserver.auth.AuthMapper;
 import com.talkforum.talkforumserver.common.dto.LoginDTO;
@@ -9,7 +10,6 @@ import com.talkforum.talkforumserver.common.util.CookieHelper;
 import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.common.util.PasswordHelper;
-import com.talkforum.talkforumserver.common.util.RedisHelper;
 import com.talkforum.talkforumserver.common.vo.AdminHomeVO;
 import com.talkforum.talkforumserver.common.vo.AuthVO;
 import com.talkforum.talkforumserver.common.vo.UserVO;
@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private InteractionMapper interactionMapper;
     @Autowired
-    private RedisHelper redisHelper;
+    private AuthCacheService authCacheService;
     @Autowired
     private AuthMapper authMapper;
 
@@ -68,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
 
             // 存入Redis和HttpOnlyCookie
             CookieHelper.setCookie(response, ServerConstant.LOGIN_COOKIE, jwtToken);
-            redisHelper.setLoginToken(loginCheck.id, jwtToken, (long)jwtHelper.getExpire(), TimeUnit.MILLISECONDS);
+            authCacheService.setLoginToken(loginCheck.id, jwtToken, (long)jwtHelper.getExpire(), TimeUnit.MILLISECONDS);
             // 生成认证信息
             return new AuthVO(new UserVO(loginCheck),
                     interactionMapper.queryInteractFollowingByUserId(loginCheck.id));
@@ -86,7 +86,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logout(long userId) {
-        redisHelper.removeLoginToken(userId);
+        authCacheService.removeLoginToken(userId);
     }
 
 

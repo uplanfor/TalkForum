@@ -1,65 +1,64 @@
 /* 表格容器：实现圆角+横向滚动 */
 .table-wrapper {
-  width: 100%;
-  overflow: hidden; /* 先设置默认隐藏（裁剪圆角） */
-  overflow-x: auto; /* 再单独开启横向滚动（优先级更高） */
-  margin: 1em 0;
-  border-radius: 9px;
-  box-sizing: border-box;
+    width: 100%;
+    overflow: hidden; /* 先设置默认隐藏（裁剪圆角） */
+    overflow-x: auto; /* 再单独开启横向滚动（优先级更高） */
+    margin: 1em 0;
+    border-radius: 9px;
+    box-sizing: border-box;
 }
 
 /* 表格核心样式 */
 .custom-table {
-  width: 100%;
-  min-width: 100%; /* 内容不足时占满容器 */
-  border-collapse: separate;
-  border-spacing: 0;
-  border-radius: 9px;
-  border: 1px solid var(--neutral-border);
-  box-sizing: border-box; /* 避免边框导致表格宽度超出容器 */
+    width: 100%;
+    min-width: 100%; /* 内容不足时占满容器 */
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 9px;
+    border: 1px solid var(--neutral-border);
+    box-sizing: border-box; /* 避免边框导致表格宽度超出容器 */
 }
 
 /* 单元格通用样式 */
 .custom-table th,
 .custom-table td {
-  border: 1px solid var(--neutral-border);
-  padding: 0.5em;
-  text-align: left;
-  white-space: nowrap; /* 防止单元格换行，确保横向滚动生效 */
+    border: 1px solid var(--neutral-border);
+    padding: 0.5em;
+    text-align: left;
+    white-space: nowrap; /* 防止单元格换行，确保横向滚动生效 */
 }
 
 /* 表头样式 */
 .custom-table thead tr th {
-  background-color: var(--primary);
-  font-weight: 600;
-  border-bottom: 1px solid var(--neutral-border);
-  border-right: 1px solid var(--neutral-border);
-  border-top: none; /* 移除表头顶部边框 */
+    background-color: var(--primary);
+    font-weight: 600;
+    border-bottom: 1px solid var(--neutral-border);
+    border-right: 1px solid var(--neutral-border);
+    border-top: none; /* 移除表头顶部边框 */
 }
 
 /* 奇偶行背景色 */
 .custom-table tbody tr:nth-child(odd) {
-  background-color: var(--secondary-warm-1);
+    background-color: var(--secondary-warm-1);
 }
 
 /* 最后一行单元格移除下边框 */
 .custom-table tbody tr:last-child td {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 /* 第一个单元格移除左边框 */
 .custom-table td:first-child,
 .custom-table th:first-child {
-  border-left: none;
+    border-left: none;
 }
 
 /* 最后一个单元格移除右边框 */
 .custom-table td:last-child,
 .custom-table th:last-child {
-  border-right: none;
+    border-right: none;
 }
 
-
 .custom-table tbody tr:hover {
-  background-color: var(--secondary-cool);
+    background-color: var(--secondary-cool);
 }

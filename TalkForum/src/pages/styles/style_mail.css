@@ -7,7 +7,6 @@
     user-select: none;
 }
 
-
 .mail-list .mail-item {
     box-sizing: content-box;
     display: flex;
@@ -24,7 +23,6 @@
     background-color: var(--neutral-border);
 }
 
-
 .mail-item img {
     display: block;
     width: 70px;
@@ -36,7 +34,6 @@
     object-fit: cover;
 }
 
-
 .mail-item .combo {
     width: calc(100% - 70px);
     padding: 9px 0 0 9px;
@@ -45,7 +42,6 @@
     flex-direction: column;
     justify-content: flex-start;
 }
-
 
 .mail-list .mail-item h3 {
     white-space: nowrap;

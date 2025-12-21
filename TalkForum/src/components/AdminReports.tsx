@@ -3,7 +3,12 @@ import { useTranslation } from 'react-i18next';
 import ShowTable from './ShowTable';
 import Pagination from './Pagination';
 import AuditReportDialog from './AuditReportDialog';
-import { reportsAdminGetReports, reportsAdminHandleReport, type Report, type ReportPage } from '../api/ApiReports';
+import {
+    reportsAdminGetReports,
+    reportsAdminHandleReport,
+    type Report,
+    type ReportPage,
+} from '../api/ApiReports';
 import { useDispatch, useSelector } from 'react-redux';
 import { type RootState, type AppDispatch } from '../store';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +17,7 @@ import { debounce, throttle } from '../utils/debounce&throttle';
 import dayjs from 'dayjs';
 import { getSingleSimpleUserInfo } from '../utils/simpleUserInfoCache';
 import { ReportTargetConstant, ReportProcessConstant } from '../constants/report_constant';
-import "./styles/style_admin_common.css"
+import './styles/style_admin_common.css';
 
 const AdminReports = () => {
     const { t } = useTranslation();
@@ -43,7 +48,7 @@ const AdminReports = () => {
             // Prepare query parameters
             const params: any = {
                 page: pageNum,
-                pageSize: pageSize
+                pageSize: pageSize,
             };
 
             // Only add non-empty parameters
@@ -83,10 +88,13 @@ const AdminReports = () => {
     }, [page]);
 
     // Create throttled refresh function, maximum once per 5 seconds
-    const throttledRefresh = useCallback(throttle(() => {
-        Msg.success(t('adminReports.refreshingMessage'));
-        loadReports(page);
-    }, 5000), [page]);
+    const throttledRefresh = useCallback(
+        throttle(() => {
+            Msg.success(t('adminReports.refreshingMessage'));
+            loadReports(page);
+        }, 5000),
+        [page]
+    );
 
     // 获取目标类型的标签
     const getTargetTypeLabel = (type: string) => {
@@ -108,7 +116,7 @@ const AdminReports = () => {
     const handleQueryChange = debounce((field: string, value: string) => {
         setQueryConditions(prev => ({
             ...prev,
-            [field]: value
+            [field]: value,
         }));
     }, 300);
 
@@ -167,7 +175,7 @@ const AdminReports = () => {
 
         try {
             const reportIds = Array.from(selectedReports);
-            const res = await reportsAdminHandleReport(reportIds, "HANDLED");
+            const res = await reportsAdminHandleReport(reportIds, 'HANDLED');
             if (res.success) {
                 Msg.success(res.message);
             } else {
@@ -186,7 +194,7 @@ const AdminReports = () => {
     // 处理单个举报
     const handleAuditReport = async (reportId: number) => {
         try {
-            const res = await reportsAdminHandleReport([reportId], "HANDLED");
+            const res = await reportsAdminHandleReport([reportId], 'HANDLED');
             if (res.success) {
                 Msg.success(res.message);
             } else {
@@ -217,51 +225,67 @@ const AdminReports = () => {
     const totalPages = Math.ceil(total / pageSize);
 
     return (
-        <div className="admin-reports-container">
+        <div className='admin-reports-container'>
             <h1>{t('adminReports.title')}</h1>
 
             {/* Search filters area */}
-            <div className="admin-search-filters">
-                <div className="filter-row">
-                    <div className="filter-item">
+            <div className='admin-search-filters'>
+                <div className='filter-row'>
+                    <div className='filter-item'>
                         <label>{t('adminReports.targetTypeLabel')} </label>
                         <select
                             value={queryConditions.reportTargetType}
-                            onChange={(e) => handleQueryChange('reportTargetType', e.target.value)}
+                            onChange={e => handleQueryChange('reportTargetType', e.target.value)}
                         >
-                            <option value="">{t('adminReports.allTypes')}</option>
-                            <option value={ReportTargetConstant.POST}>{t('adminReports.post')}</option>
-                            <option value={ReportTargetConstant.COMMENT}>{t('adminReports.comment')}</option>
-                            <option value={ReportTargetConstant.USER}>{t('adminReports.user')}</option>
-                            <option value={ReportTargetConstant.CLUB}>{t('adminReports.club')}</option>
+                            <option value=''>{t('adminReports.allTypes')}</option>
+                            <option value={ReportTargetConstant.POST}>
+                                {t('adminReports.post')}
+                            </option>
+                            <option value={ReportTargetConstant.COMMENT}>
+                                {t('adminReports.comment')}
+                            </option>
+                            <option value={ReportTargetConstant.USER}>
+                                {t('adminReports.user')}
+                            </option>
+                            <option value={ReportTargetConstant.CLUB}>
+                                {t('adminReports.club')}
+                            </option>
                         </select>
                     </div>
                 </div>
-                <div className="filter-row">
-                    <div className="filter-item">
+                <div className='filter-row'>
+                    <div className='filter-item'>
                         <label>{t('adminReports.statusLabel')} </label>
                         <select
                             value={queryConditions.status}
-                            onChange={(e) => handleQueryChange('status', e.target.value)}
+                            onChange={e => handleQueryChange('status', e.target.value)}
                         >
-                            <option value="">{t('adminReports.allStatus')}</option>
-                            <option value={ReportProcessConstant.PENDING}>{t('adminReports.pending')}</option>
-                            <option value={ReportProcessConstant.HANDLED}>{t('adminReports.handled')}</option>
+                            <option value=''>{t('adminReports.allStatus')}</option>
+                            <option value={ReportProcessConstant.PENDING}>
+                                {t('adminReports.pending')}
+                            </option>
+                            <option value={ReportProcessConstant.HANDLED}>
+                                {t('adminReports.handled')}
+                            </option>
                         </select>
                     </div>
                 </div>
-                <div className="filter-row">
-                    <div className="filter-item">
-                        <button onClick={applyQuery} className="search-button">{t('adminReports.searchButton')}</button>
-                        <button onClick={resetQuery} className="reset-button">{t('adminReports.resetButton')}</button>
+                <div className='filter-row'>
+                    <div className='filter-item'>
+                        <button onClick={applyQuery} className='search-button'>
+                            {t('adminReports.searchButton')}
+                        </button>
+                        <button onClick={resetQuery} className='reset-button'>
+                            {t('adminReports.resetButton')}
+                        </button>
                     </div>
                 </div>
             </div>
 
             {/* Action buttons area */}
-            <div className="action-buttons">
+            <div className='action-buttons'>
                 <button
-                    className="btn btn-primary"
+                    className='btn btn-primary'
                     onClick={handleAuditSelected}
                     disabled={selectedReports.size === 0}
                 >
@@ -269,14 +293,16 @@ const AdminReports = () => {
                 </button>
             </div>
 
-            <div className="pagination-info">
-                <span>{t('adminReports.showingEntries', { 
-                    start: (page - 1) * pageSize + 1, 
-                    end: Math.min(page * pageSize, total), 
-                    total 
-                })}</span>
+            <div className='pagination-info'>
+                <span>
+                    {t('adminReports.showingEntries', {
+                        start: (page - 1) * pageSize + 1,
+                        end: Math.min(page * pageSize, total),
+                        total,
+                    })}
+                </span>
                 <button
-                    className="refresh-button"
+                    className='refresh-button'
                     onClick={throttledRefresh}
                     title={t('adminReports.refreshTooltip')}
                 >
@@ -286,22 +312,22 @@ const AdminReports = () => {
 
             <ShowTable
                 data={reports}
-                renderItem={(item) => (
+                renderItem={item => (
                     <tr>
                         <td>
                             <input
-                                type="checkbox"
+                                type='checkbox'
                                 checked={selectedReports.has(item.id)}
                                 onChange={() => handleSelectReport(item.id)}
                             />
                         </td>
                         <td>{item.id}</td>
                         <td>
-                            <div className="user-info">
+                            <div className='user-info'>
                                 <img
                                     src={getSingleSimpleUserInfo(item.userId).avatarLink}
-                                    alt="Avatar"
-                                    className="user-avatar"
+                                    alt='Avatar'
+                                    className='user-avatar'
                                     onClick={() => window.open(`/user/${item.userId}`)}
                                 />
                                 <span>{`${getSingleSimpleUserInfo(item.userId).name}(id: ${item.userId})`}</span>
@@ -309,14 +335,16 @@ const AdminReports = () => {
                         </td>
                         <td>{`${getTargetTypeLabel(item.reportTargetType)}(id: ${item.reportTarget})`}</td>
                         <td>{item.reason}</td>
-                        <td>
-                            {item.status}
-                        </td>
+                        <td>{item.status}</td>
                         <td>{dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss')}</td>
-                        <td>{item.handledAt ? dayjs(item.handledAt).format('YYYY-MM-DD HH:mm:ss') : '-'}</td>
+                        <td>
+                            {item.handledAt
+                                ? dayjs(item.handledAt).format('YYYY-MM-DD HH:mm:ss')
+                                : '-'}
+                        </td>
                         <td>
                             <button
-                                className="btn btn-sm btn-primary"
+                                className='btn btn-sm btn-primary'
                                 onClick={() => handleAuditReport(item.id)}
                             >
                                 {t('adminReports.auditButton')}
@@ -328,7 +356,7 @@ const AdminReports = () => {
                     <tr>
                         <th>
                             <input
-                                type="checkbox"
+                                type='checkbox'
                                 checked={isAllSelected}
                                 onChange={handleSelectAll}
                             />
@@ -358,7 +386,7 @@ const AdminReports = () => {
                 <AuditReportDialog
                     onClose={closeAuditDialog}
                     reportId={currentReport?.id}
-                // reportData={currentReport}
+                    // reportData={currentReport}
                 />
             )}
         </div>

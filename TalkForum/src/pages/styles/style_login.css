@@ -1,149 +1,150 @@
 .login-container {
-  background: url('https://bing.img.run/1366x768.php') no-repeat center center fixed;
-  background-size: cover;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
+    background: url('https://bing.img.run/1366x768.php') no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
 }
 
 .login-form {
-  background: var(--neutral-module);
-  padding: 2rem;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 4px 6px var(--neutral-shadow);
-  border: 1px solid var(--neutral-border);
+    background: var(--neutral-module);
+    padding: 2rem;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px var(--neutral-shadow);
+    border: 1px solid var(--neutral-border);
 }
 
 .login-form h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: var(--neutral-text-main);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--neutral-text-main);
 }
 
 .form-group {
-  margin-bottom: 1rem;
+    margin-bottom: 1rem;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--neutral-text-secondary);
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--neutral-text-secondary);
 }
 
-.form-group input, .form-group input:focus {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--neutral-border);
-  border-radius: 4px;
-  font-size: 1rem;
-  background: var(--neutral-bg);
-  color: var(--neutral-text-main);
-  box-shadow: 0 4px 8px var(--neutral-shadow);
-  outline: none;
+.form-group input,
+.form-group input:focus {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--neutral-border);
+    border-radius: 4px;
+    font-size: 1rem;
+    background: var(--neutral-bg);
+    color: var(--neutral-text-main);
+    box-shadow: 0 4px 8px var(--neutral-shadow);
+    outline: none;
 }
 
 .submit-btn {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: var(--primary);
-  color: var(--neutral-module);
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 1rem;
-  transition: background-color 0.2s;
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--primary);
+    color: var(--neutral-module);
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.2s;
 }
 
 .submit-btn:hover {
-  background-color: var(--secondary-warm-2);
+    background-color: var(--secondary-warm-2);
 }
 
 .toggle-form {
-  text-align: center;
-  margin-top: 1rem;
-  color: var(--neutral-text-secondary);
+    text-align: center;
+    margin-top: 1rem;
+    color: var(--neutral-text-secondary);
 }
 
 .toggle-btn {
-  background: none;
-  border: none;
-  color: var(--secondary-cool);
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 0;
-  font-size: inherit;
-  transition: color 0.2s;
+    background: none;
+    border: none;
+    color: var(--secondary-cool);
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    font-size: inherit;
+    transition: color 0.2s;
 }
 
 .toggle-btn:hover {
-  color: var(--secondary-warm-1);
+    color: var(--secondary-warm-1);
 }
 
 /* 隐私协议复选框样式 */
 .privacy-agreement {
-  margin: 1rem 0;
+    margin: 1rem 0;
 }
 
 .checkbox-container {
-  display: flex;
-  align-items: flex-start;
-  font-size: 0.9rem;
-  color: var(--neutral-text-secondary);
-  cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    font-size: 0.9rem;
+    color: var(--neutral-text-secondary);
+    cursor: pointer;
 }
 
-.checkbox-container input[type="checkbox"] {
-  margin-right: 0.5rem;
-  margin-top: 0.2rem;
-  width: auto;
-  padding: 0;
-  border: 1px solid var(--neutral-border);
-  background: var(--neutral-bg);
-  color: var(--primary);
-  box-shadow: none;
+.checkbox-container input[type='checkbox'] {
+    margin-right: 0.5rem;
+    margin-top: 0.2rem;
+    width: auto;
+    padding: 0;
+    border: 1px solid var(--neutral-border);
+    background: var(--neutral-bg);
+    color: var(--primary);
+    box-shadow: none;
 }
 
 .privacy-text {
-  flex: 1;
-  line-height: 1.4;
+    flex: 1;
+    line-height: 1.4;
 }
 
 .privacy-link {
-  background: none;
-  border: none;
-  color: var(--secondary-cool);
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 0;
-  font-size: inherit;
-  margin-left: 0.3rem;
-  transition: color 0.2s;
+    background: none;
+    border: none;
+    color: var(--secondary-cool);
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    font-size: inherit;
+    margin-left: 0.3rem;
+    transition: color 0.2s;
 }
 
 .privacy-link:hover {
-  color: var(--secondary-warm-1);
+    color: var(--secondary-warm-1);
 }
 
 /* 版权声明样式 */
 .copyright-notice {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  text-align: center;
-  padding: 1rem 0;
-  /* background: rgba(255, 255, 255, 0.8); */
-  /* backdrop-filter: blur(5px); */
-  color: var(--neutral-text-secondary);
-  font-size: 0.8rem;
-  z-index: 10;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 1rem 0;
+    /* background: rgba(255, 255, 255, 0.8); */
+    /* backdrop-filter: blur(5px); */
+    color: var(--neutral-text-secondary);
+    font-size: 0.8rem;
+    z-index: 10;
 }
 
 .copyright-notice p {
-  margin: 0;
+    margin: 0;
 }

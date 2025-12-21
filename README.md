@@ -30,22 +30,25 @@ Talk Forum（聊吧）是一个简易的论坛系统，致力于设计一个轻�
 前端项目储存在`/TalkForum`文件夹  [页面参考规范请点击](./聊吧论坛前端页面规范.md)
 
 ```powershell
-pnpm build
+pnpm install          # 安装依赖
+pnpm build            # 构建
+pnpm dev              # 运行当前
+pnpm preview          # 运行构建后
 ```
 
 后端项目储存在`/TalkForumServer`文件夹，修改`appplication.yml`修改，[接口参考规范请点击](./聊吧论坛后端接口规范.md)
 
 ```powershell
-mvn clean package -Dmaven.test.skip=true
+mvn clean package -Dmaven.test.skip=true #打包并忽略测试案例
 ```
 
-使用`MySQL`作为数据库，[数据库表参考规范请点击](./聊吧论坛数据库表规范.md)，执行`init_database.sql`一键构建数据库`test_data.sql`构建默认数据，所有用户密码均为Qu123456!
+使用`MySQL`作为数据库，[数据库表参考规范请点击](./聊吧论坛数据库表规范.md)，执行`init_database.sql`一键构建数据库`test_data.sql`构建默认数据，所有用户密码均为`Qu123456!`
 
 ## 简要细节
 
 登录过程：用户填写好表单后发送至后端服务，后端验证账号密码成功后，通过响应头Set-Cookie将JWT Token设置为HttpOnly Cookie（前端由浏览器自动存储，无法通过JS操作），同时将Token与用户ID的绑定关系存储到Redis中，用于后续有效性校验
 
-限流过程：运用Redis的ZSet结构实现滑动窗口限流，将请求唯一标识（简单使用用户的IP）设为member、请求时间戳设为score；通过ZREMRANGEBYSCORE命令移除score（时间戳）小于「当前时间-窗口大小」的历史请求，再用ZCARD命令统计窗口内剩余请求数。后端通过Interceptor结合自定义注解，实现不同接口/角色的差异化限流规则
+限流过程：运用Redis的ZSet结构实现滑动窗口限流，将请求唯一标识（用户的IP和请求URL组合）设为member、请求时间戳设为score；通过ZREMRANGEBYSCORE命令移除score（时间戳）小于「当前时间-窗口大小」的历史请求，再用ZCARD命令统计窗口内剩余请求数。后端通过Interceptor结合自定义注解，实现不同接口/角色的差异化限流规则
 
 鉴权过程：通过自定义权限注解（如@LoginRequired, @AdminRequired）搭配Interceptor，在请求处理前加入权限判断逻辑（校验用户角色、资源归属），防止垂直越权和水平越权问题
 
@@ -53,7 +56,7 @@ mvn clean package -Dmaven.test.skip=true
 
 国际化：根据浏览器语言策略判断用户语言倾向，展示对应的语言版本；若检测的语言未适配，则以默认英文兜底
 
- 无限滚动容器：基于InfiniteScroll库实现无限滚动功能，搭配骨架屏加载效果，缓解用户刷帖时的等待焦虑
+无限滚动容器：基于InfiniteScroll库实现无限滚动功能，搭配骨架屏加载效果，缓解用户刷帖时的等待焦虑
 
 ### 作品展示
 

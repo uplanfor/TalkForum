@@ -5,11 +5,11 @@
  * - 背景图片
  * - 帖子容器（支持最新和精华两个标签页）
  */
-import Nav from "../components/Nav";
-import BackgroundImg from "../components/BackgroundImg";
-import PostsContainer, { PostContainerTargetType } from "../components/PostsContainer";
-import { DefaultBackgroundUrl } from "../constants/default";
-import { useTranslation } from "react-i18next";
+import Nav from '../components/Nav';
+import BackgroundImg from '../components/BackgroundImg';
+import PostsContainer, { PostContainerTargetType } from '../components/PostsContainer';
+import { DefaultBackgroundUrl } from '../constants/default';
+import { useTranslation } from 'react-i18next';
 // import KeepAlive from "react-activation";
 
 /**
@@ -19,20 +19,30 @@ import { useTranslation } from "react-i18next";
 const Home = () => {
     // 国际化钩子
     const { t } = useTranslation();
-    
+
     return (
         <>
             {/* 导航栏组件 */}
             <Nav></Nav>
-            
+
             {/* 背景图片组件，使用默认背景图URL */}
-            <BackgroundImg src={DefaultBackgroundUrl} >
-                <div style={{
-                    position: "absolute", top: "50%", left: "50%", textAlign: "center",
-                    transform: "translate(-50%, -50%)", width: "fit-content", height: "fit-content",
-                    fontSize: "2rem", color: "white", fontWeight: "bold",}}>
+            <BackgroundImg src={DefaultBackgroundUrl}>
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        textAlign: 'center',
+                        transform: 'translate(-50%, -50%)',
+                        width: 'fit-content',
+                        height: 'fit-content',
+                        fontSize: '2rem',
+                        color: 'white',
+                        fontWeight: 'bold',
+                    }}
+                >
                     {t('home.title')}
-                    <p style={{fontSize: "1rem", fontWeight: "normal"}}>{t('home.subtitle')}</p>
+                    <p style={{ fontSize: '1rem', fontWeight: 'normal' }}>{t('home.subtitle')}</p>
                 </div>
             </BackgroundImg>
             {/* <BackgroundImg src="https://bing.img.run/1366x768.php" /> */}
@@ -42,6 +52,5 @@ const Home = () => {
         </>
     );
 };
-
 
 export default Home;

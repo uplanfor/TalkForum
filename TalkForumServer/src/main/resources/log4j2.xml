@@ -1,42 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Log4j2配置文件 - 支持info、warn、debug三个级别的日志输出 -->
 <Configuration status="WARN" monitorInterval="30">
+    <!-- 定义日志输出格式 -->
     <Properties>
-        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</Property>
-        <Property name="LOG_FILE">logs/application.log</Property>
+        <!-- 彩色控制台日志格式：时间 [线程名] 彩色日志级别 日志名 - 消息 -->
+        <Property name="CONSOLE_LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight{%-5level} %cyan{%logger{36}} - %msg%n</Property>
+        <!-- 文件日志格式：时间 [线程名] 日志级别 日志名 - 消息 -->
+        <Property name="FILE_LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Property>
+        <!-- 彩色简化控制台格式：时间 彩色日志级别 - 消息 -->
+        <Property name="SIMPLE_CONSOLE_PATTERN">%d{HH:mm:ss.SSS} %highlight{%-5level} - %msg%n</Property>
     </Properties>
 
     <Appenders>
+        <!-- 控制台输出器 - 输出所有级别的日志到控制台 -->
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <PatternLayout pattern="%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %cyan{%logger{36}} - %msg%n}" disableAnsi="false"/>
         </Console>
 
-        <RollingFile name="File" fileName="${LOG_FILE}" filePattern="logs/application-%d{yyyy-MM-dd}-%i.log">
-            <PatternLayout pattern="${LOG_PATTERN}"/>
-            <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
-                <SizeBasedTriggeringPolicy size="10MB"/>
-            </Policies>
-            <DefaultRolloverStrategy max="10"/>
-        </RollingFile>
+        <!-- 测试控制台输出器 - 简化格式，专门用于测试缓存功能 -->
+        <Console name="TestConsole" target="SYSTEM_OUT">
+            <PatternLayout pattern="%highlight{%d{HH:mm:ss} %-5level} %msg%n" disableAnsi="false"/>
+        </Console>
+
+        <!-- 文件输出器 - 输出所有级别的日志到文件 -->
+        <File name="File" fileName="logs/application.log" append="true">
+            <PatternLayout pattern="${FILE_LOG_PATTERN}"/>
+        </File>
+
+        <!-- Debug文件输出器 - 专门输出debug级别日志 -->
+        <File name="DebugFile" fileName="logs/debug.log" append="true">
+            <PatternLayout pattern="${FILE_LOG_PATTERN}"/>
+        </File>
+
+        <!-- Warn文件输出器 - 专门输出warn级别日志 -->
+        <File name="WarnFile" fileName="logs/warn.log" append="true">
+            <PatternLayout pattern="${FILE_LOG_PATTERN}"/>
+        </File>
+
+        <!-- Error文件输出器 - 专门输出error级别日志 -->
+        <File name="ErrorFile" fileName="logs/error.log" append="true">
+            <PatternLayout pattern="${FILE_LOG_PATTERN}"/>
+        </File>
     </Appenders>
 
     <Loggers>
-        <Logger name="com.talkforum.talkforumserver" level="info" additivity="false">
+        <!-- 根日志记录器 - 设置默认日志级别为DEBUG，确保能捕获所有日志 -->
+        <Root level="DEBUG">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="File"/>
-        </Logger>
-
-        <Logger name="org.springframework" level="warn" additivity="false">
-            <AppenderRef ref="Console"/>
-        </Logger>
-
-        <Logger name="org.apache.ibatis" level="warn" additivity="false">
-            <AppenderRef ref="Console"/>
-        </Logger>
-
-        <Root level="info warn">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="File"/>
+            <AppenderRef ref="DebugFile"/>
+            <AppenderRef ref="WarnFile"/>
+            <AppenderRef ref="ErrorFile"/>
         </Root>
+
+        <!-- 业务包日志记录器 - 专门处理业务代码日志 -->
+        <!-- 设置com.talkforum.talkforumserver包及其子包的日志级别为DEBUG -->
+        <Logger name="com.talkforum.talkforumserver" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+            <AppenderRef ref="DebugFile"/>
+            <AppenderRef ref="WarnFile"/>
+            <AppenderRef ref="ErrorFile"/>
+        </Logger>
+
+        <!-- PostCacheService专用日志记录器 - 确保PostCacheService的日志能被正确处理 -->
+        <Logger name="com.talkforum.talkforumserver.post.PostCacheService" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="TestConsole"/> <!-- 使用测试控制台输出器 -->
+            <AppenderRef ref="File"/>
+            <AppenderRef ref="DebugFile"/>
+            <AppenderRef ref="WarnFile"/>
+            <AppenderRef ref="ErrorFile"/>
+        </Logger>
+
+        <!-- 第三方库日志级别设置 - 减少噪音 -->
+        <!-- Spring框架日志级别设置为INFO -->
+        <Logger name="org.springframework" level="INFO"/>
+        <!-- MyBatis日志级别设置为INFO -->
+        <Logger name="org.mybatis" level="INFO"/>
+        <!-- Druid连接池日志级别设置为INFO -->
+        <Logger name="com.alibaba.druid" level="INFO"/>
+        <!-- Redis日志级别设置为INFO -->
+        <Logger name="org.springframework.data.redis" level="INFO"/>
     </Loggers>
 </Configuration>

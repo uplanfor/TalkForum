@@ -1,10 +1,10 @@
 package com.talkforum.talkforumserver.interceptor;
 
+import com.talkforum.talkforumserver.auth.AuthCacheService;
 import com.talkforum.talkforumserver.common.anno.AdminRequired;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
 import com.talkforum.talkforumserver.common.util.CookieHelper;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
-import com.talkforum.talkforumserver.common.util.RedisHelper;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
 import io.jsonwebtoken.JwtException;
@@ -26,7 +26,7 @@ public class ModeratorInterceptor implements HandlerInterceptor {
     @Autowired
     private JWTHelper jwtHelper; // JWT工具类，用于解析和验证JWT令牌
     @Autowired
-    private RedisHelper redisHelper;
+    private AuthCacheService authCacheService;
 
     /**
      * 处理请求前的拦截方法
@@ -71,7 +71,7 @@ public class ModeratorInterceptor implements HandlerInterceptor {
                     return false;
                 }
                 // 验证令牌是否在Redis中存在
-                Object t =  redisHelper.getLoginToken(userId);
+                Object t =  authCacheService.getLoginToken(userId);
                 if (t == null) {
                     throw new BusinessRuntimeException("invalid token");
                 }

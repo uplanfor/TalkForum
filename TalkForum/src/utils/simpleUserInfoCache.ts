@@ -1,5 +1,5 @@
-import { usersGetSimpleUsersInfo, type SimpleUserInfo } from "../api/ApiUsers"
-import { DefaultAvatarUrl } from "../constants/default";
+import { usersGetSimpleUsersInfo, type SimpleUserInfo } from '../api/ApiUsers';
+import { DefaultAvatarUrl } from '../constants/default';
 const cache = new Map<number, SimpleUserInfo>();
 
 /**
@@ -7,9 +7,9 @@ const cache = new Map<number, SimpleUserInfo>();
  * @param userIds 用户id列表
  */
 const requestSimpleUserInfoCache = async (userIds: number[]) => {
-    const notInCache = userIds.filter((id) => !cache.has(id));
+    const notInCache = userIds.filter(id => !cache.has(id));
     await updateSimpleUserInfoCache(notInCache);
-}
+};
 
 /**
  * 更新缓存(不去重，有则覆盖，无则更新)
@@ -32,26 +32,21 @@ const updateSimpleUserInfoCache = async (userIds: number[]) => {
     } catch (error) {
         console.error(error);
     }
-}
-
+};
 
 /**
  * 用于获取用户简单信息，优先从缓存中获取，如果缓存中没有，则失败
  * @param userId 用户id
  * @returns 简单用户信息
  */
-const getSingleSimpleUserInfo = (userId: number) : SimpleUserInfo=> {
+const getSingleSimpleUserInfo = (userId: number): SimpleUserInfo => {
     if (cache.has(userId)) {
         return cache.get(userId) as SimpleUserInfo;
     }
     return {
         avatarLink: DefaultAvatarUrl,
-        name: "UNKNOWN",
-    }
-}
+        name: 'UNKNOWN',
+    };
+};
 
-export {
-    updateSimpleUserInfoCache,
-    getSingleSimpleUserInfo,
-    requestSimpleUserInfoCache,
-}
+export { updateSimpleUserInfoCache, getSingleSimpleUserInfo, requestSimpleUserInfoCache };

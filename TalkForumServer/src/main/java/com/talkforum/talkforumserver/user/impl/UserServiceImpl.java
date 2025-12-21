@@ -1,5 +1,6 @@
 package com.talkforum.talkforumserver.user.impl;
 
+import com.talkforum.talkforumserver.auth.impl.AuthServiceImpl;
 import com.talkforum.talkforumserver.common.dto.UserDTO;
 import com.talkforum.talkforumserver.common.dto.UserProfileDTO;
 import com.talkforum.talkforumserver.common.entity.User;
@@ -12,6 +13,7 @@ import com.talkforum.talkforumserver.common.vo.UserVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
 import com.talkforum.talkforumserver.invitecode.InviteCodeMapper;
+import com.talkforum.talkforumserver.user.UserCacheService;
 import com.talkforum.talkforumserver.user.UserMapper;
 import com.talkforum.talkforumserver.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper; // 用户数据访问层
     @Autowired
+    private UserCacheService userCacheService; // 用户缓存服务
+    @Autowired
     private InviteCodeMapper inviteCodeMapper; // 邀请码数据访问层
+    @Autowired
+    private AuthServiceImpl authServiceImpl;
 
     /**
      * 用户注册实现
@@ -92,22 +98,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserVO getUserById(Long userId) {
-        UserVO userVO = userMapper.getUserVOById(userId);
-        if (userVO == null) {
-            throw new BusinessRuntimeException(I18n.t("user.not.found"));
-        }
-        return userVO;
-    }
-
-    /**
-     * 根据邮箱获取用户信息实现
-     * @param email 用户邮箱
-     * @return 用户VO对象
-     * @throws BusinessRuntimeException 用户不存在时抛出异常
-     */
-    @Override
-    public UserVO getUserByEmail(String email) {
-        UserVO userVO = userMapper.getUserVOByEmail(email);
+        // 使用缓存服务获取用户信息，优先从缓存读取
+        UserVO userVO = userCacheService.getUserVO(userId);
         if (userVO == null) {
             throw new BusinessRuntimeException(I18n.t("user.not.found"));
         }
@@ -131,6 +123,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void setUserProfile(UserProfileDTO user) {
         userMapper.setUserProfile(user);
+        // 更新缓存中的用户数据（仅当缓存存在时）
+        userCacheService.updateUserCache(user.id);
     }
 
     /**
@@ -155,6 +149,8 @@ public class UserServiceImpl implements UserService {
             // 加密新密码并更新
             String encryptedPassword = PasswordHelper.encryptPassword(newPassword);
             userMapper.resetUserPassword(userId, encryptedPassword);
+            // 踢出登录
+            authServiceImpl.logout(loginCheck.id);
         } else {
             throw new BusinessRuntimeException(I18n.t("user.password.wrong"));
         }
@@ -193,6 +189,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void setUserRole(long userId, String role) {
         userMapper.setUserRole(userId, role);
+        // 更新缓存中的用户数据（仅当缓存存在时）
+        userCacheService.updateUserCache(userId);
     }
 
     /**
@@ -203,6 +201,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateStatus(long userId, String status) {
         userMapper.updateUserStatus(userId, status);
+        // 更新缓存中的用户数据（仅当缓存存在时）
+        userCacheService.updateUserCache(userId);
     }
 
     /**

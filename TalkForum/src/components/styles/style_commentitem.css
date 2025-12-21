@@ -1,5 +1,5 @@
 .comment-item {
-  display: flex;
+    display: flex;
 }
 
 .comment-item .comment-user-avatar {
@@ -14,7 +14,6 @@
     background-color: var(--neutral-module);
     border: 1px solid var(--neutral-border);
 }
-
 
 .comment-item .comment-info {
     flex: 1;
@@ -62,12 +61,11 @@
     color: var(--neutral-text-secondary);
 }
 
-.comment-item .comment-info .comment-footer>span {
+.comment-item .comment-info .comment-footer > span {
     display: block;
     height: 30px;
     line-height: 30px;
 }
-
 
 .comment-item .comment-info .comment-footer span.comment-footer-reply {
     padding: 0 3px;
@@ -139,7 +137,7 @@
     font-size: smaller;
 }
 
-.comment-reply-list .reply-total>span{
+.comment-reply-list .reply-total > span {
     padding: 2px;
     user-select: none;
     color: var(--primary);

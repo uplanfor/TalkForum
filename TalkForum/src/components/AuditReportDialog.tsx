@@ -11,12 +11,9 @@ interface AuditReportDialogProps {
 
 const AuditReportDialog = ({ onClose, reportId, reportData }: AuditReportDialogProps) => {
     // 预留功能实现
-    
+
     return (
-        <PopUpDialogBase
-            title="Audit Report"
-            onClose={onClose}
-        >
+        <PopUpDialogBase title='Audit Report' onClose={onClose}>
             <div style={{ padding: '20px', textAlign: 'center' }}>
                 Audit Report Dialog - 功能待实现
             </div>

@@ -1,224 +1,224 @@
 /* 搜索页面头部样式 */
 .search-header {
-  display: flex;
-  align-items: center;
-  position: fixed;
-  top: 1px;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-bottom: 30px;
-  padding: 12px 16px;
-  width: 100%;
-  max-width: 800px;
-  border-radius: 9px;
-  background-color: var(--neutral-module);
-  border-bottom: 1px solid var(--neutral-border);
-  box-shadow: 0 2px 4px var(--neutral-shadow);
-  z-index: 1000;
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 1px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 30px;
+    padding: 12px 16px;
+    width: 100%;
+    max-width: 800px;
+    border-radius: 9px;
+    background-color: var(--neutral-module);
+    border-bottom: 1px solid var(--neutral-border);
+    box-shadow: 0 2px 4px var(--neutral-shadow);
+    z-index: 1000;
 }
 
 /* 返回按钮样式 */
 .search-header svg {
-  width: 24px;
-  height: 24px;
-  margin-right: 12px;
-  color: var(--neutral-text-main);
-  transition: color 0.2s;
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    color: var(--neutral-text-main);
+    transition: color 0.2s;
 }
 
 .search-header svg:hover {
-  color: var(--primary);
+    color: var(--primary);
 }
 
 /* 搜索输入组合样式 */
 .search-combo {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  height: 40px;
-  padding: 0 16px;
-  background-color: var(--neutral-bg);
-  border: 1px solid var(--neutral-border);
-  border-radius: 20px;
-  margin-right: 12px;
-  transition: border-color 0.2s;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    height: 40px;
+    padding: 0 16px;
+    background-color: var(--neutral-bg);
+    border: 1px solid var(--neutral-border);
+    border-radius: 20px;
+    margin-right: 12px;
+    transition: border-color 0.2s;
 }
 
 .search-combo:focus-within {
-  border-color: var(--primary);
+    border-color: var(--primary);
 }
 
 .search-combo svg {
-  width: 20px;
-  height: 20px;
-  margin-right: 8px;
-  color: var(--neutral-text-secondary);
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    color: var(--neutral-text-secondary);
 }
 
 .search-combo input {
-  flex: 1;
-  border: none;
-  outline: none;
-  background-color: transparent;
-  font-size: 16px;
-  color: var(--neutral-text-main);
+    flex: 1;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    font-size: 16px;
+    color: var(--neutral-text-main);
 }
 
 .search-combo input::placeholder {
-  color: var(--neutral-text-placeholder);
+    color: var(--neutral-text-placeholder);
 }
 
 /* 搜索按钮样式 */
 .search-header button {
-  padding: 0 16px;
-  height: 40px;
-  background-color: var(--primary);
-  color: var(--neutral-module);
-  border: none;
-  border-radius: 20px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    padding: 0 16px;
+    height: 40px;
+    background-color: var(--primary);
+    color: var(--neutral-module);
+    border: none;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .search-header button:hover {
-  background-color: var(--secondary-warm-2);
+    background-color: var(--secondary-warm-2);
 }
 
 .search-header button:active {
-  background-color: var(--secondary-warm-1);
+    background-color: var(--secondary-warm-1);
 }
 
 /* 遮罩层样式 */
 .filter-mask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
 }
 
 /* 筛选条件面板样式 */
 .search-filters {
-  background-color: var(--neutral-module);
-  border: 1px solid var(--neutral-border);
-  border-radius: 9px;
-  box-shadow: 0 2px 10px var(--neutral-shadow);
-  padding: 20px;
-  width: 100%;
-  max-width: 800px;
-  position: fixed;
-  top: 69px; /* 位于搜索头部下方 */
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
+    background-color: var(--neutral-module);
+    border: 1px solid var(--neutral-border);
+    border-radius: 9px;
+    box-shadow: 0 2px 10px var(--neutral-shadow);
+    padding: 20px;
+    width: 100%;
+    max-width: 800px;
+    position: fixed;
+    top: 69px; /* 位于搜索头部下方 */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
 }
 
 .filter-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
 }
 
 .filter-group label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--neutral-text-main);
-  margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--neutral-text-main);
+    margin-bottom: 6px;
 }
 
 .filter-group input {
-  padding: 10px 12px;
-  border: 1px solid var(--neutral-border);
-  border-radius: 4px;
-  font-size: 14px;
-  color: var(--neutral-text-main);
-  background-color: var(--neutral-bg);
-  outline: none;
-  transition: border-color 0.2s;
+    padding: 10px 12px;
+    border: 1px solid var(--neutral-border);
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--neutral-text-main);
+    background-color: var(--neutral-bg);
+    outline: none;
+    transition: border-color 0.2s;
 }
 
 .filter-group input:focus {
-  border-color: var(--primary);
+    border-color: var(--primary);
 }
 
 .filter-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
 }
 
 .filter-actions button {
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .filter-actions button:first-child {
-  background-color: transparent;
-  color: var(--neutral-text-main);
-  border: 1px solid var(--neutral-border);
+    background-color: transparent;
+    color: var(--neutral-text-main);
+    border: 1px solid var(--neutral-border);
 }
 
 .filter-actions button:first-child:hover {
-  background-color: var(--neutral-hover);
+    background-color: var(--neutral-hover);
 }
 
 .filter-actions button:last-child {
-  background-color: var(--primary);
-  color: var(--neutral-module);
-  border: none;
+    background-color: var(--primary);
+    color: var(--neutral-module);
+    border: none;
 }
 
 .filter-actions button:last-child:hover {
-  background-color: var(--secondary-warm-2);
+    background-color: var(--secondary-warm-2);
 }
 
 /* 响应式设计 */
 @media screen and (max-width: 600px) {
-  .search-header {
-    padding: 8px 12px;
-  }
+    .search-header {
+        padding: 8px 12px;
+    }
 
-  /* 保持SVG图标尺寸不变 */
-  .search-header svg {
-    flex-shrink: 0; /* 防止返回按钮被压缩 */
-    margin-right: 8px;
-  }
+    /* 保持SVG图标尺寸不变 */
+    .search-header svg {
+        flex-shrink: 0; /* 防止返回按钮被压缩 */
+        margin-right: 8px;
+    }
 
-  .search-combo {
-    height: 36px;
-    padding: 0 12px;
-    max-width: calc(100% - 100px); /* 调整最大宽度计算 */
-    flex: 1; /* 保持弹性布局 */
-  }
+    .search-combo {
+        height: 36px;
+        padding: 0 12px;
+        max-width: calc(100% - 100px); /* 调整最大宽度计算 */
+        flex: 1; /* 保持弹性布局 */
+    }
 
-  /* 保持搜索框内SVG图标尺寸不变 */
-  .search-combo svg {
-    flex-shrink: 0; /* 防止搜索图标被压缩 */
-    margin-right: 6px;
-  }
+    /* 保持搜索框内SVG图标尺寸不变 */
+    .search-combo svg {
+        flex-shrink: 0; /* 防止搜索图标被压缩 */
+        margin-right: 6px;
+    }
 
-  .search-combo input {
-    font-size: 14px;
-    min-width: 0; /* 允许输入框收缩 */
-  }
+    .search-combo input {
+        font-size: 14px;
+        min-width: 0; /* 允许输入框收缩 */
+    }
 
-  .search-header button {
-    height: 36px;
-    padding: 0 10px; /* 减少按钮padding */
-    font-size: 14px;
-    flex-shrink: 0; /* 防止搜索按钮被压缩 */
-    white-space: nowrap; /* 防止文字换行 */
-  }
+    .search-header button {
+        height: 36px;
+        padding: 0 10px; /* 减少按钮padding */
+        font-size: 14px;
+        flex-shrink: 0; /* 防止搜索按钮被压缩 */
+        white-space: nowrap; /* 防止文字换行 */
+    }
 }

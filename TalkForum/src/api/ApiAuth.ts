@@ -2,39 +2,38 @@
  * 认证相关API请求
  * 处理用户登录、登出和获取用户信息等功能
  */
-import type ApiResponse from "./ApiResponse";
-import Request from "../utils/Request";
+import type ApiResponse from './ApiResponse';
+import Request from '../utils/Request';
 
 /**
  * 用户信息接口
  * 定义了用户的基本信息结构
  */
 export interface UserInfo {
-    id: number;                    // 用户ID
-    email: string;                 // 用户邮箱
-    name: string;                  // 用户名
-    role: string;                  // 用户角色
-    intro: string;                 // 个人简介
-    avatarLink: string;            // 头像链接
-    backgroundLink: string;        // 背景图链接
-    lastLoginAt?: string;          // 上次登录时间（可选）
-    isLoggedIn: boolean;           // 是否已登录
-    fansCount: number;             // 粉丝数量
-    followingCount: number;        // 关注数量
+    id: number; // 用户ID
+    email: string; // 用户邮箱
+    name: string; // 用户名
+    role: string; // 用户角色
+    intro: string; // 个人简介
+    avatarLink: string; // 头像链接
+    backgroundLink: string; // 背景图链接
+    lastLoginAt?: string; // 上次登录时间（可选）
+    isLoggedIn: boolean; // 是否已登录
+    fansCount: number; // 粉丝数量
+    followingCount: number; // 关注数量
 }
 
 export interface AdminHomeInfo {
-    totalUsers: number;            // 总用户数量
-    totalPosts: number;         // 总文章数量
-    totalReports: number;        // 总举报数量
-    postsNotHandled: number;     // 未处理文章数量
-    commentsNotHandled: number;  // 未处理评论数量
-    reportsNotHandled: number;   // 未处理举报数量
+    totalUsers: number; // 总用户数量
+    totalPosts: number; // 总文章数量
+    totalReports: number; // 总举报数量
+    postsNotHandled: number; // 未处理文章数量
+    commentsNotHandled: number; // 未处理评论数量
+    reportsNotHandled: number; // 未处理举报数量
 }
 
-
 export interface AuthInfo extends UserInfo {
-    following: number[];          // 关注列表
+    following: number[]; // 关注列表
 }
 
 /**
@@ -42,7 +41,6 @@ export interface AuthInfo extends UserInfo {
  * 扩展了ApiResponse接口，包含UserInfo类型的数据
  */
 export interface AuthResponse extends ApiResponse<AuthInfo> {}
-
 
 export interface AdminHomeResponse extends ApiResponse<AdminHomeInfo> {}
 
@@ -52,41 +50,40 @@ export interface AdminHomeResponse extends ApiResponse<AdminHomeInfo> {}
  * @param password 密码
  * @returns 认证响应，包含用户信息
  */
-export const authSignIn = (nameOrEmail: string, password: string) : Promise<AuthResponse> => {
-    return Request.post<AuthResponse>("/api/auth/login", {
+export const authSignIn = (nameOrEmail: string, password: string): Promise<AuthResponse> => {
+    return Request.post<AuthResponse>('/api/auth/login', {
         nameOrEmail,
         password,
     });
-}
+};
 
 /**
  * 用户登出
  * @returns 登出响应
  */
-export const authSignOut = () : Promise<ApiResponse> => {
-    return Request.post<ApiResponse>("/api/auth/logout");
-}
+export const authSignOut = (): Promise<ApiResponse> => {
+    return Request.post<ApiResponse>('/api/auth/logout');
+};
 
 /**
  * 获取当前登录用户信息
  * @returns 认证响应，包含当前登录用户信息
  */
-export const authGetLoginInfo = () : Promise<AuthResponse> => {
-    return Request.get<AuthResponse>("/api/auth/");
-}
+export const authGetLoginInfo = (): Promise<AuthResponse> => {
+    return Request.get<AuthResponse>('/api/auth/');
+};
 
 /**
  * 获取管理员信息
  * @returns 认证响应，包含管理员信息
  */
-export const authGetAdminInfo = () : Promise<AuthResponse> => {
-    return Request.get<AuthResponse>("/api/auth/admin");
-}
-
+export const authGetAdminInfo = (): Promise<AuthResponse> => {
+    return Request.get<AuthResponse>('/api/auth/admin');
+};
 
 /**
  * 获取管理员首屏信息
  */
-export const  authGetAdminHomeInfo = () : Promise<AdminHomeResponse> => {
-    return Request.get<AdminHomeResponse>("/api/auth/admin/home");
-}
+export const authGetAdminHomeInfo = (): Promise<AdminHomeResponse> => {
+    return Request.get<AdminHomeResponse>('/api/auth/admin/home');
+};

@@ -6,7 +6,7 @@ import java.util.List;
 import com.talkforum.talkforumserver.common.anno.CustomRateLimit;
 import com.talkforum.talkforumserver.common.anno.NoRateLimit;
 import com.talkforum.talkforumserver.common.util.I18n;
-import com.talkforum.talkforumserver.common.util.RedisHelper;
+import com.talkforum.talkforumserver.constant.RedisConstant;
 import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -73,7 +73,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             returnJson(response, "限流ID不能为空");
             return false;
         }
-        String redisKey = "rate_limit:" + limitId; // RedisKey前缀
+        String redisKey = RedisConstant.RATE_LIMIT_PREFIX + limitId; // RedisKey前缀
 
         // 5. 执行Lua脚本
         List<String> keys = Collections.singletonList(redisKey);

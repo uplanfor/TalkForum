@@ -3,14 +3,14 @@
  * 支持点赞，踩，关注
  */
 
-import type ApiResponse from "./ApiResponse";
-import Request from "../utils/Request";
+import type ApiResponse from './ApiResponse';
+import Request from '../utils/Request';
 
 export const INTERACT_TYPE = {
-    USER: "USER",
-    POST: "POST",
-    COMMENT: "COMMENT"
-}
+    USER: 'USER',
+    POST: 'POST',
+    COMMENT: 'COMMENT',
+};
 
 export const INTERACT_POST = {
     LIKE: 1,
@@ -18,28 +18,31 @@ export const INTERACT_POST = {
     NONE: 0,
 };
 
-
 export const INTERACT_COMMENT = {
     LIKE: 1,
     DISLIKE: -1,
-    NONE: 0
+    NONE: 0,
 };
-
 
 export const INTERACT_USER = {
     FOLLOW: 1,
-    UNFOLLOW: 0
+    UNFOLLOW: 0,
 };
-
 
 /**
  * 与用户互动
  * @param interactId 互动对象ID
  * @param interactContent 互动内容
  */
-export const interactionMakeInteractionWithUser = (interactId: number, interactContent: number): Promise<ApiResponse> => {
-    return Request.post_auth<ApiResponse>(`/api/interactions/`, 
-        { interactId, interactContent, interactType: INTERACT_TYPE.USER });
+export const interactionMakeInteractionWithUser = (
+    interactId: number,
+    interactContent: number
+): Promise<ApiResponse> => {
+    return Request.post_auth<ApiResponse>(`/api/interactions/`, {
+        interactId,
+        interactContent,
+        interactType: INTERACT_TYPE.USER,
+    });
 };
 
 /**
@@ -47,9 +50,15 @@ export const interactionMakeInteractionWithUser = (interactId: number, interactC
  * @param interactId 互动对象ID
  * @param interactContent 互动内容
  */
-export const interactionMakeInteractionWithPost = (interactId: number, interactContent: number): Promise<ApiResponse> => {
-    return Request.post_auth<ApiResponse>(`/api/interactions/`, 
-        { interactId, interactContent, interactType: INTERACT_TYPE.POST });
+export const interactionMakeInteractionWithPost = (
+    interactId: number,
+    interactContent: number
+): Promise<ApiResponse> => {
+    return Request.post_auth<ApiResponse>(`/api/interactions/`, {
+        interactId,
+        interactContent,
+        interactType: INTERACT_TYPE.POST,
+    });
 };
 
 /**
@@ -57,19 +66,30 @@ export const interactionMakeInteractionWithPost = (interactId: number, interactC
  * @param interactId 互动对象ID
  * @param interactContent 互动内容
  */
-export const interactionMakeInteractionWithComment = (interactId: number, interactContent: number): Promise<ApiResponse> => {
-    return Request.post_auth<ApiResponse>(`/api/interactions/`, 
-        { interactId, interactContent, interactType: INTERACT_TYPE.COMMENT });
+export const interactionMakeInteractionWithComment = (
+    interactId: number,
+    interactContent: number
+): Promise<ApiResponse> => {
+    return Request.post_auth<ApiResponse>(`/api/interactions/`, {
+        interactId,
+        interactContent,
+        interactType: INTERACT_TYPE.COMMENT,
+    });
 };
 
 /**
  * 关注或取消关注用户
  * @param interactId 对象id
  * @param follow 关注或取消关注
- * @returns 
+ * @returns
  */
-export const interactionsFollowOrUnfollowUser = (interactId: number, follow: boolean): Promise<ApiResponse> => {
-    return Request.post_auth<ApiResponse>(`/api/interactions/`, 
-        { interactId, interactContent: follow ? INTERACT_USER.FOLLOW : INTERACT_USER.UNFOLLOW, 
-            interactType: INTERACT_TYPE.USER });
+export const interactionsFollowOrUnfollowUser = (
+    interactId: number,
+    follow: boolean
+): Promise<ApiResponse> => {
+    return Request.post_auth<ApiResponse>(`/api/interactions/`, {
+        interactId,
+        interactContent: follow ? INTERACT_USER.FOLLOW : INTERACT_USER.UNFOLLOW,
+        interactType: INTERACT_TYPE.USER,
+    });
 };

@@ -50,7 +50,7 @@
     border-radius: 18px;
 }
 
-.post-card .menu ul>li{
+.post-card .menu ul > li {
     display: block;
     list-style: none;
     width: 75px;
@@ -59,7 +59,7 @@
     color: var(--neutral-text-main);
 }
 
-.post-card .menu ul>li:hover {
+.post-card .menu ul > li:hover {
     color: var(--primary);
 }
 
@@ -90,7 +90,6 @@
     margin-top: 0;
 }
 
-
 .post-card .author-info h4 {
     color: var(--secondary-warm-1);
 }
@@ -98,8 +97,6 @@
 .post-card .author-info p {
     color: var(--neutral-text-secondary);
 }
-
-
 
 .post-card img {
     margin-top: 9px;
@@ -109,7 +106,6 @@
     border-radius: 8px;
     overflow: hidden;
 }
-
 
 .post-card .content {
     /* margin: 0; */
@@ -126,7 +122,6 @@
 .post-card .content p {
     color: var(--neutral-text-primary);
 }
-
 
 .post-card .interaction {
     display: flex;
@@ -167,7 +162,6 @@
     color: var(--primary);
 }
 
-
 .post-card .belong {
     display: flex;
 }
@@ -189,23 +183,20 @@
     background-color: var(--primary);
 }
 
-
 .post-card .belong span.tag.tag2 {
     background-color: var(--secondary-warm-1);
 }
-
 
 .post-card .belong span.tag.tag3 {
     background-color: var(--secondary-warm-2);
 }
 
 .post-card .belong span.tag::before {
-    content: "#";
+    content: '#';
 }
 
-
 @media screen and (max-width: 600px) {
-    .post-card>img {
+    .post-card > img {
         height: 150px;
     }
 }

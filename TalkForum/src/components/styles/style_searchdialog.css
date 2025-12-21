@@ -9,7 +9,9 @@
     left: 0;
     opacity: 1;
     /* transform: translateY(0); */
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
 }
 
 .cover.closing {

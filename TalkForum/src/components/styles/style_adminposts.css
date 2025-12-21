@@ -3,233 +3,233 @@
 
 /* 帖子页面布局样式 */
 .admin-posts-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  color: var(--neutral-text-main);
-  background-color: var(--neutral-bg);
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    color: var(--neutral-text-main);
+    background-color: var(--neutral-bg);
 }
 
 /* 查询条件区域样式 */
 .search-filters {
-  background-color: var(--neutral-surface);
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: var(--neutral-surface);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .filter-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 16px;
-  align-items: flex-end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+    align-items: flex-end;
 }
 
 .filter-row:last-child {
-  margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 .filter-item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 180px;
 }
 
 .filter-item label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--neutral-text-main);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--neutral-text-main);
 }
 
 .filter-item input,
 .filter-item select {
-  padding: 8px 12px;
-  border: 1px solid var(--neutral-border);
-  border-radius: 4px;
-  font-size: 14px;
-  background-color: var(--neutral-background);
-  color: var(--neutral-text-main);
-  transition: border-color 0.2s;
+    padding: 8px 12px;
+    border: 1px solid var(--neutral-border);
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: var(--neutral-background);
+    color: var(--neutral-text-main);
+    transition: border-color 0.2s;
 }
 
 .filter-item input:focus,
 .filter-item select:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
 }
 
 .filter-actions {
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
-  margin-left: auto;
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    margin-left: auto;
 }
 
 /* 操作按钮区域样式 */
 .action-buttons {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  margin-bottom: 15px;
-  padding: 10px 15px;
-  background-color: var(--neutral-module);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px var(--neutral-shadow);
-  border: 1px solid var(--neutral-border);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    background-color: var(--neutral-module);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--neutral-shadow);
+    border: 1px solid var(--neutral-border);
 }
 
 /* 批量审核按钮样式 */
 .batch-audit-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  font-weight: 600;
-  position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    font-weight: 600;
+    position: relative;
 }
 
 .batch-audit-btn::before {
-  content: "✓";
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  font-size: 12px;
-  margin-right: 5px;
+    content: '✓';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    font-size: 12px;
+    margin-right: 5px;
 }
 
 .batch-audit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background-color: var(--secondary-warm-2);
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: var(--secondary-warm-2);
 }
 
 .batch-audit-btn:disabled::before {
-  background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* 分页信息样式 */
 .pagination-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 10px 15px;
-  background-color: var(--neutral-module);
-  border: 1px solid var(--neutral-border);
-  border-radius: 4px;
-  color: var(--neutral-text-main);
-  box-shadow: 0 2px 4px var(--neutral-shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: var(--neutral-module);
+    border: 1px solid var(--neutral-border);
+    border-radius: 4px;
+    color: var(--neutral-text-main);
+    box-shadow: 0 2px 4px var(--neutral-shadow);
 }
 
 /* 表格样式增强 */
 .admin-posts-container table {
-  border-collapse: collapse;
-  width: 100%;
-  background-color: var(--neutral-module);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px var(--neutral-shadow);
+    border-collapse: collapse;
+    width: 100%;
+    background-color: var(--neutral-module);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px var(--neutral-shadow);
 }
 
 .admin-posts-container th {
-  background-color: var(--secondary-warm-1);
-  color: var(--neutral-text-main);
-  font-weight: 600;
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid var(--neutral-border);
+    background-color: var(--secondary-warm-1);
+    color: var(--neutral-text-main);
+    font-weight: 600;
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--neutral-border);
 }
 
 .admin-posts-container td {
-  padding: 12px 15px;
-  border-bottom: 1px solid var(--neutral-border);
-  color: var(--neutral-text-main);
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--neutral-border);
+    color: var(--neutral-text-main);
 }
 
 .admin-posts-container tr:last-child td {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .admin-posts-container tr:hover {
-  background-color: var(--secondary-warm-1);
+    background-color: var(--secondary-warm-1);
 }
 
 /* 帖子内容样式 */
 .post-content {
-  max-width: 300px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* 精华按钮样式 */
 .featured-button {
-  padding: 4px 8px;
-  border: 1px solid var(--neutral-border);
-  border-radius: 4px;
-  background-color: var(--secondary-warm-2);
-  color: var(--neutral-text-main);
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s;
+    padding: 4px 8px;
+    border: 1px solid var(--neutral-border);
+    border-radius: 4px;
+    background-color: var(--secondary-warm-2);
+    color: var(--neutral-text-main);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s;
 }
 
 .featured-button.featured {
-  background-color: var(--primary);
-  color: var(--neutral-text-main);
+    background-color: var(--primary);
+    color: var(--neutral-text-main);
 }
 
 .featured-button:hover {
-  background-color: var(--secondary-warm-1);
-  transform: translateY(-1px);
+    background-color: var(--secondary-warm-1);
+    transform: translateY(-1px);
 }
 
 /* 审核按钮样式 */
 .audit-button {
-  padding: 4px 8px;
-  border: 1px solid var(--neutral-border);
-  border-radius: 4px;
-  background-color: var(--secondary-warm-2);
-  color: var(--neutral-text-main);
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s;
+    padding: 4px 8px;
+    border: 1px solid var(--neutral-border);
+    border-radius: 4px;
+    background-color: var(--secondary-warm-2);
+    color: var(--neutral-text-main);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s;
 }
 
 .audit-button.approved {
-  background-color: var(--secondary-cool);
-  color: var(--neutral-text-inverse);
+    background-color: var(--secondary-cool);
+    color: var(--neutral-text-inverse);
 }
 
 .audit-button.rejected {
-  background-color: var(--primary);
-  color: var(--neutral-text-main);
+    background-color: var(--primary);
+    color: var(--neutral-text-main);
 }
 
 .audit-button:hover {
-  transform: translateY(-1px);
+    transform: translateY(-1px);
 }
 
 /* 互动统计样式 */
 .interaction-stats {
-  display: flex;
-  gap: 10px;
-  font-size: 12px;
-  color: var(--neutral-text-secondary);
+    display: flex;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--neutral-text-secondary);
 }
 
 .stat-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }

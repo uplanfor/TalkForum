@@ -8,9 +8,8 @@
     z-index: 2;
 }
 
-
 .container::before {
-    content: "";
+    content: '';
     position: absolute;
     left: 0;
     right: 0;
@@ -22,14 +21,12 @@
     border-top-right-radius: 54px;
 }
 
-
 .container .list {
     margin: 0 auto;
     width: 96%;
     max-width: 800px;
     background-color: var(--neutral-bg);
 }
-
 
 .container .center-text {
     position: absolute;
@@ -60,7 +57,7 @@
     height: 100%;
     text-align: center;
     cursor: pointer;
-    transition: color 0.2s ease; 
+    transition: color 0.2s ease;
 }
 
 /* .container .tabs .tab.active::after {
@@ -76,11 +73,9 @@
     background-color: var(--primary);
 } */
 
-
-
 /* 为所有 tab 添加下划线基础样式（默认隐藏） */
 .container .tabs .tab::after {
-    content: "";
+    content: '';
     display: block;
     position: absolute;
     left: 50%;

@@ -28,13 +28,7 @@ public interface UserService {
      * @return 用户VO对象
      */
     public UserVO getUserById(Long userId);
-    
-    /**
-     * 根据邮箱获取用户信息
-     * @param email 用户邮箱
-     * @return 用户VO对象
-     */
-    public UserVO getUserByEmail(String email);
+
     
     /**
      * 批量获取用户简单信息

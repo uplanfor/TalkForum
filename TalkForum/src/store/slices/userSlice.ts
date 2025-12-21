@@ -10,7 +10,7 @@ const initialState: UserState = {
     id: 0,
     email: 'please@login.com',
     name: 'You have not logged in yet!',
-    intro: "Please login and you will see more fun!",
+    intro: 'Please login and you will see more fun!',
     role: 'USER',
     avatarLink: DefaultAvatarUrl,
     backgroundLink: DefaultBackgroundUrl,
@@ -43,12 +43,12 @@ const userSlice = createSlice({
 
             // 正确的写法，同上方，或者用下面这个
             // 返回新状态，Immer 会直接使用这个新对象
-            return {...action.payload, isLoggedIn: true }
+            return { ...action.payload, isLoggedIn: true };
         },
-        userLogout: (state) => {
+        userLogout: state => {
             // state = {...initialState };
             // 正确的写法
-            return {...initialState }
+            return { ...initialState };
         },
         changeUserFollowing: (state, action: PayloadAction<number>) => {
             const targetId = action.payload;
@@ -60,16 +60,15 @@ const userSlice = createSlice({
                     state.fansCount += 1;
                 }
             } else {
-                state.following.splice(index, 1);   
+                state.following.splice(index, 1);
                 state.followingCount -= 1;
                 if (targetId == state.id) {
                     state.fansCount -= 1;
                 }
             }
-        }
+        },
     },
 });
-
 
 export const { userLogin, userLogout, changeUserFollowing } = userSlice.actions;
 
