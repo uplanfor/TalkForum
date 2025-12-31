@@ -1,8 +1,6 @@
 package com.talkforum.talkforumserver.config;
 
-import com.talkforum.talkforumserver.interceptor.AdministratorInterceptor;
 import com.talkforum.talkforumserver.interceptor.LoginInterceptor;
-import com.talkforum.talkforumserver.interceptor.ModeratorInterceptor;
 import com.talkforum.talkforumserver.interceptor.RateLimitInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -18,10 +16,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private LoginInterceptor loginInterceptor; // 登录验证拦截器
     @Autowired
-    private AdministratorInterceptor administratorInterceptor; // 管理员权限拦截器
-    @Autowired
-    private ModeratorInterceptor moderatorInterceptor; // 版主权限拦截器
-    @Autowired
     private RateLimitInterceptor rateLimitInterceptor;
 
     /**
@@ -30,10 +24,8 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(rateLimitInterceptor).addPathPatterns("/**"); // 限流
-        registry.addInterceptor(loginInterceptor).addPathPatterns("/**"); // 对所有路径应用登录拦截器
-        registry.addInterceptor(administratorInterceptor).addPathPatterns("/**"); // 对所有路径应用管理员拦截器
-        registry.addInterceptor(moderatorInterceptor).addPathPatterns("/**"); // 对所有路径应用版主拦截器
+        registry.addInterceptor(rateLimitInterceptor).addPathPatterns("/**").excludePathPatterns("/doc.html", "/webjars/**", "/knife4j/**", "/v3/api-docs/**"); // 限流
+        registry.addInterceptor(loginInterceptor).addPathPatterns("/**").excludePathPatterns("/doc.html", "/webjars/**", "/knife4j/**", "/v3/api-docs/**");
     }
 
 }

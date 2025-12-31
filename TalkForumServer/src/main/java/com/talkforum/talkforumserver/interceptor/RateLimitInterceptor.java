@@ -82,7 +82,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         Long result = stringRedisTemplate.execute(rateLimitScript, keys, args.toArray(new String[0]));
 
         // 6. 判断结果：1=放行，0=限流
-        if (result == null || result == 0) {
+        if (result == 0) {
             returnJson(response, I18n.t("common.equestrianism"));
             return false;
         }
@@ -113,7 +113,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     private void returnJson(HttpServletResponse response, String msg) throws IOException {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=utf-8");
-        response.getWriter().write("{\"code\":429,\"msg\":\"" + msg + "\"}");
+        response.getWriter().write("{\"code\":429,\"message\":\"" + msg + "\",\"success\":false,\"data\":null}");
     }
 
     /**

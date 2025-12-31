@@ -67,12 +67,13 @@
         "selectClub": "#Club"
     },
     "searchDialog": {
-        "placeholder": "search something...",
+        "placeholder": "search for tags, posts, users...",
         "searchButton": "Search",
         "hotTopics": "Hot Topics",
         "searchHistory": "Search History"
     },
     "search": {
+        "placeholder": "search for tags, posts, users...",
         "searchButton": "Search",
         "userIdLabel": "User IDs",
         "userIdPlaceholder": "Enter user IDs (comma-separated)",
@@ -88,8 +89,8 @@
         "share": "Share",
         "edit": "Edit",
         "delete": "Delete",
-        "setEssence": "Set Essence",
-        "unsetEssence": "Unset Essence",
+        "setEssence": "Essence",
+        "unsetEssence": "UnEssence",
         "report": "Report",
         "shareSuccess": "Already copy the link to clipboard! send to your friends to share!",
         "setEssenceSuccess": "Set essence successfully!",
@@ -238,6 +239,15 @@
         "send": "Send",
         "reportNotification": "Report Post(id: {{postId}}) By author {{authorName}}(id: {{authorId}}): {{brief}}",
         "commentEmpty": "Comment content cannot be empty!"
+    },
+    "invitecodedialog": {
+        "title": "Create Invite Codes in a Batch",
+        "maxUsedCount": "Max Used Count",
+        "generateCount": "Generate Count",
+        "expiredDays": "Expired Days",
+        "maxUsedCountPlaceholder": "Enter max use count",
+        "generateCountPlaceholder": "Enter generate count",
+        "expiredDaysPlaceholder": "Enter expired days"
     },
     "adminComments": {
     "title": "Comments Management",
@@ -412,5 +422,13 @@
     "notFound": {
         "title": "404 Not Found",
         "redirectMessage": "{{countDown}} seconds later, you will be redirected to the home page"
+    },
+    "pagination": {
+        "first": "First",
+        "previous": "Previous",
+        "last": "Last",
+        "next": "Next",
+        "page": "Page",
+        "of": "Of"
     }
 }

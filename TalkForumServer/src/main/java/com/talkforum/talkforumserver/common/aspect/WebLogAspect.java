@@ -66,8 +66,8 @@ public class WebLogAspect {
         log.info("===== Api Calling Start =====");
         log.info("Request {} {} Called by {} Args{}", request.getMethod(), request.getRequestURI(), ip, argsJson);
 
-        Object result = null;
-        String resultJson = "null";
+        Object result;
+        String resultJson;
         try {
             // 2. 执行目标方法
             result = joinPoint.proceed();

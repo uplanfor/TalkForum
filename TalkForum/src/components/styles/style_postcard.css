@@ -170,6 +170,7 @@
     display: block;
     width: fit-content;
     height: 28px;
+    text-align: center;
 }
 
 .post-card .belong span.tag {

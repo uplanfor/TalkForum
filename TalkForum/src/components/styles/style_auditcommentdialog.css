@@ -1,7 +1,5 @@
 /* 评论审核对话框样式 */
 .comment-list-container {
-    max-height: 500px;
-    overflow-y: auto;
     padding: 10px;
     border: 1px solid var(--neutral-border);
     border-radius: 8px;
@@ -17,6 +15,12 @@
     margin-bottom: 15px;
     transition: all 0.3s ease;
     box-shadow: none;
+}
+
+.comment-user-avatar>img {
+    display: block;
+    width: 50px;
+    height: 50px;
 }
 
 .comment-item:hover {
@@ -59,13 +63,13 @@
 }
 
 .comment-date {
+    margin-left: 9px;
     font-size: 12px;
     color: var(--neutral-text-secondary);
 }
 
 .audited-badge {
     background-color: var(--secondary-warm-2);
-    color: white;
     padding: 2px 8px;
     border-radius: 12px;
     font-size: 12px;
@@ -92,13 +96,11 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-weight: bold;
     transition: all 0.2s ease;
 }
 
 .reject-btn {
-    background-color: #f44336;
-    color: white;
+    background-color: var(--secondary-cool);
 }
 
 .reject-btn:hover:not(.disabled) {
@@ -107,7 +109,6 @@
 
 .pass-btn {
     background-color: var(--primary);
-    color: white;
 }
 
 .pass-btn:hover:not(.disabled) {

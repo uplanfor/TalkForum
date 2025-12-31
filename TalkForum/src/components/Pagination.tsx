@@ -4,6 +4,7 @@
  */
 import { useState, useEffect } from 'react';
 import './styles/style_pagination.css';
+import { useTranslation } from 'react-i18next';
 
 interface PaginationProps {
     currentPage: number;
@@ -18,6 +19,7 @@ const Pagination = ({
     loading = false,
     onPageChange,
 }: PaginationProps) => {
+    const { t } = useTranslation();
     const [pageInput, setPageInput] = useState(currentPage.toString());
 
     // 当currentPage变化时，更新pageInput
@@ -59,14 +61,14 @@ const Pagination = ({
     return (
         <div className='pagination-controls'>
             <button onClick={handleFirst} disabled={currentPage === 1 || loading}>
-                First
+                {t("pagination.first")}
             </button>
             <button onClick={handlePrevious} disabled={currentPage === 1 || loading}>
-                Previous
+                {t("pagination.previous")}
             </button>
 
             <div className='page-info-container'>
-                <span className='page-info'>Page</span>
+                <span className='page-info'> {t("pagination.page")} </span>
                 <form onSubmit={handlePageInputSubmit} className='page-input-form'>
                     <input
                         type='number'
@@ -79,14 +81,14 @@ const Pagination = ({
                         disabled={loading}
                     />
                 </form>
-                <span className='page-info'>of {totalPages || 1}</span>
+                <span className='page-info'> {t("pagination.of")} {totalPages || 1}</span>
             </div>
 
             <button onClick={handleNext} disabled={currentPage >= totalPages || loading}>
-                Next
+                {t("pagination.next")}
             </button>
             <button onClick={handleLast} disabled={currentPage >= totalPages || loading}>
-                Last
+                {t("pagination.last")}
             </button>
         </div>
     );

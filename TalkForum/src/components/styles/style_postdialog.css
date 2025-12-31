@@ -48,6 +48,7 @@
     min-width: 60px;
     max-width: 200px;
     width: auto;
+    height: 40px;
     cursor: text;
     position: relative;
     flex-shrink: 0;
@@ -71,13 +72,13 @@
 .post-tag-input {
     padding: 0 5px;
     width: 90px;
+    height: 20px;
     border: none;
     background: transparent;
     outline: none;
     font-size: 14px;
     color: var(--neutral-text-main);
     flex-grow: 1;
-    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }

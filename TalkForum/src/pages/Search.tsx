@@ -3,7 +3,6 @@ import PostsContainer, {
     PostContainerTargetType,
     type PostsContainerSearchParams,
 } from '../components/PostsContainer';
-import { DefaultBackgroundUrl } from '../constants/default';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,6 +46,7 @@ const Search = () => {
 
         // // 替换当前页面url，重新加载
         navigate(`/search?${newParams.toString()}`, { replace: true });
+        setShowFilters(false);
     };
 
     // 处理回车键搜索

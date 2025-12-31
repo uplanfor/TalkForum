@@ -4,8 +4,8 @@
 .admin-posts-container,
 .admin-comments-container,
 .admin-users-container,
-.admin-invitecodes-container,
-.admin-reports-container {
+.admin-invite-codes-container,
+.admin-reports-container{
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;

@@ -2,6 +2,7 @@
 .invite-code-dialog-form {
     padding: 16px 0;
     width: 100%;
+    max-width: 800px;
 }
 
 .form-group {

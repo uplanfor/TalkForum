@@ -12,7 +12,7 @@ import { parseMarkdown } from '../utils/MarkdownUtil';
 import './styles/style_postdocument.css';
 import { getSingleSimpleUserInfo } from '../utils/simpleUserInfoCache';
 import dayjs from 'dayjs';
-import { debounce } from '../utils/debounce&throttle';
+import { debounce, throttle } from '../utils/debounce&throttle';
 
 interface AuditPostDialogProps {
     onClose: () => void;
@@ -28,69 +28,71 @@ const AuditPostDialog = ({ onClose }: AuditPostDialogProps) => {
     const [auditedPosts, setAuditedPosts] = useState<Set<number>>(new Set()); // 跟踪已审核的帖子
 
     // 加载帖子内容 - 使用useCallback
-    const loadPostContent = useCallback(async (postId: number) => {
-        try {
-            const res = await postsAdminGetPostContent(postId);
-            if (res.success) {
-                const t = await parseMarkdown(res.data);
-                setRenderContent(t.html);
-            } else {
-                throw new Error(res.message || 'Failed to get post content.');
-            }
-        } catch (err) {
-            Msg.error(err as string);
-            setRenderContent('Failed to load content.');
-        }
-    }, []);
-
-    // 加载帖子队列 - 使用useCallback
-    const loadPostQueue = useCallback(
-        async (page: number) => {
-            setIsLoading(true);
+    const loadPostContent = useCallback(
+        async (postId: number) => {
             try {
-                const res = await postsAdminGetPostList({
-                    page: page,
-                    pageSize: 20,
-                    status: PostCommentStatusEnum.PENDING,
-                });
-
+                const res = await postsAdminGetPostContent(postId);
                 if (res.success) {
-                    if (res.data.data.length === 0) {
-                        if (page === 1) {
-                            // 第一页就没有帖子，显示无帖子提示
-                            Msg.error('No pending posts to review!');
-                            onClose();
-                        } else {
-                            // 不是第一页但没有帖子，说明没有更多帖子了
-                            setHasMorePosts(false);
-                            Msg.error('No more pending posts!');
-                        }
-                        return;
-                    }
-
-                    if (page === 1) {
-                        // 第一页，直接替换队列
-                        setPostPendingQueue(res.data.data);
-                        setCurrentPostIndex(0);
-                    } else {
-                        // 不是第一页，追加到队列
-                        setPostPendingQueue(prev => [...prev, ...res.data.data]);
-                    }
-
-                    // 如果返回的帖子数少于20，说明没有更多帖子了
-                    if (res.data.data.length < 20) {
-                        setHasMorePosts(false);
-                    }
+                    const t = await parseMarkdown(res.data);
+                    setRenderContent(t.html);
                 } else {
-                    throw new Error(res.message || 'Failed to get post list.');
+                    throw new Error(res.message || 'Failed to get post content.');
                 }
             } catch (err) {
                 Msg.error(err as string);
-                onClose();
-            } finally {
-                setIsLoading(false);
+                setRenderContent('Failed to load content.');
             }
-        },
+        }
+        , []);
+
+    // 加载帖子队列 - 使用useCallback
+    const loadPostQueue = useCallback(debounce(async (page: number) => {
+        setIsLoading(true);
+        try {
+            const res = await postsAdminGetPostList({
+                page: page,
+                pageSize: 20,
+                status: PostCommentStatusEnum.PENDING,
+            });
+
+            if (res.success) {
+                if (res.data.data.length === 0) {
+                    if (page === 1) {
+                        // 第一页就没有帖子，显示无帖子提示
+                        Msg.error('No pending posts to review!');
+                        onClose();
+                    } else {
+                        // 不是第一页但没有帖子，说明没有更多帖子了
+                        setHasMorePosts(false);
+                        Msg.error('No more pending posts!');
+                    }
+                    return;
+                }
+
+                if (page === 1) {
+                    // 第一页，直接替换队列
+                    setPostPendingQueue(res.data.data);
+                    setCurrentPostIndex(0);
+                } else {
+                    // 不是第一页，追加到队列
+                    setPostPendingQueue(prev => [...prev, ...res.data.data]);
+                }
+
+                // 如果返回的帖子数少于20，说明没有更多帖子了
+                if (res.data.data.length < 20) {
+                    setHasMorePosts(false);
+                }
+            } else {
+                throw new Error(res.message);
+            }
+        } catch (err) {
+            Msg.error(err as string);
+            onClose();
+        } finally {
+            setIsLoading(false);
+        }
+    }, 300)
+        ,
         [onClose]
     );
 

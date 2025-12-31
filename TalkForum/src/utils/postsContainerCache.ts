@@ -34,7 +34,7 @@ const cache = new Map<string, CacheItem>();
  * @param searchParams 搜索参数（仅SEARCH模式使用）
  * @returns 复合键字符串
  */
-const getCacheKey = (
+const getPostsCacheKey = (
     targetType: PostContainerTargetType,
     targetId?: number | string,
     searchParams?: string
@@ -52,18 +52,18 @@ const getCacheKey = (
  * @param searchParams 搜索参数（仅SEARCH模式使用）
  * @returns 缓存项或undefined
  */
-export const getCache = (
+export const getPostsCache = (
     targetType: PostContainerTargetType,
     targetId?: number | string,
     searchParams?: string
 ): CacheItem | undefined => {
-    const cacheItem = cache.get(getCacheKey(targetType, targetId, searchParams));
-    if (cacheItem && isCacheValid(cacheItem)) {
+    const cacheItem = cache.get(getPostsCacheKey(targetType, targetId, searchParams));
+    if (cacheItem && isPostsCacheValid(cacheItem)) {
         return cacheItem;
     }
     // 如果缓存无效，则清除它
     if (cacheItem) {
-        clearCache(targetType, targetId, searchParams);
+        clearPostsCache(targetType, targetId, searchParams);
     }
     return undefined;
 };
@@ -75,13 +75,13 @@ export const getCache = (
  * @param searchParams 搜索参数（仅SEARCH模式使用）
  * @param cacheItem 缓存项
  */
-export const setCache = (
+export const setPostsCache = (
     targetType: PostContainerTargetType,
     targetId: number | string | undefined,
     searchParams: string | undefined,
     cacheItem: Omit<CacheItem, 'timestamp'>
 ): void => {
-    cache.set(getCacheKey(targetType, targetId, searchParams), {
+    cache.set(getPostsCacheKey(targetType, targetId, searchParams), {
         ...cacheItem,
         timestamp: Date.now(),
     });
@@ -93,18 +93,18 @@ export const setCache = (
  * @param targetId 目标ID
  * @param searchParams 搜索参数（仅SEARCH模式使用）
  */
-export const clearCache = (
+export const clearPostsCache = (
     targetType: PostContainerTargetType,
     targetId?: number | string,
     searchParams?: string
 ): void => {
-    cache.delete(getCacheKey(targetType, targetId, searchParams));
+    cache.delete(getPostsCacheKey(targetType, targetId, searchParams));
 };
 
 /**
  * 清除所有缓存
  */
-export const clearAllCache = (): void => {
+export const clearPostsAllCache = (): void => {
     cache.clear();
 };
 
@@ -114,6 +114,6 @@ export const clearAllCache = (): void => {
  * @param maxAge 最大缓存时间（毫秒）
  * @returns 是否有效
  */
-export const isCacheValid = (cacheItem: CacheItem, maxAge: number = 30 * 60 * 1000): boolean => {
+export const isPostsCacheValid = (cacheItem: CacheItem, maxAge: number = 30 * 60 * 1000): boolean => {
     return Date.now() - cacheItem.timestamp < maxAge;
 };

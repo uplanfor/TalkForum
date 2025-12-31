@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.talkforum.talkforumserver.mapper.ReportMapper">
+    <select id="getReports" resultType="com.talkforum.talkforumserver.common.entity.Report">
+       <bind name="offset" value="(page-1)*pageSize"></bind>
+
+        SELECT id, user_id, report_type, report_target_type, report_target,
+               reason, status, created_at, handled_at, handled_by
+        FROM report
+        <where>
+            <if test="reportTargetType != null">AND report_target_type = #{reportTargetType}</if>
+            <if test="status != null">AND status = #{status}</if>
+        </where>
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countReports" resultType="long">
+         SELECT COUNT(*)
+         FROM report
+        <where>
+            <if test="reportTargetType != null">AND report_target_type = #{reportTargetType}</if>
+            <if test="status != null">AND status = #{status}</if>
+        </where>
+    </select>
+
+    <insert id="addReport">
+        INSERT INTO report (
+            user_id, report_type, report_target_type, report_target, reason
+        ) VALUES (
+            #{userId}, #{reportType}, #{reportTargetType}, #{reportTarget}, #{reason}
+        )
+    </insert>
+
+    <update id="handleReports">
+        UPDATE report SET handled_by = #{userId}, status = #{status}, handled_at = NOW()
+        WHERE id IN
+        <foreach collection="reportIds" item="reportId" open="(" separator="," close=")">
+            #{reportId}
+        </foreach>
+    </update>
+</mapper>

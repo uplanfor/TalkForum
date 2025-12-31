@@ -50,3 +50,22 @@ jwt:
   secret-key: "XyvhaihdoehEF+gaosfcotynyogmeltoehsshlrybghsbschsb="
   expire: 5400000  # 1.5 hr
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.talkforum.talkforumserver.controller  # 要写到controller包那里
+  default-flat-param-object: false
+# knife4j的增强配置，不需要增强可以不配
+knife4j:
+  enable: true
+  enhancement:
+    enable: true # 这个是注解生效的关键，必须开启
+  setting:
+    language: zh_cn

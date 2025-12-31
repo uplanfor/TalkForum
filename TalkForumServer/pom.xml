@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.7</version>
+        <version>3.0.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.talkforum</groupId>
@@ -33,7 +33,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>3.2.0</version>
+<!--            <version>3.2.0</version>-->
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -115,7 +115,6 @@
             <version>0.4</version> <!-- 最新稳定版，可直接使用 -->
         </dependency>
 
-<!--        我渴望自由-->
 <!--        <dependency>-->
 <!--            <groupId>org.springframework.boot</groupId>-->
 <!--            <artifactId>spring-boot-starter-security</artifactId>-->
@@ -157,6 +156,20 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
+
+        <!-- Hutool工具包（包含雪花算法实现） -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <!-- 推荐使用稳定版本，如5.8.28 -->
+            <version>5.8.28</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+            <version>4.5.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -165,26 +178,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-            <!-- 编译插件：指定JDK版本，核心配置 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <!-- JDK25需用3.13.0及以上版本，低版本不支持 -->
-                <version>3.13.0</version>
-                <configuration>
-                    <!-- 核心：指定JDK版本 -->
-                    <source>25</source> <!-- 源码编译遵循JDK25语法 -->
-                    <target>25</target> <!-- 生成JDK25兼容的字节码 -->
-                    <encoding>UTF-8</encoding> <!-- 避免中文乱码，必加 -->
 
-                    <!-- 可选：若使用JDK25的预览特性，需开启 -->
-<!--                    <compilerArgs>-->
-<!--                        <arg>&#45;&#45;enable-preview</arg>-->
-<!--                    </compilerArgs>-->
-                </configuration>
-            </plugin>
         </plugins>
     </build>
-
-
 </project>

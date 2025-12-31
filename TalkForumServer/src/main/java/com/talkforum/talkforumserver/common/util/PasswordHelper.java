@@ -1,6 +1,5 @@
 package com.talkforum.talkforumserver.common.util;
 
-// 替换：去掉 Spring Security 的导入，换成原生 jbcrypt 的包
 import org.mindrot.jbcrypt.BCrypt;
 
 public class PasswordHelper {

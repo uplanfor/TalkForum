@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import Msg from '../utils/msg';
 import { debounce, throttle } from '../utils/debounce&throttle';
 import dayjs from 'dayjs';
-import { getSingleSimpleUserInfo } from '../utils/simpleUserInfoCache';
+import { getSingleSimpleUserInfo, updateSimpleUserInfoCache } from '../utils/simpleUserInfoCache';
 import { ReportTargetConstant, ReportProcessConstant } from '../constants/report_constant';
 import './styles/style_admin_common.css';
 
@@ -67,6 +67,8 @@ const AdminReports = () => {
                 params.reportTargetType,
                 params.status
             );
+
+            await updateSimpleUserInfoCache(reportData.data.data.map(report => report.userId));
 
             // Extract the actual report page data from the API response
             const reportPageData = reportData.data as ReportPage;
@@ -252,8 +254,6 @@ const AdminReports = () => {
                             </option>
                         </select>
                     </div>
-                </div>
-                <div className='filter-row'>
                     <div className='filter-item'>
                         <label>{t('adminReports.statusLabel')} </label>
                         <select
@@ -270,15 +270,13 @@ const AdminReports = () => {
                         </select>
                     </div>
                 </div>
-                <div className='filter-row'>
-                    <div className='filter-item'>
+                <div className='filter-row'> 
                         <button onClick={applyQuery} className='search-button'>
                             {t('adminReports.searchButton')}
                         </button>
                         <button onClick={resetQuery} className='reset-button'>
                             {t('adminReports.resetButton')}
                         </button>
-                    </div>
                 </div>
             </div>
 

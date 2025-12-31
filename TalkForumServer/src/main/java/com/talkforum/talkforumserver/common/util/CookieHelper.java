@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Cookie 操作工具类
@@ -39,12 +40,8 @@ public class CookieHelper {
         // 遍历匹配 Cookie 名称，解码值（处理特殊字符）
         for (Cookie cookie : cookies) {
             if (cookieName.equals(cookie.getName())) {
-                try {
-                    // URL 解码：对应写入时的编码，避免特殊字符（如空格、&、=）失效
-                    return java.net.URLDecoder.decode(cookie.getValue(), "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    return cookie.getValue(); // 编码异常时返回原始值，避免崩溃
-                }
+                // URL 解码：对应写入时的编码，避免特殊字符（如空格、&、=）失效
+                return java.net.URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
             }
         }
         return null;

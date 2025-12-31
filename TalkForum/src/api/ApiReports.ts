@@ -31,6 +31,8 @@ export interface ReportPage {
     total: number; // 举报总数
 }
 
+export interface ReportResponce extends ApiResponse<ReportPage> {}
+
 /**
  * 提交举报
  * @param {string} reportType - 举报类型
@@ -67,7 +69,7 @@ export const reportsAdminGetReports = async (
     reportTargetType?: string,
     status?: string
 ) => {
-    return Request.get_auth<ApiResponse>(`/api/reports/admin`, {
+    return Request.get_auth<ReportResponce>(`/api/reports/admin`, {
         page,
         pageSize,
         reportTargetType,

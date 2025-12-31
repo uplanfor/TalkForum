@@ -3,6 +3,7 @@
  * 用于管理员生成、管理和分发邀请码
  */
 import './styles/style_admin_common.css';
+import './styles/style_admin_shared.css'
 import ShowTable from './ShowTable';
 import Pagination from './Pagination';
 import Msg from '../utils/msg';

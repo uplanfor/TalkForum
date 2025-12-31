@@ -2,7 +2,7 @@
  * 管理员用户管理组件
  * 用于管理员查看和管理用户信息，包括设置用户角色、状态和重置密码等功能
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     usersAdminGetUsersByPage,
     usersAdminSetUserRole,
@@ -23,6 +23,7 @@ import Msg from '../utils/msg';
 import dayjs from 'dayjs';
 import './styles/style_admin_common.css';
 import { useTranslation } from 'react-i18next';
+import { debounce } from '../utils/debounce&throttle';
 
 // 定义用户角色选项
 const userRoles: UserRole[] = Object.values(UserRoleEnum);
@@ -42,26 +43,27 @@ const AdminUser: React.FC = () => {
     const [selectAll, setSelectAll] = useState(false);
 
     // 加载用户列表
-    const loadUsers = async (currentPage: number, currentPageSize: number) => {
-        setLoading(true);
+    const loadUsers = useCallback(
+        debounce(async (currentPage: number, currentPageSize: number) => {
+            setLoading(true);
 
-        await usersAdminGetUsersByPage(currentPage, currentPageSize)
-            .then(res => {
-                if (res.success && res.data) {
-                    setUsers(res.data.data);
-                    setTotal(res.data.total);
-                } else {
-                    throw new Error(res.message || 'Failed to load users');
-                }
-            })
-            .catch(err => {
-                Msg.error(err || 'Failed to load users');
-                console.error(err);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    };
+            await usersAdminGetUsersByPage(currentPage, currentPageSize)
+                .then(res => {
+                    if (res.success && res.data) {
+                        setUsers(res.data.data);
+                        setTotal(res.data.total);
+                    } else {
+                        throw new Error(res.message || 'Failed to load users');
+                    }
+                })
+                .catch(err => {
+                    Msg.error(err || 'Failed to load users');
+                    console.error(err);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }, 200), [])
 
     // 初始加载
     useEffect(() => {

@@ -16,7 +16,7 @@ import { PostCommentStatusEnum, type PostStatus } from '../constants/post_commen
 import './styles/style_admin_common.css';
 import { getSingleSimpleUserInfo, requestSimpleUserInfoCache } from '../utils/simpleUserInfoCache';
 import dayjs from 'dayjs';
-import { throttle } from '../utils/debounce&throttle';
+import { debounce, throttle } from '../utils/debounce&throttle';
 import { EyeIcon, HandThumbUpIcon, ChatBubbleBottomCenterIcon } from '@heroicons/react/24/outline';
 import AuditPostDialog from './AuditPostDialog';
 import { useTranslation } from 'react-i18next';
@@ -40,53 +40,55 @@ const AdminPosts = () => {
     const [isEssence, setIsEssence] = useState<number | undefined>(undefined);
 
     // 加载帖子列表
-    const loadPosts = async () => {
-        setLoading(true);
-        const params: any = {
-            page,
-            pageSize,
-        };
+    const loadPosts = useCallback(debounce(
+        async () => {
+            setLoading(true);
+            const params: any = {
+                page,
+                pageSize,
+            };
 
-        // 添加查询条件
-        if (keyword) params.keyword = keyword;
-        if (status) params.status = status;
-        if (clubIds) {
-            // 将逗号分隔的字符串转换为数字数组
-            const clubIdArray = clubIds
-                .split(',')
-                .map(id => parseInt(id.trim()))
-                .filter(id => !isNaN(id));
-            if (clubIdArray.length > 0) params.clubIds = clubIdArray;
-        }
-        if (userIds) {
-            // 将逗号分隔的字符串转换为数字数组
-            const userIdArray = userIds
-                .split(',')
-                .map(id => parseInt(id.trim()))
-                .filter(id => !isNaN(id));
-            if (userIdArray.length > 0) params.userIds = userIdArray;
-        }
-        if (isEssence !== undefined) params.isEssence = isEssence;
+            // 添加查询条件
+            if (keyword) params.keyword = keyword;
+            if (status) params.status = status;
+            if (clubIds) {
+                // 将逗号分隔的字符串转换为数字数组
+                const clubIdArray = clubIds
+                    .split(',')
+                    .map(id => parseInt(id.trim()))
+                    .filter(id => !isNaN(id));
+                if (clubIdArray.length > 0) params.clubIds = clubIdArray;
+            }
+            if (userIds) {
+                // 将逗号分隔的字符串转换为数字数组
+                const userIdArray = userIds
+                    .split(',')
+                    .map(id => parseInt(id.trim()))
+                    .filter(id => !isNaN(id));
+                if (userIdArray.length > 0) params.userIds = userIdArray;
+            }
+            if (isEssence !== undefined) params.isEssence = isEssence;
 
-        await postsAdminGetPostList(params)
-            .then(async res => {
-                if (res.success) {
-                    const userIds = res.data.data.map(item => item.userId);
-                    await requestSimpleUserInfoCache(userIds);
-                    setPosts(res.data.data);
-                    setTotal(res.data.total);
-                } else {
-                    Msg.error(res.message);
-                }
-            })
-            .catch(err => {
-                Msg.error(err.message || 'Failed to load posts');
-                console.error('Error loading posts:', err);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    };
+            await postsAdminGetPostList(params)
+                .then(async res => {
+                    if (res.success) {
+                        const userIds = res.data.data.map(item => item.userId);
+                        await requestSimpleUserInfoCache(userIds);
+                        setPosts(res.data.data);
+                        setTotal(res.data.total);
+                    } else {
+                        Msg.error(res.message);
+                    }
+                })
+                .catch(err => {
+                    Msg.error(err.message || 'Failed to load posts');
+                    console.error('Error loading posts:', err);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }, 300
+    ), []);
 
     // 处理单个选择
     const handleSelectPost = (postId: number) => {

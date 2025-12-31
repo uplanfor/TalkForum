@@ -7,6 +7,7 @@ import PopUpDialogBase, { type PopUpDialogButton } from './PopUpDialogBase';
 import { useState } from 'react';
 import { adminUpdateInviteCodes, adminGenerateInviteCodes } from '../api/ApiInvitecode';
 import Msg from '../utils/msg';
+import { useTranslation } from 'react-i18next';
 
 /**
  * 邀请码对话框类型
@@ -34,6 +35,9 @@ const InviteCodeDialog: React.FC<InviteCodeDialogProps> = ({
     selectedCodes = [],
     onSuccess,
 }) => {
+    // 国际化钩子
+    const { t } = useTranslation();
+
     // 表单状态
     const [maxCount, setMaxCount] = useState('');
     const [expiredDays, setExpiredDays] = useState('');
@@ -178,41 +182,40 @@ const InviteCodeDialog: React.FC<InviteCodeDialogProps> = ({
         >
             <div className='invite-code-dialog-form'>
                 <div className='form-group'>
-                    <label>Max Usage Count *</label>
+                    <label>{t("invitecodedialog.maxUsedCount")}</label>
                     <input
                         type='number'
                         value={maxCount}
                         onChange={e => setMaxCount(e.target.value)}
                         min='1'
-                        placeholder='Enter max usage count'
+                        placeholder={t("invitecodedialog.maxUsedCountPlaceholder")}
                         disabled={isSubmitting}
                     />
                 </div>
                 <div className='form-group'>
-                    <label>Expiration Days *</label>
+                    <label>{t("invitecodedialog.expiredDays")}</label>
                     <input
                         type='number'
                         value={expiredDays}
                         onChange={e => setExpiredDays(e.target.value)}
                         min='1'
-                        placeholder='Enter expiration days'
+                        placeholder={t("invitecodedialog.expiredDaysPlaceholder")}
                         disabled={isSubmitting}
                     />
                 </div>
                 {type === 'create' && (
                     <div className='form-group'>
-                        <label>Generate Count *</label>
+                        <label>{t("invitecodedialog.generateCount")}</label>
                         <input
                             type='number'
                             value={generateCount}
                             onChange={e => setGenerateCount(e.target.value)}
                             min='1'
-                            placeholder='Enter number of codes to generate'
+                            placeholder={t("invitecodedialog.generateCountPlaceholder")}
                             disabled={isSubmitting}
                         />
                     </div>
                 )}
-                <div className='form-note'>All fields marked with * are required</div>
             </div>
         </PopUpDialogBase>
     );

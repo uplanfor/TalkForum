@@ -11,7 +11,7 @@ import PostCardPlaceholder from './PostCardPlaceholder';
 import { postsGetPostList } from '../api/ApiPosts';
 import { debounce } from '../utils/debounce&throttle';
 import { requestSimpleUserInfoCache } from '../utils/simpleUserInfoCache';
-import { clearCache, getCache, setCache } from '../utils/postsContainerCache';
+import { clearPostsCache, getPostsCache, setPostsCache } from '../utils/postsContainerCache';
 import type ApiResponse from '../api/ApiResponse';
 import { useDispatch, useSelector } from 'react-redux';
 import { type RootState, type AppDispatch } from '../store';
@@ -21,12 +21,12 @@ import { useTranslation } from 'react-i18next';
  * 帖子容器组件的目标类型常量
  */
 export const PostContainerTargetType = {
-    SELF: 'self', // 自己的空间
-    HOME: 'home', // 首页
-    USER: 'user', // 其他用户的空间
-    CLUB: 'club', // 俱乐部空间
-    TAG: 'tag', // 标签空间
-    SEARCH: 'search', // 搜索空间
+    SELF: 'self',             // 自己的空间
+    HOME: 'home',             // 首页
+    USER: 'user',             // 其他用户的空间
+    CLUB: 'club',             // 圈子空间
+    TAG: 'tag',                // 标签空间
+    SEARCH: 'search',          // 搜索空间
 } as const;
 
 export type PostContainerTargetType =
@@ -81,6 +81,10 @@ const PostContainer = ({
     const isRefreshingRef = useRef(false);
     const isErrorRef = useRef(false);
     const isLoadingRef = useRef(false);
+
+    const removePost = (id: number) => {
+        setPosts(posts.filter(post => post.id !== id));
+    };
 
     // 使用useState仅用于触发UI更新
     const [, forceUpdate] = useReducer(x => x + 1, 0);
@@ -179,7 +183,7 @@ const PostContainer = ({
             targetType === PostContainerTargetType.SEARCH && searchParams
                 ? JSON.stringify(searchParams)
                 : undefined;
-        const cacheItem = getCache(targetType, targetId, searchParamsString);
+        const cacheItem = getPostsCache(targetType, targetId, searchParamsString);
 
         if (cacheItem) {
             // 使用缓存的数据
@@ -258,7 +262,7 @@ const PostContainer = ({
                 : undefined;
 
         // 清除当前缓存
-        clearCache(targetType, targetId, searchParamsString);
+        clearPostsCache(targetType, targetId, searchParamsString);
 
         updateIsRefreshing(true);
         updateCursor(null);
@@ -334,7 +338,7 @@ const PostContainer = ({
      * 根据targetType、targetId和当前标签获取对应的帖子列表
      */
     const loadMore = useCallback(async () => {
-        console.log('try load more');
+        // console.log('try load more');
         // 如果没有更多帖子、发生错误、正在刷新或API请求已在进行中，则不执行任何操作
         if (
             !hasMoreRef.current ||
@@ -342,20 +346,20 @@ const PostContainer = ({
             isRefreshingRef.current ||
             isLoadingRef.current
         ) {
-            console.log(
-                !hasMoreRef.current,
-                isErrorRef.current,
-                isRefreshingRef.current,
-                isLoadingRef.current,
-                'hit!'
-            );
+            // console.log(
+            //     !hasMoreRef.current,
+            //     isErrorRef.current,
+            //     isRefreshingRef.current,
+            //     isLoadingRef.current,
+            //     'hit!'
+            // );
             return;
         }
 
         // 获取当前标签
         const currentTab = tabsRef.current[curTabIndexRef.current];
         if (currentTab == undefined) {
-            console.log('hit!');
+            // console.log('hit!');
             return;
         }
 
@@ -369,7 +373,7 @@ const PostContainer = ({
         if (targetType === PostContainerTargetType.CLUB) {
             updateHasMore(false);
             // 更新缓存
-            setCache(targetType, targetId, searchParamsString, {
+            setPostsCache(targetType, targetId, searchParamsString, {
                 posts: [],
                 hasMore: false,
                 cursor: null,
@@ -386,7 +390,7 @@ const PostContainer = ({
         ) {
             updateHasMore(false);
             // 更新缓存
-            setCache(targetType, targetId, searchParamsString, {
+            setPostsCache(targetType, targetId, searchParamsString, {
                 posts: [],
                 hasMore: false,
                 cursor: null,
@@ -524,7 +528,7 @@ const PostContainer = ({
             updateHasMore(updatedHasMore);
 
             // 更新缓存
-            setCache(targetType, targetId, searchParamsString, {
+            setPostsCache(targetType, targetId, searchParamsString, {
                 posts:
                     isRefreshingRef.current || cursorRef.current === null
                         ? updatedPosts
@@ -591,7 +595,7 @@ const PostContainer = ({
                 >
                     {/* 帖子列表 */}
                     {posts.map(post => (
-                        <PostCard key={post.id} {...post} />
+                        <PostCard key={post.id} {...post} removeSelf={removePost} />
                     ))}
 
                     {/* 没有更多帖子提示 */}

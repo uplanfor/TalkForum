@@ -15,7 +15,7 @@ import { PostCommentStatusEnum, type CommentStatus } from '../constants/post_com
 import './styles/style_admin_common.css';
 import { getSingleSimpleUserInfo, requestSimpleUserInfoCache } from '../utils/simpleUserInfoCache';
 import dayjs from 'dayjs';
-import { throttle } from '../utils/debounce&throttle';
+import { debounce, throttle } from '../utils/debounce&throttle';
 import { HandThumbUpIcon, ChatBubbleBottomCenterIcon } from '@heroicons/react/24/outline';
 import AuditCommentDialog from './AuditCommentDialog';
 import { useTranslation } from 'react-i18next';
@@ -35,29 +35,32 @@ const AdminComments = () => {
     const [status, setStatus] = useState('');
 
     // 加载评论列表
-    const loadComments = async () => {
-        setLoading(true);
+    const loadComments = useCallback(debounce(
+        async () => {
+            setLoading(true);
 
-        // 根据status是否为空字符串决定是否传递status参数
-        await commentAdminGetCommentsByPage(page, pageSize, status || null)
-            .then(async res => {
-                if (res.success) {
-                    const userIds = res.data.data.map(item => item.userId);
-                    await requestSimpleUserInfoCache(userIds);
-                    setComments(res.data.data);
-                    setTotal(res.data.total);
-                } else {
-                    Msg.error(res.message);
-                }
-            })
-            .catch(err => {
-                Msg.error(err.message || 'Failed to load comments');
-                console.error('Error loading comments:', err);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    };
+            // 根据status是否为空字符串决定是否传递status参数
+            await commentAdminGetCommentsByPage(page, pageSize, status || null)
+                .then(async res => {
+                    if (res.success) {
+                        const userIds = res.data.data.map(item => item.userId);
+                        await requestSimpleUserInfoCache(userIds);
+                        setComments(res.data.data);
+                        setTotal(res.data.total);
+                    } else {
+                        Msg.error(res.message);
+                    }
+                })
+                .catch(err => {
+                    Msg.error(err.message);
+                    console.error('Error loading comments:', err);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }, 200), []);
+
+
 
     // 处理单个选择
     const handleSelectComment = (commentId: number) => {

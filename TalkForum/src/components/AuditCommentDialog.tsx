@@ -11,7 +11,7 @@ import './styles/style_postdocument.css';
 import './styles/style_auditcommentdialog.css';
 import { getSingleSimpleUserInfo } from '../utils/simpleUserInfoCache';
 import dayjs from 'dayjs';
-import { debounce } from '../utils/debounce&throttle';
+import { debounce, throttle } from '../utils/debounce&throttle';
 
 interface AuditCommentDialogProps {
     onClose: () => void;
@@ -25,11 +25,10 @@ const AuditCommentDialog = ({ onClose }: AuditCommentDialogProps) => {
     const [hasMoreComments, setHasMoreComments] = useState<boolean>(true);
     const [auditedComments, setAuditedComments] = useState<Set<number>>(new Set()); // 跟踪已审核的评论
     const [currentListAudited, setCurrentListAudited] = useState<boolean[]>([]); // 跟踪当前列表中每条评论是否已审核
-    // 新增状态：跟踪每条评论的审核结果（true: 通过, false: 拒绝）
     const [commentAuditResults, setCommentAuditResults] = useState<Map<number, boolean>>(new Map());
 
     // 加载评论队列 - 使用useCallback
-    const loadCommentQueue = useCallback(
+    const loadCommentQueue = useCallback(debounce(
         async (page: number) => {
             setIsLoading(true);
             try {
@@ -77,7 +76,7 @@ const AuditCommentDialog = ({ onClose }: AuditCommentDialogProps) => {
                         setHasMoreComments(false);
                     }
                 } else {
-                    throw new Error(res.message || 'Failed to get comment list.');
+                    throw new Error(res.message);
                 }
             } catch (err) {
                 Msg.error(err as string);
@@ -85,7 +84,9 @@ const AuditCommentDialog = ({ onClose }: AuditCommentDialogProps) => {
             } finally {
                 setIsLoading(false);
             }
-        },
+        }, 300
+    )
+        ,
         [onClose]
     );
 
@@ -354,16 +355,6 @@ const AuditCommentDialog = ({ onClose }: AuditCommentDialogProps) => {
         <PopUpDialogBase title='Audit Comments' onClose={onClose} bottomBtns={bottomButtons}>
             {currentCommentList ? (
                 <>
-                    <div
-                        style={{
-                            marginBottom: '15px',
-                            textAlign: 'center',
-                            fontSize: '16px',
-                            fontWeight: 'bold',
-                        }}
-                    >
-                        Comment List {currentCommentListIndex + 1} of {commentPendingQueue.length}
-                    </div>
                     <div className='comment-list-container'>
                         {currentCommentList.map((comment, index) => (
                             <div
@@ -418,6 +409,10 @@ const AuditCommentDialog = ({ onClose }: AuditCommentDialogProps) => {
                             marginTop: '15px',
                             fontSize: '14px',
                             color: '#666',
+                            position: "absolute",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)"
                         }}
                     >
                         {currentListAudited.filter(status => status).length} of{' '}

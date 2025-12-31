@@ -37,6 +37,7 @@ export interface PostCardProps {
     isEssence: number; // 是否精华（0：非精华，1：精华）
     createdAt: string; // 发布时间
     interactContent?: number; // 互动内容（参考interaction接口）
+    removeSelf: (id: number)=>void;  // 删掉自己的帖子回调函数
     tag1?: string | null; // 标签1（可为空）
     tag2?: string | null; // 标签2（可为空）
     tag3?: string | null; // 标签3（可为空）
@@ -61,6 +62,7 @@ const PostCard = (props: PostCardProps) => {
         likeCount,
         commentCount,
         interactContent,
+        removeSelf,
         tag1,
         tag2,
         tag3,
@@ -163,6 +165,7 @@ const PostCard = (props: PostCardProps) => {
             if (result) {
                 postsDeletePostAuth(id).then(res => {
                     if (res.success) {
+                        removeSelf(id);
                         Msg.success(t('postCard.deletePostSuccess'));
                     } else {
                         throw new Error(res.message);
@@ -297,7 +300,7 @@ const PostCard = (props: PostCardProps) => {
                         {t('postCard.share')}
                     </li>
 
-                    {/* 编辑和删除功能（仅作者或管理员/版主可见） */}
+                    {/* 编辑和删除功能（仅作者或管理员/风纪可见） */}
                     {(user.id === userId || user.role != UserType.USER) && (
                         <>
                             <li onClick={() => openPost(id, PostViewType.EDIT)}>
@@ -307,7 +310,7 @@ const PostCard = (props: PostCardProps) => {
                         </>
                     )}
 
-                    {/* 设置精华功能（仅管理员/版主可见） */}
+                    {/* 设置精华功能（仅管理员/风纪可见） */}
                     {user.role != UserType.USER && (
                         <li onClick={() => essencePost(id)}>
                             {curEssence != 0
