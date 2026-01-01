@@ -1,6 +1,6 @@
 package com.talkforum.talkforumserver.service;
 
-import com.talkforum.talkforumserver.common.dto.AdminPostRequestDTO;
+import com.talkforum.talkforumserver.common.dto.AdminGetPostsDTO;
 import com.talkforum.talkforumserver.common.dto.PostEditDTO;
 
 import com.talkforum.talkforumserver.common.dto.PostCommitDTO;
@@ -55,10 +55,10 @@ public interface PostService {
 
     /**
      * 管理员获取帖子列表
-     * @param adminPostRequestDTO 管理员帖子请求DTO，包含分页、筛选等参数
+     * @param adminGetPostsDTO 管理员帖子请求DTO，包含分页、筛选等参数
      * @return 分页后的帖子列表VO
      */
-    PageVO<PostVO> getPostsWithAdminRight(AdminPostRequestDTO adminPostRequestDTO);
+    PageVO<PostVO> getPostsWithAdminRight(AdminGetPostsDTO adminGetPostsDTO);
     
     /**
      * 审核帖子

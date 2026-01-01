@@ -15,7 +15,7 @@ public class InviteCodeDTO {
         example = "10",
         requiredMode = Schema.RequiredMode.REQUIRED,
         minimum = "1",
-        maximum = "1000"
+        maximum = "10"
     )
     @NotNull
     private Integer count;  // 生成数量

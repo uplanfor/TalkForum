@@ -1,6 +1,6 @@
 package com.talkforum.talkforumserver.mapper;
 
-import com.talkforum.talkforumserver.common.dto.UserDTO;
+import com.talkforum.talkforumserver.common.dto.UserRegisterDTO;
 import com.talkforum.talkforumserver.common.dto.UserProfileDTO;
 import com.talkforum.talkforumserver.common.vo.SimpleUserVO;
 import com.talkforum.talkforumserver.common.vo.UserVO;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
-    int addUser(UserDTO user);
+    int addUser(UserRegisterDTO user);
     UserVO getUserVOById(long userId);
     User getUserLoginInfoByNameOrEmail(String nameOrEmail);
     User getUserLoginInfoById(long userId);

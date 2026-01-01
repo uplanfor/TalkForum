@@ -1,6 +1,7 @@
 package com.talkforum.talkforumserver.common.dto;
 
 import com.sun.istack.NotNull;
+import com.talkforum.talkforumserver.constant.CommentConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
@@ -11,7 +12,6 @@ import lombok.Data;
  */
 @Data
 @Schema(
-    name = "AdminAuditCommentsDTO",
     description = "管理员审核评论请求参数，包含审核状态和待审核的评论ID列表"
 )
 public class AdminAuditCommentsDTO {
@@ -22,9 +22,9 @@ public class AdminAuditCommentsDTO {
      */
     @Schema(
         description = "评论审核状态，支持通过、拒绝等操作",
-        example = "APPROVED",
+        example = CommentConstant.PASS,
         requiredMode = Schema.RequiredMode.REQUIRED,
-        allowableValues = {"PENDING", "APPROVED", "REJECTED", "DELETED"}
+        allowableValues = {CommentConstant.PASS, CommentConstant.PENDING, CommentConstant.REJECTED, CommentConstant.DELETED}
     )
     @NotNull
     private String status;

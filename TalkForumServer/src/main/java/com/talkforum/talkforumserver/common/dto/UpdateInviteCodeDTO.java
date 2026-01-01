@@ -44,6 +44,7 @@ public class UpdateInviteCodeDTO {
     // 被修改
     @Schema(
         description = "新的过期时间，系统自动计算，无需手动设置",
+        requiredMode =  Schema.RequiredMode.NOT_REQUIRED,
         hidden = true
     )
     private Date expiredAt;

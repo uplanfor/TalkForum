@@ -11,7 +11,6 @@ import lombok.Data;
  */
 @Data
 @Schema(
-    name = "AdminGetCommentsDTO",
     description = "管理员获取评论列表请求参数，支持按状态筛选和分页查询"
 )
 public class AdminGetCommentsDTO {

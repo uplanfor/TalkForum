@@ -1,6 +1,6 @@
 package com.talkforum.talkforumserver.mapper;
 
-import com.talkforum.talkforumserver.common.dto.AdminPostRequestDTO;
+import com.talkforum.talkforumserver.common.dto.AdminGetPostsDTO;
 import com.talkforum.talkforumserver.common.dto.PostCommitDTO;
 import com.talkforum.talkforumserver.common.dto.PostEditDTO;
 import com.talkforum.talkforumserver.common.dto.PostRequestDTO;
@@ -21,8 +21,8 @@ public interface PostMapper {
     int updatePost(PostEditDTO postEditDTO, String status, String brief, String coverUrl);
     int deletePost(Long postId);
 
-    List<PostVO> adminGetPosts(AdminPostRequestDTO adminPostRequestDTO);
-    long adminCountPosts(AdminPostRequestDTO adminPostRequestDTO);
+    List<PostVO> adminGetPosts(AdminGetPostsDTO adminGetPostsDTO);
+    long adminCountPosts(AdminGetPostsDTO adminGetPostsDTO);
     int auditPost(Long postId, String status);
     int essencePost(Long postId, int isEssence);
     void increaseViewCount(Long postId);

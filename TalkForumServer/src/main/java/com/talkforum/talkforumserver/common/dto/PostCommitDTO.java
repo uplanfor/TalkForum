@@ -1,23 +1,68 @@
 package com.talkforum.talkforumserver.common.dto;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+@Schema(
+        description = "发帖时的请求参数"
+)
 @Data
 public class PostCommitDTO {
+    @Schema(
+            description = "发帖人用户id",
+            example = "16354"
+    )
     public Long userId;
+
+
+    @Schema(
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED
+    )
     public Long id; // 回填id
+
+    @Schema(
+            description = "帖子所属的圈子id(废弃)",
+            example = "12"
+    )
     public Long clubId;
+
+    @Schema(
+            description = "帖子标题"
+    )
     public String title;
-    @Size(min = 1, max = 16, message = "Tag cannot be too long!")
+
+    @Schema(
+            description = "帖子所属标签",
+            maxLength = 16,
+            example = "能源电力"
+    )
+    @Size(max = 16, message = "Tag cannot be too long!")
     public String tag1;
-    @Size(min = 1, max = 16, message = "Tag cannot be too long!")
+
+    @Schema(
+            description = "帖子所属标签",
+            maxLength = 16,
+            example = "工程师"
+    )
+    @Size( max = 16, message = "Tag cannot be too long!")
     public String tag2;
-    @Size(min = 1, max = 16, message = "Tag cannot be too long!")
+
+    @Schema(
+            description = "帖子所属标签",
+            maxLength = 16,
+            example = "pi"
+    )
+    @Size(max = 16, message = "Tag cannot be too long!")
     public String tag3;
+
+    @Schema(
+            description = "发帖内容",
+            requiredMode = Schema.RequiredMode.REQUIRED
+    )
     @NotBlank
     public String content;
 

@@ -131,16 +131,16 @@ public class PostController {
 
     /**
      * 管理员获取帖子列表
-     * @param adminPostRequestDTO 管理员帖子列表请求DTO
+     * @param adminGetPostsDTO 管理员帖子列表请求DTO
      * @param token 登录凭证Token
      * @return 帖子列表
      */
     @ModeratorRequired
     @GetMapping("/admin")
     @Validated
-    public Result getPostsWithAdminRight(AdminPostRequestDTO adminPostRequestDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+    public Result getPostsWithAdminRight(AdminGetPostsDTO adminGetPostsDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         // 管理员状态下不传递userId，不进行互动内容赋值
-        return Result.success(I18n.t("post.admin.list.success"), postService.getPostsWithAdminRight(adminPostRequestDTO));
+        return Result.success(I18n.t("post.admin.list.success"), postService.getPostsWithAdminRight(adminGetPostsDTO));
     }
 
     /**

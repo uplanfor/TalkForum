@@ -1,6 +1,6 @@
 package com.talkforum.talkforumserver.service;
 
-import com.talkforum.talkforumserver.common.dto.UserDTO;
+import com.talkforum.talkforumserver.common.dto.UserRegisterDTO;
 import com.talkforum.talkforumserver.common.dto.UserProfileDTO;
 import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.common.vo.SimpleUserVO;
@@ -19,7 +19,7 @@ public interface UserService {
      * @return 用户VO对象
      * @throws RuntimeException 注册失败时抛出异常
      */
-    public UserVO registerUser(UserDTO user) throws RuntimeException;
+    public UserVO registerUser(UserRegisterDTO user) throws RuntimeException;
     
     /**
      * 根据用户ID获取用户信息

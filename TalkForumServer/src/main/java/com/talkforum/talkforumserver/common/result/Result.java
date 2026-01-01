@@ -36,7 +36,7 @@ public class Result<T>{
      */
     @Schema(
             description = "响应人类可读信息，根据前端的请求自动返回正确的翻译文本",
-            example = "Too Many Requests!",
+            example = "Success!",
             requiredMode = Schema.RequiredMode.REQUIRED
     )
     public String message;
@@ -46,6 +46,7 @@ public class Result<T>{
      */
     @Schema(
             description = "响应业务数据（泛型类型）",
+            example = "null",
             nullable = true // 允许为null（无数据时返回null）
     )
     public T data;

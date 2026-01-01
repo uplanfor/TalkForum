@@ -44,7 +44,7 @@ public class UserController {
      */
     @PostMapping("/")
     @Validated
-    public Result registerUser(@Valid @RequestBody UserDTO user) {
+    public Result registerUser(@Valid @RequestBody UserRegisterDTO user) {
         return Result.success(I18n.t("user.register.success"), userService.registerUser(user));
     }
 

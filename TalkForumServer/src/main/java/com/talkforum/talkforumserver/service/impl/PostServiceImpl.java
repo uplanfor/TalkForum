@@ -1,6 +1,6 @@
 package com.talkforum.talkforumserver.service.impl;
 
-import com.talkforum.talkforumserver.common.dto.AdminPostRequestDTO;
+import com.talkforum.talkforumserver.common.dto.AdminGetPostsDTO;
 import com.talkforum.talkforumserver.common.dto.PostCommitDTO;
 import com.talkforum.talkforumserver.common.dto.PostEditDTO;
 import com.talkforum.talkforumserver.common.dto.PostRequestDTO;
@@ -179,15 +179,15 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 管理员获取帖子列表
-     * @param adminPostRequestDTO 管理员帖子请求DTO，包含分页、筛选等参数
+     * @param adminGetPostsDTO 管理员帖子请求DTO，包含分页、筛选等参数
      * @return 分页后的帖子列表VO
      */
     @Override
-    public PageVO<PostVO> getPostsWithAdminRight(AdminPostRequestDTO adminPostRequestDTO) {
+    public PageVO<PostVO> getPostsWithAdminRight(AdminGetPostsDTO adminGetPostsDTO) {
         // 管理员查询帖子列表
-        List<PostVO> list = postMapper.adminGetPosts(adminPostRequestDTO);
+        List<PostVO> list = postMapper.adminGetPosts(adminGetPostsDTO);
         // 计算总帖子数
-        long total = postMapper.adminCountPosts(adminPostRequestDTO);
+        long total = postMapper.adminCountPosts(adminGetPostsDTO);
         
         // 管理员状态下直接忽略互动内容的赋值
         

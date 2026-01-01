@@ -29,7 +29,8 @@ public class InteractionRequestDTO {
     private String interactId;
     
     @Schema(
-        description = "互动内容，表示具体的互动行为",
+        description = "互动内容，表示具体的互动行为,当interactType=POST或COMMENT时，1表示点赞，0为什么都没做，-1表示踩，" +
+                "interactType=USER时，1表示关注了，0表示没关注",
         example = "1",
         requiredMode = Schema.RequiredMode.REQUIRED,
         allowableValues = {"-1", "0", "1"}

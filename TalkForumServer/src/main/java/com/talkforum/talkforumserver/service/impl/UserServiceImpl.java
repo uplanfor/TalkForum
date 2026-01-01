@@ -1,6 +1,6 @@
 package com.talkforum.talkforumserver.service.impl;
 
-import com.talkforum.talkforumserver.common.dto.UserDTO;
+import com.talkforum.talkforumserver.common.dto.UserRegisterDTO;
 import com.talkforum.talkforumserver.common.dto.UserProfileDTO;
 import com.talkforum.talkforumserver.common.entity.User;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
      * @throws BusinessRuntimeException 注册失败时抛出异常
      */
     @Override
-    public UserVO registerUser(UserDTO user) throws BusinessRuntimeException {
+    public UserVO registerUser(UserRegisterDTO user) throws BusinessRuntimeException {
         // 判断密码长度是否在8-32之间，且符合字母数字和.和_的规则，验证邮箱格式
         if (user.password.length() < 8 || user.password.length() > 32 ||
                 !user.password.matches(ServerConstant.USER_PASSWORD_RULE)) {

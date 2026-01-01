@@ -11,7 +11,6 @@ import lombok.Data;
  */
 @Data
 @Schema(
-    name = "AddCommentDTO",
     description = "添加评论请求参数，包含评论内容、帖子ID和回复关系信息"
 )
 public class AddCommentDTO {
