@@ -11,11 +11,11 @@ import { type CommentStatus } from '../constants/post_comment_status';
  * 表示一条评论的详细信息
  */
 export interface Comment {
-    id: number; // 评论ID
-    postId: number; // 帖子ID
-    userId: number; // 评论用户ID
-    rootId: number | null; // 根评论ID（如果是回复，指向顶级评论；否则为null）
-    parentId: number | null; // 父评论ID（如果是回复，指向直接父评论；否则为null）
+    id: string; // 评论ID
+    postId: string; // 帖子ID
+    userId: string; // 评论用户ID
+    rootId: string | null; // 根评论ID（如果是回复，指向顶级评论；否则为null）
+    parentId: string | null; // 父评论ID（如果是回复，指向直接父评论；否则为null）
     content: string; // 评论内容
     status: string; // 评论状态
     createdAt: string; // 创建时间
@@ -30,7 +30,7 @@ export interface Comment {
  */
 export interface CommentList {
     data: Comment[]; // 评论数据数组
-    cursor: number | null; // 游标，用于分页查询
+    cursor: string | null; // 游标，用于分页查询
     hasMore: boolean; // 是否还有更多数据
 }
 
@@ -60,14 +60,14 @@ export interface CommentPageResponse extends ApiResponse<CommentPage> {}
 
 /**
  * 获取评论列表
- * @param {number} postId - 帖子ID
- * @param {number | null} cursor - 游标，用于分页查询
- * @param {number} pageSize - 每页大小
+ * @param {string} postId - 帖子ID
+ * @param {string | null} cursor - 游标，用于分页查询
+ * @param {string} pageSize - 每页大小
  * @returns {Promise<CommentListResponse>} 评论列表响应
  */
 export const commentGetCommentList = (
-    postId: number,
-    cursor: number | null,
+    postId: string,
+    cursor: string | null,
     pageSize: number
 ): Promise<CommentListResponse> => {
     return Request.get<CommentListResponse>('/api/comments/', {
@@ -79,18 +79,18 @@ export const commentGetCommentList = (
 
 /**
  * 获取评论回复列表
- * @param {number} postId - 帖子ID
- * @param {number | null} cursor - 游标，用于分页查询
- * @param {number} rootId - 根评论ID
- * @param {number | null} parentId - 父评论ID
+ * @param {string} postId - 帖子ID
+ * @param {string | null} cursor - 游标，用于分页查询
+ * @param {string} rootId - 根评论ID
+ * @param {string | null} parentId - 父评论ID
  * @param {number} pageSize - 每页大小
  * @returns {Promise<CommentListResponse>} 评论回复列表响应
  */
 export const commentGetCommentReplyList = (
-    postId: number,
-    cursor: number | null,
-    rootId: number,
-    parentId: number | null,
+    postId: string,
+    cursor: string | null,
+    rootId: string,
+    parentId: string | null,
     pageSize: number
 ): Promise<CommentListResponse> => {
     return Request.get<CommentListResponse>('/api/comments/replies', {
@@ -104,17 +104,17 @@ export const commentGetCommentReplyList = (
 
 /**
  * 发布评论
- * @param {number} postId - 帖子ID
+ * @param {string} postId - 帖子ID
  * @param {string} content - 评论内容
- * @param {number | null} rootId - 根评论ID（如果是回复，指向顶级评论；否则为null）
- * @param {number | null} parentId - 父评论ID（如果是回复，指向直接父评论；否则为null）
+ * @param {string | null} rootId - 根评论ID（如果是回复，指向顶级评论；否则为null）
+ * @param {string | null} parentId - 父评论ID（如果是回复，指向直接父评论；否则为null）
  * @returns {Promise<CommentResopne>} 评论响应
  */
 export const commentPostComment = (
-    postId: number,
+    postId: string,
     content: string,
-    rootId: number | null,
-    parentId: number | null
+    rootId: string | null,
+    parentId: string | null
 ): Promise<CommentResopne> => {
     return Request.post<CommentResopne>('/api/comments/', {
         postId,
@@ -126,10 +126,10 @@ export const commentPostComment = (
 
 /**
  * 删除评论
- * @param {number} commentId - 评论ID
+ * @param {string} commentId - 评论ID
  * @returns {Promise<ApiResponse>} 删除结果响应
  */
-export const commentDeleteComment = (commentId: number): Promise<ApiResponse> => {
+export const commentDeleteComment = (commentId: string): Promise<ApiResponse> => {
     return Request.delete<ApiResponse>(`/api/comments/${commentId}`);
 };
 
@@ -154,12 +154,12 @@ export const commentAdminGetCommentsByPage = (
 
 /**
  * 管理员审核评论
- * @param {number[]} commentIds - 评论ID数组
+ * @param {string[]} commentIds - 评论ID数组
  * @param {string} status - 审核状态
  * @returns {Promise<ApiResponse>} 审核结果响应
  */
 export const commentAdminAuditComments = (
-    commentIds: number[],
+    commentIds: string[],
     status: CommentStatus
 ): Promise<ApiResponse> => {
     return Request.put_auth<ApiResponse>('/api/comments/admin/audit', {
@@ -170,11 +170,11 @@ export const commentAdminAuditComments = (
 
 /**
  * 管理员获得评论内容
- * @param {number[]} commentIds - 评论ID数组
+ * @param {string[]} commentIds - 评论ID数组
  * @returns {Promise<ApiResponse<Comment[]>>} 评论内容响应
  */
 export const commentAdminGetCommentsContent = (
-    commentIds: number[]
+    commentIds: string[]
 ): Promise<ApiResponse<Comment[]>> => {
     return Request.get_auth<ApiResponse<Comment[]>>('/api/comments/admin/content', {
         commentIds,

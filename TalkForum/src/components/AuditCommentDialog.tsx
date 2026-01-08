@@ -23,9 +23,9 @@ const AuditCommentDialog = ({ onClose }: AuditCommentDialogProps) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [hasMoreComments, setHasMoreComments] = useState<boolean>(true);
-    const [auditedComments, setAuditedComments] = useState<Set<number>>(new Set()); // 跟踪已审核的评论
+    const [auditedComments, setAuditedComments] = useState<Set<string>>(new Set()); // 跟踪已审核的评论
     const [currentListAudited, setCurrentListAudited] = useState<boolean[]>([]); // 跟踪当前列表中每条评论是否已审核
-    const [commentAuditResults, setCommentAuditResults] = useState<Map<number, boolean>>(new Map());
+    const [commentAuditResults, setCommentAuditResults] = useState<Map<string, boolean>>(new Map());
 
     // 加载评论队列 - 使用useCallback
     const loadCommentQueue = useCallback(debounce(
@@ -175,8 +175,8 @@ const AuditCommentDialog = ({ onClose }: AuditCommentDialogProps) => {
         const currentCommentList = commentPendingQueue[currentCommentListIndex];
         if (!currentCommentList) return;
 
-        const approvedCommentIds: number[] = [];
-        const rejectedCommentIds: number[] = [];
+        const approvedCommentIds: string[] = [];
+        const rejectedCommentIds: string[] = [];
 
         currentCommentList.forEach(comment => {
             const auditResult = commentAuditResults.get(comment.id);

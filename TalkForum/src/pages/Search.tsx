@@ -80,40 +80,13 @@ const Search = () => {
         }
 
         // 处理userIds参数
-        let parsedUserIds: number[] | undefined;
-        if (userIds) {
-            try {
-                parsedUserIds = userIds
-                    .split(',')
-                    .map(id => {
-                        const numId = parseInt(id.trim(), 10);
-                        return isNaN(numId) ? null : numId;
-                    })
-                    .filter(id => id !== null) as number[];
-            } catch (error) {
-                console.error('Error parsing userIds parameter:', error);
-            }
-        }
-
-        // 处理clubIds参数
-        let parsedClubIds: number[] | undefined;
-        if (clubId) {
-            try {
-                const clubIdNum = parseInt(clubId.trim(), 10);
-                if (!isNaN(clubIdNum)) {
-                    parsedClubIds = [clubIdNum];
-                }
-            } catch (error) {
-                console.error('Error parsing clubId parameter:', error);
-            }
-        }
+        let parsedUserIds: string[] | undefined;
 
         // 构建搜索参数对象
         const newSearchParams: PostsContainerSearchParams = {
             keyword: keyword || '',
             tag: tag || undefined,
             userIds: parsedUserIds,
-            clubIds: parsedClubIds,
         };
 
         // console.log(newSearchParams);
@@ -185,14 +158,14 @@ const Search = () => {
                         />
                     </div>
 
-                    <div className='filter-group'>
+                    {/* <div className='filter-group'>
                         <label>{t('search.clubIdLabel')}:</label>
                         <input
                             type='text'
                             placeholder={t('search.clubIdPlaceholder')}
                             ref={clubIdInput}
                         />
-                    </div>
+                    </div> */}
 
                     <div className='filter-actions'>
                         <button onClick={() => setShowFilters(false)}>

@@ -1,12 +1,12 @@
 import { usersGetSimpleUsersInfo, type SimpleUserInfo } from '../api/ApiUsers';
 import { DefaultAvatarUrl } from '../constants/default';
-const cache = new Map<number, SimpleUserInfo>();
+const cache = new Map<string, SimpleUserInfo>();
 
 /**
  * 请求获取用户信息并更新缓存（会去重,filter掉已经缓存的用户）
  * @param userIds 用户id列表
  */
-const requestSimpleUserInfoCache = async (userIds: number[]) => {
+const requestSimpleUserInfoCache = async (userIds: string[]) => {
     const notInCache = userIds.filter(id => !cache.has(id));
     await updateSimpleUserInfoCache(notInCache);
 };
@@ -15,7 +15,7 @@ const requestSimpleUserInfoCache = async (userIds: number[]) => {
  * 更新缓存(不去重，有则覆盖，无则更新)
  * @param userIds 用户id列表
  */
-const updateSimpleUserInfoCache = async (userIds: number[]) => {
+const updateSimpleUserInfoCache = async (userIds: string[]) => {
     try {
         if (userIds.length === 0) {
             return;
@@ -39,7 +39,7 @@ const updateSimpleUserInfoCache = async (userIds: number[]) => {
  * @param userId 用户id
  * @returns 简单用户信息
  */
-const getSingleSimpleUserInfo = (userId: number): SimpleUserInfo => {
+const getSingleSimpleUserInfo = (userId: string): SimpleUserInfo => {
     if (cache.has(userId)) {
         return cache.get(userId) as SimpleUserInfo;
     }

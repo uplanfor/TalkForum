@@ -1,5 +1,7 @@
 package com.talkforum.talkforumserver.controller;
 
+import com.talkforum.talkforumserver.common.vo.CommentListVO;
+import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.mapper.CommentMapper;
 import com.talkforum.talkforumserver.service.CommentService;
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
@@ -16,6 +18,8 @@ import com.talkforum.talkforumserver.constant.UserConstant;
 import com.talkforum.talkforumserver.mapper.UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +27,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +45,7 @@ import java.util.Map;
 )
 @RestController
 @RequestMapping("/comments")
+@Validated
 public class CommentController {
     @Autowired
     private CommentService commentService; // 评论服务层
@@ -59,18 +65,25 @@ public class CommentController {
      */
     @Operation(
         summary = "获取评论列表",
-        description = "根据帖子ID获取该帖子下的评论列表，支持分页查询和用户互动状态显示"
+        description = "根据帖子ID获取该帖子下的评论列表，支持分页查询和用户互动状态显示，注意，这个只要执行了获取动作，success都会为true"
+    )
+    @ApiResponse(
+            responseCode = "200", // 响应状态码
+            description = "请求成功",
+            content = @Content( // 指定响应内容
+                    mediaType = "application/json", // 媒体类型（JSON格式）
+                    schema = @Schema(
+                            implementation = Result.class,
+                            subTypes = CommentListVO.class
+                    )
+            )
     )
     @GetMapping("/")
-    @Validated
-    public Result getCommentList(
-            @NotNull long postId, 
-
-            Integer cursor, 
-
-            @NotNull int pageSize,
-
-            @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false) String token) {
+    public Result<CommentListVO> getCommentList(
+            @Parameter(description = "帖子id", example = "1") @NotNull long postId,
+            @Parameter(description = "游标(可为空)", example = "236") Integer cursor,
+            @Parameter(description = "游标(可为空)", example = "236") @NotNull int pageSize,
+            @Parameter(description = "登录token，用于解析登录情况") @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false) String token) {
         Long userId = null;
         try {
             if (token != null) {
@@ -101,16 +114,25 @@ public class CommentController {
         summary = "获取评论回复列表",
         description = "获取指定评论下的回复列表，支持多级评论结构，可选用户互动状态显示"
     )
+    @ApiResponse(
+            responseCode = "200",
+            description = "请求成功",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Result.class, subTypes =  CommentListVO.class)
+            )
+    )
     @GetMapping("/replies")
     @Validated
-    public Result getCommentReplyList(
-            @NotNull long postId,
-            Integer cursor,
-            @NotNull int pageSize,
-            @NotNull Long rootId,
-            Long parentId,
-            @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false) String token) {
+    public Result<CommentListVO> getCommentReplyList(
+            @Parameter(description = "帖子的id") @NotNull long postId,
+            @Parameter(description = "游标") Integer cursor,
+            @Parameter(description = "分页大小（最大10)") @NotNull int pageSize,
+            @Parameter(description = "根评论id") @NotNull Long rootId,
+            @Parameter(description = "被回复的评论id,可为NULL") Long parentId,
+            @Parameter(description = "用户登录token，用于返回点赞情况") @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false) String token) {
         Long userId = null;
+        // 处理登录的状况
         try {
             if (token != null) {
                 Map<String, Object> information = jwtHelper.parseJWTToken(token);
@@ -136,11 +158,21 @@ public class CommentController {
         summary = "添加评论",
         description = "用户发表评论，需要登录权限，支持直接评论帖子和回复其他评论"
     )
+    @ApiResponse(
+            responseCode = "200",
+            description = "请求成功",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            implementation = Result.class,
+                            subTypes = Comment.class
+                    )
+            )
+    )
     @LoginRequired
     @PostMapping("/")
-    @Validated
-    public Result addComment(
-            @Valid @RequestBody AddCommentDTO addCommentDTO,
+    public Result<Comment> addComment(
+            @RequestBody @Valid AddCommentDTO addCommentDTO,
             @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
         long userId = ((Number)(information.get("id"))).longValue(); // 获取用户ID
@@ -175,7 +207,7 @@ public class CommentController {
     )
     @LoginRequired
     @DeleteMapping("/{commentId}")
-    public Result deleteComment(
+    public Result<Object> deleteComment(
             @PathVariable long commentId,
             @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
@@ -197,11 +229,23 @@ public class CommentController {
         summary = "管理员获取评论列表",
         description = "管理员获取评论列表，支持按状态筛选和分页查询，需要管理员或版主权限"
     )
+    @ApiResponse(
+            responseCode = "200",
+            description = "请求成功",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            implementation = Result.class,
+                            subTypes = PageVO.class
+                    )
+            )
+    )
     @ModeratorRequired
     @GetMapping("/admin")
-    public Result adminGetCommentsByPage(
+    public Result<PageVO<Comment>> adminGetCommentsByPage(
             @Valid AdminGetCommentsDTO adminGetCommentsDTO) {
-        return Result.success(I18n.t("comment.admin.list.success"), commentService.adminGetCommentsByPage(adminGetCommentsDTO));
+        return Result.success(I18n.t("comment.admin.list.success"),
+                commentService.adminGetCommentsByPage(adminGetCommentsDTO));
     }
 
     /**
@@ -219,9 +263,10 @@ public class CommentController {
     @Validated
     @ModeratorRequired
     @PutMapping("/admin/audit")
-    public Result adminAuditComments(
-             @RequestBody AdminAuditCommentsDTO adminAuditCommentsDTO) {
-        return Result.success(I18n.t("comment.admin.audit.success"), commentService.adminAuditComments(adminAuditCommentsDTO));
+    public Result<Object> adminAuditComments(
+             @RequestBody @Valid AdminAuditCommentsDTO adminAuditCommentsDTO) {
+        return Result.success(I18n.t("comment.admin.audit.success"),
+                commentService.adminAuditComments(adminAuditCommentsDTO));
     }
 
     /**
@@ -236,9 +281,20 @@ public class CommentController {
         summary = "管理员获取评论内容",
         description = "管理员批量获取评论的详细内容，用于审核或查看，需要管理员或版主权限"
     )
+    @ApiResponse(
+            responseCode = "200",
+            description = "请求成功",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            implementation = Result.class,
+                            subTypes = List.class
+                    )
+            )
+    )
     @ModeratorRequired
     @GetMapping("/admin/content")
-    public Result adminGetCommentsContent(
+    public Result<List<Comment>> adminGetCommentsContent(
             @RequestParam List<Long> commentIds) {
         return Result.success(I18n.t("comment.admin.get.success"), commentService.adminGetCommentsContent(commentIds));
     }

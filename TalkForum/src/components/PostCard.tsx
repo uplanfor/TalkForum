@@ -28,16 +28,16 @@ export interface PostCardProps {
     title?: string; // 帖子标题（可选）
     brief: string; // 帖子简介
     coverUrl?: string; // 封面图链接（可选）
-    userId: number; // 发布者ID
-    id: number; // 帖子ID
-    clubId?: number; // 所属圈子ID（可选）
+    userId: string; // 发布者ID
+    id: string; // 帖子ID
+    clubId?: string; // 所属圈子ID（可选）
     viewCount: number; // 浏览量
     likeCount: number; // 点赞数
     commentCount: number; // 评论数
     isEssence: number; // 是否精华（0：非精华，1：精华）
     createdAt: string; // 发布时间
     interactContent?: number; // 互动内容（参考interaction接口）
-    removeSelf: (id: number)=>void;  // 删掉自己的帖子回调函数
+    removeSelf: (id: string)=>void;  // 删掉自己的帖子回调函数
     tag1?: string | null; // 标签1（可为空）
     tag2?: string | null; // 标签2（可为空）
     tag3?: string | null; // 标签3（可为空）
@@ -90,9 +90,9 @@ const PostCard = (props: PostCardProps) => {
 
     /**
      * 设置或取消帖子精华
-     * @param {number} id - 帖子ID
+     * @param {string} id - 帖子ID
      */
-    const essencePost = async (id: number) => {
+    const essencePost = async (id: string) => {
         // 计算目标精华状态（取反当前状态）
         const targetEssence = curEssence != 0 ? 0 : 1;
         // 调用API设置精华状态
@@ -113,10 +113,10 @@ const PostCard = (props: PostCardProps) => {
 
     /**
      * 打开帖子详情页
-     * @param {number} id - 帖子ID
+     * @param {string} id - 帖子ID
      * @param {string} target - 目标视图类型
      */
-    const openPost = (id: number, target: string) => {
+    const openPost = (id: string, target: string) => {
         if (target === PostViewType.EDIT) {
             // 使用正常的push模式导航，保留历史记录
             navigate(`/post/${id}?edit=true`);
@@ -127,9 +127,9 @@ const PostCard = (props: PostCardProps) => {
 
     /**
      * 处理点赞操作
-     * @param {number} id - 帖子ID
+     * @param {string} id - 帖子ID
      */
-    const handleLike = async (id: number) => {
+    const handleLike = async (id: string) => {
         // 检查用户是否登录
         if (!user.isLoggedIn) {
             Msg.error(t('postCard.loginRequired'));
@@ -157,9 +157,9 @@ const PostCard = (props: PostCardProps) => {
 
     /**
      * 删除帖子
-     * @param {number} id - 帖子ID
+     * @param {string} id - 帖子ID
      */
-    const deletePost = async (id: number) => {
+    const deletePost = async (id: string) => {
         try {
             const result = await Msg.confirm(t('postCard.deleteConfirm'));
             if (result) {
@@ -182,7 +182,7 @@ const PostCard = (props: PostCardProps) => {
      * 举报帖子
      * @param {number} id - 帖子ID
      */
-    const reportPost = (id: number) => {
+    const reportPost = (id: string) => {
         // 跳转到帖子详情页并添加report参数，用于自动打开举报功能
         // 使用正常的push模式导航，保留历史记录
         navigate(`/post/${id}?report=true`);
@@ -190,10 +190,10 @@ const PostCard = (props: PostCardProps) => {
 
     /**
      * 打开用户空间或圈子
-     * @param {number} targetId - 目标ID
+     * @param {string} targetId - 目标ID
      * @param {string} targetType - 目标类型
      */
-    const openSpaceView = (targetId: number, targetType: string) => {
+    const openSpaceView = (targetId: string, targetType: string) => {
         // 获取当前路由路径
         const currentPath = location.pathname;
         // 解析当前路由的类型和ID
@@ -203,7 +203,7 @@ const PostCard = (props: PostCardProps) => {
         if (
             pathSegments.length >= 2 &&
             pathSegments[0] === targetType &&
-            parseInt(pathSegments[1]) === targetId
+            pathSegments[1] === targetId
         ) {
             // 如果已经在目标页面，则不执行跳转
             return;

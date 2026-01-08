@@ -5,8 +5,10 @@ import axios, {
     type AxiosError,
     type InternalAxiosRequestConfig,
 } from 'axios';
-import ThemeUtil from './ThemeUtil';
 import { LanguageUtil } from './LanguageUtil';
+import qs from 'qs';
+
+
 // 扩展Axios请求配置
 interface RequestConfig extends AxiosRequestConfig {
     headers?: {
@@ -31,9 +33,16 @@ class Request {
             withCredentials: true, // 自动发送cookie
             headers: {
                 'Content-Type': 'application/json;charset=utf-8',
-                // 初始时先带上默认语言（后续请求拦截器会覆盖）
-                'Accept-Language': LanguageUtil.getCurrentLanguage(),
+                // // 初始时先带上默认语言（后续请求拦截器会覆盖），                  //要他干什么？
+                // 'Accept-Language': LanguageUtil.getCurrentLanguage(),
             },
+
+            paramsSerializer: {
+                serialize: (params) => {
+                    // arrayFormat: 'repeat' 表示数组序列化为 userIds=1&userIds=2，终于没有诡异的乱码了
+                    return qs.stringify(params, { arrayFormat: 'repeat' });
+                }
+            }
         });
         this.instance.interceptors.request.use(
             (config: InternalAxiosRequestConfig) => {
@@ -86,8 +95,8 @@ class Request {
 
                 // 将处理后的错误信息挂载到error上
                 error.customMessage = errorMessage;
-                // 也可以直接覆盖原始message（根据需求二选一）
-                error.message = errorMessage;
+                // // 也可以直接覆盖原始message（根据需求二选一）
+                // error.message = errorMessage;
 
                 return Promise.reject(error);
             }

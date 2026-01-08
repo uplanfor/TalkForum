@@ -12,6 +12,12 @@ import lombok.Data;
 )
 public class InteractionRequestDTO {
     @Schema(
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED
+    )
+    private Long id; // 被回传设置
+
+
+    @Schema(
         description = "互动类型，指定互动对象类型",
         example = "POST",
         requiredMode = Schema.RequiredMode.REQUIRED,
@@ -44,7 +50,7 @@ public class InteractionRequestDTO {
         example = "1234567890",
         hidden = true
     )
-    private long userId;
+    private Long userId;
     
     // 用于存储之前的互动内容，由MyBatis自动填充
     @Schema(

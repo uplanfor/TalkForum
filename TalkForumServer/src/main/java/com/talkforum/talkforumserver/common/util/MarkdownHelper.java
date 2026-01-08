@@ -1,26 +1,48 @@
 package com.talkforum.talkforumserver.common.util;
 
-import java.util.regex.Matcher;
+import com.vladsch.flexmark.ast.*;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.ast.Node;
+import com.vladsch.flexmark.util.ast.NodeVisitor;
+import com.vladsch.flexmark.util.ast.VisitHandler;
+import com.vladsch.flexmark.util.data.MutableDataSet;
+
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
 /**
- * Markdown处理工具类
- * 提供Markdown格式去除、简介生成和封面图片提取功能
+ * Markdown工具类（基于Flexmark实现，无用户内容留存）
  */
-public class MarkdownHelper {
+public final class MarkdownHelper {
+    // Flexmark解析器单例（仅初始化一次，提升性能，无状态）
+    private static final Parser FLEXMARK_PARSER;
+
+    // 句子结束标点（用于智能截断）
+    private static final String SENTENCE_END_PUNCTUATION = "。！？；，.";
+
+    static {
+        // 初始化Flexmark解析器（仅启用基础Markdown解析能力）
+        MutableDataSet options = new MutableDataSet();
+        FLEXMARK_PARSER = Parser.builder(options).build();
+    }
+
+    // 私有构造器：禁止实例化，保证纯静态工具类
+    private MarkdownHelper() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
 
     /**
-     * 核心方法：Markdown 转论坛简介
-     * @param markdown 原始 Markdown 内容
+     * 提取Markdown文本的简介（严格匹配指定方法签名）
+     * @param markdown 原始Markdown文本
      * @param maxLength 简介最大长度
-     * @return 纯文本简介
+     * @return 处理后的简介文本
      */
     public static String getIntro(String markdown, int maxLength) {
         if (markdown == null || markdown.trim().isEmpty()) {
-            return "no introduction";
+            return "";
         }
 
-        // 1. 增强的正则去除 Markdown 格式
+        // 1. 基于Flexmark AST解析去除所有Markdown格式（替代正则，更精准）
         String plainText = removeMarkdownFormat(markdown);
 
         // 2. 清理文本（合并空白、去除首尾空格）
@@ -31,7 +53,7 @@ public class MarkdownHelper {
     }
 
     /**
-     * 提取Markdown文本中的第一个图片链接
+     * 提取Markdown文本中的第一个图片链接（严格匹配指定方法签名）
      * @param markdown 原始 Markdown 内容
      * @return 第一个图片的URL，若无图片则返回null
      */
@@ -40,153 +62,103 @@ public class MarkdownHelper {
             return null;
         }
 
-        // 匹配标准Markdown图片格式：![alt](url) 或 ![alt](url "title")
-        Pattern imagePattern = Pattern.compile("!\\[(.*?)\\]\\(([^\\s]+)(?:\\s+\"([^\"]*)\")?\\)");
-        Matcher matcher = imagePattern.matcher(markdown);
-        
-        if (matcher.find()) {
-            // 返回第一个匹配的图片URL
-            return matcher.group(2);
-        }
-        
-        return null;
+        // 基于Flexmark AST解析图片节点（比正则更可靠，覆盖所有标准Markdown图片语法）
+        Node document = FLEXMARK_PARSER.parse(markdown);
+        final String[] firstImageUrl = {null};
+
+        // 遍历AST找第一个Image节点
+        NodeVisitor visitor = new NodeVisitor(
+                new VisitHandler<>(Image.class, image -> {
+                    if (firstImageUrl[0] == null) {
+                        firstImageUrl[0] = image.getUrl().toString();
+                    }
+                })
+        );
+        visitor.visit(document);
+
+        return firstImageUrl[0];
     }
 
+    // ===================== 内部辅助方法（仅工具类内部调用） =====================
     /**
-     * 增强的正则去除 Markdown 格式
-     * 支持更全面的Markdown语法元素
+     * 基于Flexmark AST解析去除所有Markdown格式，提取纯文本
      */
     private static String removeMarkdownFormat(String markdown) {
-        if (markdown == null) {
-            return "";
-        }
-        
-        // 1. 去除代码块（先处理，避免内容被其他规则干扰）
-        markdown = markdown.replaceAll("```[\\s\\S]*?```", "[codeblock]");
-        
-        // 2. 去除行内代码
-        markdown = markdown.replaceAll("`([^`]+)`", "$1");
-        
-        // 3. 去除标题（支持ATX和Setext风格）
-        markdown = markdown.replaceAll("^#{1,6}\\s+(.+)$", "$1");
-        markdown = markdown.replaceAll("^(.+)\\n[=-]+\\n", "$1");
-        
-        // 4. 去除粗体和斜体（处理嵌套情况）
-        markdown = markdown.replaceAll("\\*\\*\\*([^*]+)\\*\\*\\*", "$1"); // ***粗斜体***
-        markdown = markdown.replaceAll("___([^_]+)___", "$1"); // ___粗斜体___
-        markdown = markdown.replaceAll("\\*\\*([^*]+)\\*\\*", "$1"); // **粗体**
-        markdown = markdown.replaceAll("__([^_]+)__", "$1"); // __粗体__
-        markdown = markdown.replaceAll("\\*([^*]+)\\*", "$1"); // *斜体*
-        markdown = markdown.replaceAll("_([^_]+)_", "$1"); // _斜体_
-        
-        // 5. 去除链接（保留链接文本）
-        markdown = markdown.replaceAll("\\[([^\\]]+)\\]\\(([^)]+)\\)", "$1");
-        
-        // 6. 去除图片（替换为[图片]）
-        markdown = markdown.replaceAll("!\\[(.*?)\\]\\(([^\\s]+)(?:\\s+\"([^\"]*)\")?\\)", "[image]");
-        
-        // 7. 去除引用（支持多行引用）
-        markdown = markdown.replaceAll("^>\\s+(.+)$", "$1");
-        
-        // 8. 去除列表（有序和无序）
-        markdown = markdown.replaceAll("^\\s*[-*+]\\s+(.+)$", "$1");
-        markdown = markdown.replaceAll("^\\s*\\d+\\.\\s+(.+)$", "$1");
-        
-        // 9. 去除水平线
-        markdown = markdown.replaceAll("^\\s*[-*_]{3,}\\s*$", "");
-        
-        // 10. 去除表格（简化处理）
-        markdown = markdown.replaceAll("\\|(.+)\\|", "$1");
-        markdown = markdown.replaceAll("^[-+|\\s]+$", "");
-        
-        // 11. 去除删除线
-        markdown = markdown.replaceAll("~~([^~]+)~~", "$1");
-        
-        // 12. 去除HTML标签
-        markdown = markdown.replaceAll("<[^>]+>", "");
-        
-        // 13. 去除脚注
-        markdown = markdown.replaceAll("\\[\\^([^\\]]+)\\]", "");
-        markdown = markdown.replaceAll("\\[\\^([^\\]]+)\\]:.*", "");
-        
-        return markdown;
+        Node document = FLEXMARK_PARSER.parse(markdown);
+        StringJoiner joiner = new StringJoiner(" ");
+
+        // 遍历AST，仅提取纯文本节点，忽略所有Markdown格式节点
+        NodeVisitor visitor = new NodeVisitor(
+                // 提取标题文本
+                new VisitHandler<>(Heading.class, heading -> extractTextFromNode(heading, joiner)),
+                // 提取段落文本
+                new VisitHandler<>(Paragraph.class, paragraph -> extractTextFromNode(paragraph, joiner)),
+                // 提取列表项文本
+                new VisitHandler<>(ListItem.class, listItem -> extractTextFromNode(listItem, joiner)),
+                // 忽略图片、链接、代码块、表格等格式节点
+                new VisitHandler<>(Image.class, image -> {}),
+                new VisitHandler<>(Link.class, link -> {}),
+                new VisitHandler<>(FencedCodeBlock.class, code -> {})
+        );
+        visitor.visit(document);
+
+        return joiner.toString();
     }
 
     /**
-     * 清理文本
-     * 合并空白字符，去除首尾空格
+     * 从AST节点中提取纯文本
+     */
+    private static void extractTextFromNode(Node node, StringJoiner joiner) {
+        for (Node child : node.getChildren()) {
+            if (child instanceof Text) {
+                joiner.add(((Text) child).getChars().toString());
+            } else if (child.getChildren() != null) {
+                extractTextFromNode(child, joiner);
+            }
+        }
+    }
+
+    /**
+     * 清理文本：合并多个空白符为单个空格，去除首尾空格
      */
     private static String cleanText(String text) {
-        if (text == null) {
+        if (text == null || text.isEmpty()) {
             return "";
         }
-        
-        // 合并换行和空格
-        text = text.replaceAll("\\n+", " ");
-        text = text.replaceAll("\\s+", " ");
-        
-        return text.trim();
+        // 合并所有空白符（空格、换行、制表符等）为单个空格，再去首尾空格
+        return text.replaceAll("\\s+", " ").trim();
     }
 
     /**
-     * 智能截断文本
-     * 优先在句子结束处截断，避免截断词语
+     * 智能截断文本：优先在句子结束标点处截断，保证语义完整
      */
     private static String truncateText(String text, int maxLength) {
         if (text == null || text.isEmpty()) {
             return "";
         }
-        
+        if (maxLength <= 0) {
+            return "";
+        }
         if (text.length() <= maxLength) {
             return text;
         }
-        
-        // 首先尝试在句子结束处截断（句号、问号、感叹号）
-        int truncateIndex = findSentenceEnd(text, maxLength);
-        
-        // 如果找不到合适的句子结束位置，尝试在空格处截断
-        if (truncateIndex <= 0) {
-            truncateIndex = findSpacePosition(text, maxLength);
+
+        // 第一步：找maxLength范围内最后一个句子结束标点
+        int truncateIndex = -1;
+        for (int i = maxLength - 1; i >= 0; i--) {
+            if (SENTENCE_END_PUNCTUATION.contains(String.valueOf(text.charAt(i)))) {
+                truncateIndex = i + 1; // 包含标点
+                break;
+            }
         }
-        
-        // 如果仍然找不到合适位置，直接在maxLength处截断
-        if (truncateIndex <= 0) {
+
+        // 第二步：若没找到句子结束标点，直接截断到maxLength
+        if (truncateIndex == -1) {
             truncateIndex = maxLength;
         }
-        
-        return text.substring(0, truncateIndex) + "...";
-    }
-    
-    /**
-     * 在指定长度内查找句子结束位置
-     */
-    private static int findSentenceEnd(String text, int maxLength) {
-        int searchEnd = Math.min(text.length(), maxLength);
-        
-        // 从后向前查找句子结束符
-        for (int i = searchEnd - 1; i >= 0; i--) {
-            char c = text.charAt(i);
-            if (c == '。' || c == '！' || c == '？' || c == '.' || c == '!' || c == '?') {
-                return i + 1; // 包含句子结束符
-            }
-        }
-        
-        return -1; // 未找到
-    }
-    
-    /**
-     * 在指定长度内查找空格位置
-     */
-    private static int findSpacePosition(String text, int maxLength) {
-        int searchEnd = Math.min(text.length(), maxLength);
-        
-        // 从后向前查找空格
-        for (int i = searchEnd - 1; i >= 0; i--) {
-            if (Character.isWhitespace(text.charAt(i))) {
-                return i; // 不包含空格
-            }
-        }
-        
-        return -1; // 未找到
+
+        // 第三步：截断并补充省略号
+        String truncated = text.substring(0, truncateIndex).trim();
+        return truncated + "...";
     }
 }

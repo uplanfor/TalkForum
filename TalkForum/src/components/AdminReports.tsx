@@ -30,7 +30,7 @@ const AdminReports = () => {
     const [pageSize] = useState<number>(10);
     const [total, setTotal] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(false);
-    const [selectedReports, setSelectedReports] = useState<Set<number>>(new Set());
+    const [selectedReports, setSelectedReports] = useState<Set<string>>(new Set());
     const [showAuditDialog, setShowAuditDialog] = useState<boolean>(false);
     const [currentReport, setCurrentReport] = useState<Report | null>(null);
     const [selectAll, setSelectAll] = useState<boolean>(false);
@@ -140,7 +140,7 @@ const AdminReports = () => {
     };
 
     // Handle selection change
-    const handleSelectReport = (reportId: number) => {
+    const handleSelectReport = (reportId: string) => {
         setSelectedReports(prev => {
             if (prev.has(reportId)) {
                 // If already selected, deselect it and set selectAll to false
@@ -194,7 +194,7 @@ const AdminReports = () => {
     };
 
     // 处理单个举报
-    const handleAuditReport = async (reportId: number) => {
+    const handleAuditReport = async (reportId: string) => {
         try {
             const res = await reportsAdminHandleReport([reportId], 'HANDLED');
             if (res.success) {

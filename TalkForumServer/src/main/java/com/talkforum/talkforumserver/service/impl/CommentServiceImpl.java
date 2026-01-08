@@ -1,5 +1,7 @@
 package com.talkforum.talkforumserver.service.impl;
 
+import com.talkforum.talkforumserver.common.util.GlobalIdGenerator;
+import com.talkforum.talkforumserver.common.util.PageHelper;
 import com.talkforum.talkforumserver.mapper.CommentMapper;
 import com.talkforum.talkforumserver.service.CommentService;
 import com.talkforum.talkforumserver.common.dto.AdminAuditCommentsDTO;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.print.attribute.standard.PagesPerMinute;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +62,8 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public CommentListVO getComments(Long postId, Integer cursor, int pageSize, Long userId) {
+        // 防御
+        pageSize = PageHelper.filterPageSize(pageSize);
         // 查询评论列表
         List<Comment> comments = commentMapper.getComments(postId, cursor, pageSize);
         // 转换为CommentVO并添加互动信息
@@ -80,6 +85,8 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public CommentListVO getCommentReplyList(Long postId, Integer cursor, int pageSize, Long rootId, Long parentId, Long userId) {
+        // 防御
+        pageSize = PageHelper.filterPageSize(pageSize);
         // 查询评论回复列表
         List<Comment> comments = commentMapper.getCommentReplies(postId, cursor, pageSize, rootId, parentId);
         // 转换为CommentVO并添加互动信息
@@ -133,6 +140,13 @@ public class CommentServiceImpl implements CommentService {
             if (count2 == 0) {
                 throw new BusinessRuntimeException(I18n.t("comment.reply.invalid"));
             }
+        }
+
+        // 尝试生成id
+        try {
+            comment.setId(GlobalIdGenerator.generateId());
+        } catch (Exception e) {
+            throw new BusinessRuntimeException(I18n.t("common.snowflake.error"));
         }
         
         // 添加评论并增加帖子评论数
@@ -272,8 +286,8 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * 管理员获取评论内容
-     * @param commentIds
-     * @return
+     * @param commentIds 待获取的评论id内容
+     * @return 评论列表
      */
     public List<Comment> adminGetCommentsContent(List<Long> commentIds) {
         List<Comment> comments = commentMapper.adminGetCommentsContent(commentIds);

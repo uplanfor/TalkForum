@@ -27,7 +27,7 @@ interface InfoBackgroundProps {
     /**
      * 目标ID（可选）
      */
-    targetId?: number;
+    targetId?: string;
 }
 
 /**
@@ -56,7 +56,7 @@ const InfoBackground = (props: InfoBackgroundProps) => {
     } = useSelector((state: RootState) => state.user);
 
     const targetType = props.targetType;
-    const targetId = targetType === InfoBackgroundType.SELF ? id : (props.targetId ?? 0);
+    const targetId = targetType === InfoBackgroundType.SELF ? id : (props.targetId ?? "0");
     // 判断是否为当前用户
     let isSelf =
         (targetType === InfoBackgroundType.SELF && isLoggedIn) ||

@@ -12,15 +12,22 @@ import com.talkforum.talkforumserver.common.vo.AuthVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 
-@Tag(name="认证模块")
+@Validated
+@Tag(name="认证管理")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -30,8 +37,21 @@ public class AuthController {
     private JWTHelper jwtHelper;
 
     @Operation(summary = "请求登录")
+    @ApiResponse(
+            responseCode = "200",
+            description = "请求成功，返回用户信息",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            implementation = Result.class,
+                            subTypes = AuthVO.class
+                    )
+            )
+    )
     @PostMapping("/login")
-    public Result<AuthVO> login(@RequestBody LoginDTO loginDTO, HttpServletResponse response) {
+    public Result<AuthVO> login(
+            @RequestBody @Valid LoginDTO loginDTO,
+            HttpServletResponse response) {
         return Result.success(I18n.t("auth.login.success"), authService.login(loginDTO, response));
     }
 
@@ -39,7 +59,9 @@ public class AuthController {
     @Operation(summary = "请求登出")
     @LoginRequired
     @PostMapping("/logout")
-    public Result<Object> logout(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, HttpServletResponse response) {
+    public Result<Object> logout(
+            @Parameter(description = "登录token，用于解析登录情况") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token,
+            HttpServletResponse response) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         long userId = ((Number)(information.get("id"))).longValue();
         authService.logout(userId, response);
@@ -47,24 +69,50 @@ public class AuthController {
     }
 
     @Operation(summary = "获取此时是否登录")
+    @ApiResponse(
+            responseCode = "200",
+            description = "请求成功，返回用户信息",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            implementation = Result.class,
+                            subTypes = {AuthVO.class}
+                    )
+            )
+    )
     @LoginRequired
     @GetMapping("/")
-    public Result<AuthVO> auth(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, HttpServletResponse response) {
+    public Result<AuthVO> auth(
+            @Parameter(description = "登录token，用于解析登录情况") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token,
+            HttpServletResponse response) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         long userId = ((Number)(information.get("id"))).longValue();
-        AuthVO result = authService.auth(userId, response);
-        if (result == null) {
+        AuthVO authVO = authService.auth(userId, response);
+        if (authVO == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return Result.error(I18n.t("auth.user.notfound"));
         }
-        return Result.success(I18n.t("auth.information.update"), result);
+        return Result.success(I18n.t("auth.information.update"), authVO);
     }
 
 
     @Operation(summary = "获取此时是否管理员登录")
+    @ApiResponse(
+            responseCode = "200",
+            description = "请求成功，返回用户信息",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            implementation = Result.class,
+                            subTypes = {AuthVO.class}
+                    )
+            )
+    )
     @ModeratorRequired
     @GetMapping("/admin")
-    public Result<AuthVO> authAdmin(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, HttpServletResponse response) {
+    public Result<AuthVO> authAdmin(
+            @Parameter(description = "登录token，用于解析登录情况") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token,
+            HttpServletResponse response) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         long userId = ((Number)(information.get("id"))).longValue();
         AuthVO authVO = authService.auth(userId, response);
@@ -75,10 +123,23 @@ public class AuthController {
         return Result.success(I18n.t("auth.admin.update.success"), authVO);
     }
 
-    @Operation(summary = "获取管理员HOME信息")
+    @Operation(summary = "获取管理员HOME页面信息")
+    @ApiResponse(
+            responseCode = "200",
+            description = "请求成功，返回用户信息",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(
+                            implementation = Result.class,
+                            subTypes = {AdminHomeVO.class}
+                    )
+            )
+    )
     @ModeratorRequired
     @GetMapping("/admin/home")
-    public Result<AdminHomeVO> getAdminHome(@CookieValue(name = ServerConstant.LOGIN_COOKIE) String token, HttpServletResponse response) {
+    public Result<AdminHomeVO> getAdminHome(
+            @Parameter(description = "登录token，用于解析登录情况") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token,
+            HttpServletResponse response) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         long userId = ((Number)(information.get("id"))).longValue();
         return Result.success(I18n.t("auth.admin.home.success"), authService.getAdminHomeInfo(userId, response));

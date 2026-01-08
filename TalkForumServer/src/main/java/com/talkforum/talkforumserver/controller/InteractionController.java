@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ import java.util.Map;
     name = "用户互动管理",
     description = "用户互动相关接口，包括帖子点赞/点踩、评论点赞/点踩、用户关注/取关等互动操作"
 )
+@Validated
 @RequestMapping("/interactions")
 @RestController
 public class InteractionController {
@@ -38,24 +40,10 @@ public class InteractionController {
     @PostMapping("/")
     @LoginRequired
     @Validated
-    public Result makeInteractions(
+    public Result<Object> makeInteractions(
+            @Valid @RequestBody InteractionRequestDTO interactionRequestDTO,
             @Parameter(
-                description = "互动请求参数，包含互动类型、目标ID和互动内容",
-                required = true,
-                content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                        implementation = InteractionRequestDTO.class,
-                        description = "用户互动请求参数对象"
-                    )
-                )
-            )
-            @RequestBody InteractionRequestDTO interactionRequestDTO,
-            @Parameter(
-                description = "用户登录凭证Cookie",
-                example = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTIzNDU2Nzg5MCwidXNlcm5hbWUiOiJ0ZXN0dXNlciJ9.signature",
-                required = true,
-                hidden = true
+                description = "用户登录凭证Cookie"
             )
             @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);

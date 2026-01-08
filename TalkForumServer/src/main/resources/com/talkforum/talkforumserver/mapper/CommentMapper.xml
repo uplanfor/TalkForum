@@ -60,12 +60,12 @@
         SELECT user_id FROM `comment` WHERE status = 'PASS' AND id = #{commentId}
     </select>
 
-    <insert id="addCommentWithPostCommentCountIncreased" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    <insert id="addCommentWithPostCommentCountIncreased">
         <!--无先检查帖子是否通过，调用者保证-->
         INSERT INTO `comment` (
-            post_id, user_id, root_id, parent_id, content, status
+            id, post_id, user_id, root_id, parent_id, content, status
         ) VALUES (
-            #{postId}, #{userId}, #{rootId}, #{parentId}, #{content}, #{status}
+            #{id}, #{postId}, #{userId}, #{rootId}, #{parentId}, #{content}, #{status}
         );
 
         UPDATE post SET comment_count = comment_count + 1 WHERE id = #{postId};

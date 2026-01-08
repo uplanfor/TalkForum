@@ -1,16 +1,23 @@
 package com.talkforum.talkforumserver.controller;
 
+
 import com.talkforum.talkforumserver.common.anno.CustomRateLimit;
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
 import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
 import com.talkforum.talkforumserver.common.dto.*;
+import com.talkforum.talkforumserver.common.entity.Post;
 import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
+import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.common.vo.PostListVO;
+import com.talkforum.talkforumserver.common.vo.PostVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
 import com.talkforum.talkforumserver.service.PostService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +28,7 @@ import java.util.Map;
  * 帖子控制器
  * 处理帖子相关的HTTP请求，包括发布帖子、获取帖子列表、编辑帖子、删除帖子等
  */
+@Tag(name = "帖子管理")
 @RequestMapping("/posts")
 @RestController
 @Validated
@@ -38,7 +46,10 @@ public class PostController {
      * @return 帖子详情
      */
     @GetMapping("/{postId}")
-    public Result getPost(@PathVariable Long postId, @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false) String token) {
+    public Result<PostVO> getPost(
+            @Parameter(description = "帖子ID", example = "1234567890") @PathVariable Long postId,
+            @Parameter(description = "用户登录凭证Cookie") @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false)
+            String token) {
         // 解析Token获取用户ID，未登录则为null
         Long userId = null;
         if (token != null) {
@@ -57,7 +68,10 @@ public class PostController {
      */
     @GetMapping("/")
     @Validated
-    public Result getPosts(PostRequestDTO postRequestDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false) String token) {
+    public Result<PostListVO> getPosts(
+            @Valid PostRequestDTO postRequestDTO,
+            @Parameter(description = "用户登录凭证Cookie") @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = false)
+            String token) {
         // 解析Token获取用户ID，未登录则为null
         Long userId = null;
         try {
@@ -82,7 +96,9 @@ public class PostController {
     @PostMapping("/")
     @Validated
     @CustomRateLimit(window=5000, threefold = 1)
-    public Result commitPost(@RequestBody PostCommitDTO postCommitDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+    public Result<Post> commitPost(
+            @Valid @RequestBody PostCommitDTO postCommitDTO,
+            @Parameter(description = "用户登录凭证Cookie") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
         postCommitDTO.userId = ((Number)(information.get("id"))).longValue(); // 设置用户ID
         String role = (String) information.get("role");
@@ -101,9 +117,11 @@ public class PostController {
      */
     @LoginRequired
     @PutMapping("/{postId}")
-    @Validated
     @CustomRateLimit(window=5000, threefold = 1)
-    public Result editPost(@PathVariable Long postId, @RequestBody PostEditDTO postEditDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+    public Result<Object> editPost(
+            @Parameter(description = "帖子ID", example = "1234567890") @PathVariable Long postId,
+            @Valid @RequestBody PostEditDTO postEditDTO,
+            @Parameter(description = "用户登录凭证Cookie") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
         postEditDTO.userId = ((Number)(information.get("id"))).longValue(); // 设置用户ID
         postEditDTO.id = postId; // 设置帖子ID
@@ -121,7 +139,9 @@ public class PostController {
      */
     @LoginRequired
     @DeleteMapping("/{postId}")
-    public Result deletePost(@PathVariable Long postId, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+    public Result<Object> deletePost(
+            @Parameter(description = "帖子ID", example = "1234567890") @PathVariable Long postId,
+            @Parameter(description = "用户登录凭证Cookie") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
         long userId = ((Number)(information.get("id"))).longValue(); // 获取用户ID
         String role = (String)(information.get("role")); // 获取用户角色
@@ -132,13 +152,12 @@ public class PostController {
     /**
      * 管理员获取帖子列表
      * @param adminGetPostsDTO 管理员帖子列表请求DTO
-     * @param token 登录凭证Token
      * @return 帖子列表
      */
     @ModeratorRequired
     @GetMapping("/admin")
-    @Validated
-    public Result getPostsWithAdminRight(AdminGetPostsDTO adminGetPostsDTO, @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
+    public Result<PageVO<PostVO>> getPostsWithAdminRight(
+            @Valid AdminGetPostsDTO adminGetPostsDTO) {
         // 管理员状态下不传递userId，不进行互动内容赋值
         return Result.success(I18n.t("post.admin.list.success"), postService.getPostsWithAdminRight(adminGetPostsDTO));
     }
@@ -151,7 +170,9 @@ public class PostController {
      */
     @ModeratorRequired
     @PutMapping("/admin/{postId}/audit")
-    public Result auditPost(@PathVariable Long postId, @RequestBody PostAuditDTO postAuditDTO) {
+    public Result<Object> auditPost(
+            @Parameter(description = "帖子ID", example = "1234567890") @PathVariable Long postId,
+            @Valid @RequestBody PostAuditDTO postAuditDTO) {
         postService.auditPost(postId, postAuditDTO.getStatus()); // 调用服务层审核帖子
         return Result.success(I18n.t("post.audit.success"));
     }
@@ -164,7 +185,9 @@ public class PostController {
      */
     @ModeratorRequired
     @PutMapping("/admin/{postId}/essence")
-    public Result essencePost(@PathVariable Long postId, @RequestBody EssenceDTO essenceDTO) {
+    public Result<Object> essencePost(
+            @Parameter(description = "帖子ID", example = "1234567890") @PathVariable Long postId,
+            @Valid @RequestBody EssenceDTO essenceDTO) {
         System.out.println(essenceDTO.getIsEssence()); // 打印日志
         postService.essencePost(postId, essenceDTO.getIsEssence()); // 调用服务层设置精华
         return Result.success(I18n.t("post.essence.success"));
@@ -172,11 +195,12 @@ public class PostController {
 
     /**
      * 管理员获得帖子内容
-     * @param postId
+     * @param postId 帖子id
      */
     @ModeratorRequired
     @GetMapping("/admin/{postId}/content")
-    public Result getContent(@PathVariable Long postId) {
+    public Result<String> getContent(
+            @Parameter(description = "帖子ID", example = "1234567890") @PathVariable Long postId) {
         return Result.success(I18n.t("post.admin.get.success"), postService.getContent(postId));
     }
 }

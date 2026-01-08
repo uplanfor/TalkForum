@@ -1,6 +1,7 @@
 package com.talkforum.talkforumserver.common.exception;
 
 import com.talkforum.talkforumserver.common.result.Result;
+import com.talkforum.talkforumserver.common.util.I18n;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
@@ -16,8 +17,8 @@ public class GlobalExceptionHandler {
     /**
      * 处理自定义业务异常：直接返回异常的 getMessage()
      */
-    @ExceptionHandler(BusinessRuntimeException.class) // 严格匹配你的自定义异常类名（含拼写）
-    public Result handleBusinessRuntimeException(HttpServletRequest request, BusinessRuntimeException e) {
+    @ExceptionHandler(BusinessRuntimeException.class)
+    public Result<Object> handleBusinessRuntimeException(HttpServletRequest request, BusinessRuntimeException e) {
         // 1. 获取请求核心信息（用于日志排查）
         String clientIp = getRealClientIp(request);
         String requestUri = request.getRequestURI();
@@ -26,7 +27,7 @@ public class GlobalExceptionHandler {
 
         // 2. 记录业务异常日志（含完整堆栈，便于定位问题）
         log.error("""
-                [exception occurred]
+                [EXCEPTION OCCURRED]
                 client ip: {}
                 request uri: {}
                 exception type: {}
@@ -38,7 +39,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Result handleValidationException(MethodArgumentNotValidException e) {
+    public Result<Object> handleValidationException(MethodArgumentNotValidException e) {
         BindingResult bindingResult = e.getBindingResult();
         // 第一行固定文本，后续每个错误单独换行
         StringBuilder errorMsg = new StringBuilder("failed to validate arguments:");
@@ -62,7 +63,7 @@ public class GlobalExceptionHandler {
      * 兜底处理所有其他异常：统一返回 "Server Error 500"
      */
     @ExceptionHandler(Exception.class) // 匹配所有 Exception 子类（含 RuntimeException）
-    public Result handleAllOtherExceptions(HttpServletRequest request, Exception e) {
+    public Result<Object> handleAllOtherExceptions(HttpServletRequest request, Exception e) {
         // 1. 获取请求核心信息（用于日志排查）
         String clientIp = getRealClientIp(request);
         String requestUri = request.getRequestURI();
@@ -71,7 +72,7 @@ public class GlobalExceptionHandler {
 
         // 2. 记录系统异常日志（含完整堆栈，关键排查依据）
         log.error("""
-                [exception occurred]
+                [EXCEPTION OCCURRED]
                 client ip: {}
                 request uri: {}
                 exception type: {}
@@ -79,7 +80,7 @@ public class GlobalExceptionHandler {
                 clientIp, requestUri, exceptionType, exceptionMsg, e); // 输出完整堆栈
 
         // 3. 统一返回固定提示（避免泄露技术细节）
-        return Result.error("Server Error!");
+        return Result.error(I18n.t("common.server.error"));
     }
 
     /**

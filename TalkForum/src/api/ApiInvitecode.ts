@@ -11,7 +11,7 @@ import Request from '../utils/Request';
  */
 export interface Invitecode {
     code: string; // 邀请码字符串
-    creatorId: number; // 创建者ID
+    creatorId: string; // 创建者ID
     createdAt: string; // 创建时间
     expiredAt: string; // 过期时间
     maxCount: number; // 最大使用次数

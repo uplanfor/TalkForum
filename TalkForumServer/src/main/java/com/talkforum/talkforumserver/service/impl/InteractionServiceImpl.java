@@ -2,6 +2,7 @@ package com.talkforum.talkforumserver.service.impl;
 
 import com.talkforum.talkforumserver.common.dto.InteractionRequestDTO;
 import com.talkforum.talkforumserver.common.result.Result;
+import com.talkforum.talkforumserver.common.util.GlobalIdGenerator;
 import com.talkforum.talkforumserver.constant.InteractionConstant;
 import com.talkforum.talkforumserver.mapper.InteractionMapper;
 import com.talkforum.talkforumserver.service.InteractionService;
@@ -15,9 +16,9 @@ public class InteractionServiceImpl implements InteractionService {
     @Autowired
     private InteractionMapper interactionMapper;
 
-
     @Override
-    public Result makeInteraction(InteractionRequestDTO interactionRequestDTO) {
+    public Result<Object> makeInteraction(InteractionRequestDTO interactionRequestDTO) {
+        interactionRequestDTO.setId(GlobalIdGenerator.generateId());
         switch (interactionRequestDTO.getInteractType()) {
             case InteractionConstant.INTERACTION_TYPE_POST: {
                 interactionMapper.makeInteractionWithPost(interactionRequestDTO);

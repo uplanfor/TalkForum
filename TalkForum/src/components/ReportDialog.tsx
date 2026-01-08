@@ -34,7 +34,7 @@ interface ReportDialogProps {
     /**
      * 举报对象的ID
      */
-    reportId: number;
+    reportId: string;
     /**
      * 举报对象的类型
      */

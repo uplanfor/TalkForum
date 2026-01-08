@@ -14,7 +14,7 @@ interface CacheItem {
     // 是否还有更多帖子
     hasMore: boolean;
     // 分页游标
-    cursor: number | null;
+    cursor: string | null;
     // 当前选中的标签索引
     curTabIndex: number;
     // 缓存时间戳
@@ -54,7 +54,7 @@ const getPostsCacheKey = (
  */
 export const getPostsCache = (
     targetType: PostContainerTargetType,
-    targetId?: number | string,
+    targetId?: string,
     searchParams?: string
 ): CacheItem | undefined => {
     const cacheItem = cache.get(getPostsCacheKey(targetType, targetId, searchParams));

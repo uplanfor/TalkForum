@@ -10,8 +10,8 @@ import Request from '../utils/Request';
  * 包含举报的详细信息
  */
 export interface Report {
-    id: number; // 举报ID
-    userId: number; // 举报人ID
+    id: string; // 举报ID
+    userId: string; // 举报人ID
     reportType: string; // 举报类型
     reportTargetType: string; // 举报目标类型（如帖子、评论、用户等）
     reportTarget: string; // 举报目标ID
@@ -19,7 +19,7 @@ export interface Report {
     reason: string; // 举报原因
     createdAt: string; // 举报时间
     handledAt: string | null; // 处理时间（未处理则为null）
-    handledBy: number | null; // 处理人ID（未处理则为null）
+    handledBy: string | null; // 处理人ID（未处理则为null）
 }
 
 /**
@@ -44,7 +44,7 @@ export interface ReportResponce extends ApiResponse<ReportPage> {}
 export const reportsPostReport = async (
     reportType: string,
     reportTargetType: string,
-    reportTarget: number,
+    reportTarget: string,
     reason?: string
 ) => {
     return Request.post<ApiResponse>(`/api/reports/`, {
@@ -79,11 +79,11 @@ export const reportsAdminGetReports = async (
 
 /**
  * 管理员处理举报
- * @param {number[]} reportIds - 举报ID数组
- * @param {number} handledBy - 处理人ID
+ * @param {string[]} reportIds - 举报ID数组
+ * @param {string} handledBy - 处理人ID
  * @param {string} status - 处理结果状态
  * @returns {Promise<ApiResponse>} 处理结果响应
  */
-export const reportsAdminHandleReport = async (reportIds: number[], status: string) => {
+export const reportsAdminHandleReport = async (reportIds: string[], status: string) => {
     return Request.put_auth<ApiResponse>(`/api/reports/admin`, { reportIds, status });
 };

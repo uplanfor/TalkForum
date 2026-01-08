@@ -36,9 +36,9 @@ import { useTranslation } from 'react-i18next';
  * 定义评论回复的目标信息
  */
 export interface CommentTarget {
-    parentId: number | null; // 父评论ID
-    rootId: number | null; // 根评论ID
-    userId: number | null; // 回复的用户ID
+    parentId: string | null; // 父评论ID
+    rootId: string | null; // 根评论ID
+    userId: string | null; // 回复的用户ID
     commentToContent: string; // 回复的评论内容
 }
 
@@ -80,12 +80,12 @@ const PostView = () => {
     const [showReportDialog, setShowReportDialog] = useState(false);
     // 帖子数据状态
     const [post, setPost] = useState<PostType>({
-        id: postId ? parseInt(postId) : 0,
+        id: postId || "0",
         title: '',
         brief: '',
         content: '',
         coverUrl: '',
-        userId: 0,
+        userId: "0",
         clubId: null,
         status: 'PASS',
         isEssence: 0,
@@ -163,8 +163,7 @@ const PostView = () => {
     const loadPostDetail = useCallback(
         debounce(async (postId: string) => {
             if (postId) {
-                const postIdNum = Number(postId);
-                await postsGetPostDetailInformation(postIdNum)
+                await postsGetPostDetailInformation(postId)
                     .then(async res => {
                         if (res.success) {
                             const post_result: PostType = res.data;

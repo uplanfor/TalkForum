@@ -69,13 +69,13 @@ public class I18n {
             return message;
         } catch (NoSuchMessageException e) {
             // 记录缺失翻译键的警告信息
-            log.warn("Missing translation key: '{}' for locale: {}. Returning key as fallback.", 
+            log.error("NO TRANSLATION! Missing translation key: '{}' for locale: {}. Returning key as fallback.",
                     key, getCurrentLocale());
             // 如果找不到对应的消息，返回key本身，便于调试
             return key;
         } catch (Exception e) {
             // 记录其他异常情况
-            log.error("Error retrieving translation for key: '{}' in locale: {}. Error: {}", 
+            log.error("OTHER EXCEPTION! Error retrieving translation for key: '{}' in locale: {}. Error: {}",
                     key, getCurrentLocale(), e.getMessage());
             return key;
         }
@@ -95,6 +95,7 @@ public class I18n {
             }
         } catch (Exception e) {
             // 忽略异常，使用默认Locale
+            log.error(e.getMessage(), e);
         }
         return Locale.ENGLISH; // 默认英文
     }

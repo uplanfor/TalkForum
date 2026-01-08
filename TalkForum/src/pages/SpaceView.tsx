@@ -31,7 +31,7 @@ const SpaceView = ({}: SpaceViewProps) => {
 
     // 验证type参数并转换为PostContainerTargetType
     const validType = type === 'club' ? PostContainerTargetType.CLUB : PostContainerTargetType.USER;
-    const spaceId = id ? parseInt(id) : 0;
+    const spaceId = id || "";
 
     const handleClose = () => {
         navigate(-1); // 返回上一页

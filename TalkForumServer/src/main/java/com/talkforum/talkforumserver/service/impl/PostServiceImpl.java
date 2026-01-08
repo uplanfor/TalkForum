@@ -6,6 +6,7 @@ import com.talkforum.talkforumserver.common.dto.PostEditDTO;
 import com.talkforum.talkforumserver.common.dto.PostRequestDTO;
 import com.talkforum.talkforumserver.common.entity.Post;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
+import com.talkforum.talkforumserver.common.util.GlobalIdGenerator;
 import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.util.MarkdownHelper;
 import com.talkforum.talkforumserver.common.vo.PageVO;
@@ -56,7 +57,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostVO getPost(Long postId, Long userId) {
         // 查询帖子VO
-        PostVO postVO = postCacheService.getPostVO(postId);
+        PostVO postVO = postMapper.getPostVO(postId);
         
         // 为帖子设置互动内容
         if (postVO == null) {
@@ -113,6 +114,8 @@ public class PostServiceImpl implements PostService {
         String coverUrl = MarkdownHelper.extractFirstImage(postCommitDTO.content);
         // 调用Mapper添加帖子，根据用户角色设置审核状态
         // 普通用户发布的帖子需要审核，管理员发布的帖子直接通过
+
+        postCommitDTO.setId(GlobalIdGenerator.generateId());
 
         postMapper.addPost(postCommitDTO,
                 role.equals(UserConstant.ROLE_USER) ? PostConstant.PENDING : PostConstant.PASS,

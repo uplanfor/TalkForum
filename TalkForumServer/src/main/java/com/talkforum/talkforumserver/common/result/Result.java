@@ -46,7 +46,6 @@ public class Result<T>{
      */
     @Schema(
             description = "响应业务数据（泛型类型）",
-            example = "null",
             nullable = true // 允许为null（无数据时返回null）
     )
     public T data;

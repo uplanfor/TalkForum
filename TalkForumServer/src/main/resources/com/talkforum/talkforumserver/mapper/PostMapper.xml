@@ -60,9 +60,9 @@
 
     <insert id="addPost" useGeneratedKeys="true" keyProperty="postCommitDTO.id" keyColumn="id">
         INSERT INTO post (
-            title, content, user_id, club_id, status, brief, tag1, tag2, tag3, cover_url
+            id, title, content, user_id, club_id, status, brief, tag1, tag2, tag3, cover_url
         ) VALUES (
-            #{postCommitDTO.title}, #{postCommitDTO.content}, #{postCommitDTO.userId},
+            #{postCommitDTO.id}, #{postCommitDTO.title}, #{postCommitDTO.content}, #{postCommitDTO.userId},
                   #{postCommitDTO.clubId}, #{status}, #{brief},
                   #{postCommitDTO.tag1}, #{postCommitDTO.tag2}, #{postCommitDTO.tag3},
                   #{coverUrl}

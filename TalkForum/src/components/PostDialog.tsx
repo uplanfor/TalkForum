@@ -20,9 +20,9 @@ interface PostDialogProps {
     onClose: () => any; // 关闭对话框的回调函数
     notification?: string; // 对话框标题通知
     title?: string; // 帖子标题（编辑时使用）
-    clubInputId?: number; // 俱乐部ID（可选）
+    clubInputId?: string; // 俱乐部ID（可选）
     content?: string; // 帖子内容（编辑时使用）
-    postId?: number | null; // 帖子ID（编辑时使用，新建时为null）
+    postId?: string | null; // 帖子ID（编辑时使用，新建时为null）
     tag1?: string | null; // 标签1
     tag2?: string | null; // 标签2
     tag3?: string | null; // 标签3
@@ -36,7 +36,7 @@ const PostDialog = ({
     onClose,
     notification = '',
     title = '',
-    clubInputId = 0,
+    clubInputId = "0",
     content = '',
     postId = null,
     tag1 = '',
@@ -53,7 +53,7 @@ const PostDialog = ({
     const contentRef = useRef<HTMLTextAreaElement>(null);
 
     // 俱乐部ID状态
-    const [clubId, setClubId] = useState<number>(clubInputId);
+    const [clubId, setClubId] = useState<string>(clubInputId);
 
     // 标签状态
     const [tags, setTags] = useState<string[]>([]);
@@ -284,7 +284,7 @@ const PostDialog = ({
             await postsCommitPostAuth({
                 content: contentRef.current.value,
                 title: titleRef.current?.value,
-                clubId: clubId == 0 ? null : clubId,
+                clubId: clubId == "0" ? null : clubId,
                 tag1,
                 tag2,
                 tag3,
@@ -305,7 +305,7 @@ const PostDialog = ({
             await postsModifyPostAuth(postId, {
                 content: contentRef.current.value,
                 title: titleRef.current?.value,
-                clubId: clubId == 0 ? null : clubId,
+                clubId: clubId == "0" ? null : clubId,
                 tag1,
                 tag2,
                 tag3,

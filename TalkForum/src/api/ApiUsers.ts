@@ -31,7 +31,7 @@ export interface UserProfile {
  * 包含用户的详细信息，用于个人主页、管理员管理等场景
  */
 export interface UserVO {
-    id: number; // 用户ID
+    id: string; // 用户ID
     name: string; // 用户昵称
     email: string; // 用户邮箱
     intro: string; // 用户简介
@@ -71,21 +71,21 @@ export interface UserVOPageResponse extends ApiResponse<UserVOPage> {}
 
 /**
  * 根据用户ID获取简单用户信息
- * @param {number[]} userIds - 用户ID数组
+ * @param {string[]} userIds - 用户ID数组
  * @returns {Promise<SimpleUserInfoResponse>} 简单用户信息响应
  */
 export const usersGetSimpleUsersInfo = async (
-    userIds: number[]
+    userIds: string[]
 ): Promise<SimpleUserInfoResponse> => {
-    return Request.get<SimpleUserInfoResponse>('/api/users/simple', { userIds });
+    return Request.get<SimpleUserInfoResponse>('/api/users/simple', { userIds: userIds });
 };
 
 /**
  * 根据用户ID获取详细用户信息
- * @param {number} userId - 用户ID
+ * @param {string} userId - 用户ID
  * @returns {Promise<UserVOResponse>} 用户视图对象响应
  */
-export const usersGetDetailedUserInfo = async (userId: number): Promise<UserVOResponse> => {
+export const usersGetDetailedUserInfo = async (userId: string): Promise<UserVOResponse> => {
     return Request.get<UserVOResponse>(`/api/users/${userId}`);
 };
 
@@ -143,12 +143,12 @@ export const usersAdminGetUsersByPage = async (
 
 /**
  * 管理员设置用户角色
- * @param {number} userId - 用户ID
+ * @param {string} userId - 用户ID
  * @param {string} role - 角色名称
  * @returns {Promise<ApiResponse>} 设置结果响应
  */
 export const usersAdminSetUserRole = async (
-    userId: number,
+    userId: string,
     role: UserRole
 ): Promise<ApiResponse> => {
     return Request.put<ApiResponse>(`/api/users/admin/${userId}/role`, { userId, role });
@@ -156,12 +156,12 @@ export const usersAdminSetUserRole = async (
 
 /**
  * 管理员设置用户状态
- * @param {number} userId - 用户ID
+ * @param {string} userId - 用户ID
  * @param {string} status - 状态名称
  * @returns {Promise<ApiResponse>} 设置结果响应
  */
 export const usersAdminSetUserStatus = async (
-    userId: number,
+    userId: string,
     status: UserStatus
 ): Promise<ApiResponse> => {
     return Request.put<ApiResponse>(`/api/users/admin/${userId}/status`, { userId, status });
@@ -169,9 +169,9 @@ export const usersAdminSetUserStatus = async (
 
 /**
  * 管理员重置用户密码
- * @param {number} userId - 用户ID
+ * @param {string} userId - 用户ID
  * @returns {Promise<ApiResponse>} 重置结果响应
  */
-export const usersAdminResetUserPassword = async (userId: number): Promise<ApiResponse> => {
+export const usersAdminResetUserPassword = async (userId: string): Promise<ApiResponse> => {
     return Request.put_auth<ApiResponse>(`/api/users/admin/${userId}/reset`, { userId });
 };

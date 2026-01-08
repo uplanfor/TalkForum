@@ -3,6 +3,7 @@ package com.talkforum.talkforumserver.common.dto;
 import com.sun.istack.NotNull;
 import com.talkforum.talkforumserver.constant.UserConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Schema(
@@ -16,6 +17,6 @@ public class UserStatusDTO {
             example = UserConstant.STATUS_UNABLE,
             allowableValues = {UserConstant.STATUS_UNABLE, UserConstant.STATUS_NORMAL}
     )
-    @NotNull
+    @NotBlank
     private String status;
 }

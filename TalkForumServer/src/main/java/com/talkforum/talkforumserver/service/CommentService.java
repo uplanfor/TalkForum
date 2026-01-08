@@ -84,8 +84,8 @@ public interface CommentService {
 
     /**
      * 管理员获取评论内容
-     * @param commentIds
-     * @return
+     * @param commentIds 待获取的评论id列表
+     * @return 评论列表
      */
     List<Comment> adminGetCommentsContent(List<Long> commentIds);
 }

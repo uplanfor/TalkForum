@@ -39,7 +39,7 @@ const AdminUser: React.FC = () => {
     const [pageSize] = useState(10);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+    const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
     const [selectAll, setSelectAll] = useState(false);
 
     // 加载用户列表
@@ -87,7 +87,7 @@ const AdminUser: React.FC = () => {
     })();
 
     // 处理单个用户选择
-    const handleSelectUser = (userId: number) => {
+    const handleSelectUser = (userId: string) => {
         if (selectedUsers.includes(userId)) {
             setSelectedUsers(selectedUsers.filter(id => id !== userId));
         } else {
@@ -115,7 +115,7 @@ const AdminUser: React.FC = () => {
     }, [selectedUsers, users]);
 
     // 重置用户密码
-    const handleResetPassword = async (userId: number, userName: string) => {
+    const handleResetPassword = async (userId: string, userName: string) => {
         console.log(userName);
 
         const confirmed = await Msg.confirm(t('adminUsers.resetPasswordConfirm', { userName }));
@@ -136,7 +136,7 @@ const AdminUser: React.FC = () => {
     };
 
     // 设置用户状态
-    const handleSetStatus = async (userId: number, userName: string) => {
+    const handleSetStatus = async (userId: string, userName: string) => {
         const menu = [UsersStatusEnum.NORMAL, UsersStatusEnum.UNABLE];
         const result = await Msg.menu(menu, t('adminUsers.setStatusMenu', { userName, userId }));
         if (result !== -1) {
@@ -156,7 +156,7 @@ const AdminUser: React.FC = () => {
     };
 
     // 设置用户角色
-    const handleSetRole = async (userId: number, userName: string, role: string) => {
+    const handleSetRole = async (userId: string, userName: string, role: string) => {
         if (role === UserRoleEnum.ADMIN) {
             Msg.error(t('adminUsers.cannotChangeAdminRole'));
             return;

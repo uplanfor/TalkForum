@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 
+
 /**
  * Knife4j配置类：必须添加@EnableKnife4j注解
  */

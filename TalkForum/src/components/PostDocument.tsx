@@ -78,7 +78,7 @@ const PostDocument = (props: PostDocumentProps) => {
 
     // 使用ref管理状态，防止不必要的重新渲染
     const hasMoreRef = useRef(true);
-    const cursorRef = useRef<number | null>(null);
+    const cursorRef = useRef<string | null>(null);
     const isRefreshingRef = useRef(false);
     const isErrorRef = useRef(false);
     const isLoadingRef = useRef(false);
@@ -92,7 +92,7 @@ const PostDocument = (props: PostDocumentProps) => {
         forceUpdate();
     };
 
-    const updateCursor = (value: number | null) => {
+    const updateCursor = (value: string | null) => {
         cursorRef.current = value;
         forceUpdate();
     };
@@ -185,7 +185,7 @@ const PostDocument = (props: PostDocumentProps) => {
             const res = await commentGetCommentList(id, cursorRef.current, 10);
 
             // 收集需要缓存的用户ID
-            const needCacheTarget: number[] = [];
+            const needCacheTarget: string[] = [];
             res.data.data.forEach((item: Comment) => {
                 const commentUserId = item.userId;
                 if (!needCacheTarget.includes(commentUserId)) {
@@ -201,7 +201,6 @@ const PostDocument = (props: PostDocumentProps) => {
 
                 // 如果是刷新状态，替换评论列表，否则追加
                 if (isRefreshingRef.current) {
-                    // 刷新时，创建新的评论数组，确保React能正确更新组件
                     // 保留原有评论的interactContent属性
                     const newComments = res.data.data.map(item => {
                         // 查找原有评论中是否有相同的评论
@@ -295,12 +294,12 @@ const PostDocument = (props: PostDocumentProps) => {
 
     /**
      * 处理评论互动状态变化
-     * @param {number} commentId - 评论ID
+     * @param {string} commentId - 评论ID
      * @param {number} newInteractContent - 新的互动内容
      * @param {number} newLikeCount - 新的点赞数
      */
     const handleCommentInteractionChange = (
-        commentId: number,
+        commentId: string,
         newInteractContent: number,
         newLikeCount: number
     ) => {
@@ -316,9 +315,9 @@ const PostDocument = (props: PostDocumentProps) => {
 
     /**
      * 处理点赞操作
-     * @param {number} id - 帖子ID
+     * @param {string} id - 帖子ID
      */
-    const handleLike = async (id: number) => {
+    const handleLike = async (id: string) => {
         // 检查用户是否登录
         if (!user.isLoggedIn) {
             Msg.error(t('postDocument.loginFirst'));
@@ -360,9 +359,9 @@ const PostDocument = (props: PostDocumentProps) => {
 
     /**
      * 处理踩操作
-     * @param {number} id - 帖子ID
+     * @param {string} id - 帖子ID
      */
-    const handleDislike = async (id: number) => {
+    const handleDislike = async (id: string) => {
         // 检查用户是否登录
         if (!user.isLoggedIn) {
             Msg.error(t('postDocument.loginFirst'));
@@ -404,9 +403,9 @@ const PostDocument = (props: PostDocumentProps) => {
 
     /**
      * 打开用户空间
-     * @param {number} userId - 用户ID
+     * @param {string} userId - 用户ID
      */
-    const openSpaceView = (userId: number) => {
+    const openSpaceView = (userId: string) => {
         // 获取当前路由路径
         const currentPath = location.pathname;
         // 解析当前路由的类型和ID
@@ -416,7 +415,7 @@ const PostDocument = (props: PostDocumentProps) => {
         if (
             pathSegments.length >= 2 &&
             pathSegments[0] === SpaceViewType.USER &&
-            parseInt(pathSegments[1]) === userId
+            pathSegments[1] === userId
         ) {
             // 如果已经在目标页面，则不执行跳转
             return;

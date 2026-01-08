@@ -7,7 +7,7 @@ interface UserState extends AuthInfo {
 }
 
 const initialState: UserState = {
-    id: 0,
+    id: "0",
     email: 'please@login.com',
     name: 'You have not logged in yet!',
     intro: 'Please login and you will see more fun!',
@@ -50,7 +50,7 @@ const userSlice = createSlice({
             // 正确的写法
             return { ...initialState };
         },
-        changeUserFollowing: (state, action: PayloadAction<number>) => {
+        changeUserFollowing: (state, action: PayloadAction<string>) => {
             const targetId = action.payload;
             const index = state.following.indexOf(targetId);
             if (index === -1) {

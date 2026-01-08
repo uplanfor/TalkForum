@@ -28,7 +28,7 @@ const AdminPosts = () => {
     const [pageSize, setPageSize] = useState(10);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [selectedPosts, setSelectedPosts] = useState<number[]>([]);
+    const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
     const [selectAll, setSelectAll] = useState(false);
     const [showAuditDialog, setShowAuditDialog] = useState(false);
 
@@ -91,7 +91,7 @@ const AdminPosts = () => {
     ), []);
 
     // 处理单个选择
-    const handleSelectPost = (postId: number) => {
+    const handleSelectPost = (postId: string) => {
         setSelectedPosts(prev => {
             if (prev.includes(postId)) {
                 // 如果当前已选中，则取消选中，并将全选状态设为false
@@ -118,7 +118,7 @@ const AdminPosts = () => {
     const isAllSelected = posts.length > 0 && selectedPosts.length === posts.length;
 
     // 处理帖子审核
-    const handleAuditPost = async (postId: number) => {
+    const handleAuditPost = async (postId: string) => {
         const menus = [
             PostCommentStatusEnum.PASS,
             PostCommentStatusEnum.REJECT,
@@ -159,7 +159,7 @@ const AdminPosts = () => {
     };
 
     // 切换帖子精华状态
-    const handleToggleEssence = async (postId: number, currentEssence: number) => {
+    const handleToggleEssence = async (postId: string, currentEssence: number) => {
         const newEssence = currentEssence != 0 ? 0 : 1;
         const action =
             newEssence == 1 ? t('adminPosts.setAsEssence') : t('adminPosts.removeEssence');
@@ -172,7 +172,7 @@ const AdminPosts = () => {
     };
 
     // 设置帖子精华状态
-    const handleSetEssence = async (postId: number, isEssence: number) => {
+    const handleSetEssence = async (postId: string, isEssence: number) => {
         const action =
             isEssence != 0 ? t('adminPosts.setAsEssence') : t('adminPosts.removeEssence');
 

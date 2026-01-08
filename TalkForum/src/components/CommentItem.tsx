@@ -33,11 +33,11 @@ import { useTranslation } from 'react-i18next';
 export interface CommentItemProps extends Comment {
     setCommentTarget: CommentTargetCallback; // 设置评论目标的回调函数，用于回复评论
     onInteractionChange?: (
-        commentId: number,
+        commentId: string,
         newInteractContent: number,
         newLikeCount: number
     ) => void; // 互动状态变化回调
-    onCommentDelete?: (commentId: number) => void; // 评论删除回调
+    onCommentDelete?: (commentId: string) => void; // 评论删除回调
 }
 
 /**
@@ -76,7 +76,7 @@ const CommentItem = ({
     const [hasMore, setHasMore] = useState(true);
 
     // 分页游标状态
-    const [cursor, setCursor] = useState<number | null>(null);
+    const [cursor, setCursor] = useState<string | null>(null);
 
     // 当前点赞数的状态
     const [curLikeCount, setCurLikeCount] = useState(likeCount);
@@ -133,9 +133,9 @@ const CommentItem = ({
 
     /**
      * 打开用户空间
-     * @param {number} userId - 用户ID
+     * @param {string} userId - 用户ID
      */
-    const openSpaceView = (userId: number) => {
+    const openSpaceView = (userId: string) => {
         // 获取当前路由路径
         const currentPath = location.pathname;
         // 解析当前路由的类型和ID
@@ -145,7 +145,7 @@ const CommentItem = ({
         if (
             pathSegments.length >= 2 &&
             pathSegments[0] === SpaceViewType.USER &&
-            parseInt(pathSegments[1]) === userId
+            pathSegments[1] === userId
         ) {
             // 如果已经在目标页面，则不执行跳转
             return;
@@ -157,9 +157,9 @@ const CommentItem = ({
 
     /**
      * 处理主评论点赞操作
-     * @param {number} id - 评论ID
+     * @param {string} id - 评论ID
      */
-    const handleLike = async (id: number) => {
+    const handleLike = async (id: string) => {
         try {
             // 确定互动内容
             let newInteractContent;
@@ -207,7 +207,7 @@ const CommentItem = ({
      * 处理主评论踩操作
      * @param {number} id - 评论ID
      */
-    const handleDislike = async (id: number) => {
+    const handleDislike = async (id: string) => {
         try {
             // 确定互动内容
             let newInteractContent;

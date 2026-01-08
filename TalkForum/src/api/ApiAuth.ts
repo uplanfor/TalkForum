@@ -10,7 +10,7 @@ import Request from '../utils/Request';
  * 定义了用户的基本信息结构
  */
 export interface UserInfo {
-    id: number; // 用户ID
+    id: string; // 用户ID
     email: string; // 用户邮箱
     name: string; // 用户名
     role: string; // 用户角色
@@ -33,7 +33,7 @@ export interface AdminHomeInfo {
 }
 
 export interface AuthInfo extends UserInfo {
-    following: number[]; // 关注列表
+    following: string[]; // 关注列表
 }
 
 /**

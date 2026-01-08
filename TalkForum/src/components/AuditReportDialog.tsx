@@ -5,7 +5,7 @@ import { type Report } from '../api/ApiReports';
 interface AuditReportDialogProps {
     onClose: () => void;
     // 预留其他props
-    reportId?: number;
+    reportId?: string;
     reportData?: Report;
 }
 

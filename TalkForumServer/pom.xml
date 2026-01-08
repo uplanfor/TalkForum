@@ -165,10 +165,18 @@
             <version>5.8.28</version>
         </dependency>
 
+
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
             <version>4.5.0</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-all</artifactId>
+            <version>0.64.8</version> <!-- 稳定版本，适配JDK8+ -->
         </dependency>
     </dependencies>
 

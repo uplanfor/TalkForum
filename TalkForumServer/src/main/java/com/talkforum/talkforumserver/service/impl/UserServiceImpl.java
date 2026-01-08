@@ -4,6 +4,7 @@ import com.talkforum.talkforumserver.common.dto.UserRegisterDTO;
 import com.talkforum.talkforumserver.common.dto.UserProfileDTO;
 import com.talkforum.talkforumserver.common.entity.User;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
+import com.talkforum.talkforumserver.common.util.GlobalIdGenerator;
 import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.util.PasswordHelper;
 import com.talkforum.talkforumserver.common.vo.PageVO;
@@ -12,6 +13,7 @@ import com.talkforum.talkforumserver.common.vo.UserVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
 import com.talkforum.talkforumserver.mapper.InviteCodeMapper;
+import com.talkforum.talkforumserver.service.AuthService;
 import com.talkforum.talkforumserver.service.UserCacheService;
 import com.talkforum.talkforumserver.mapper.UserMapper;
 import com.talkforum.talkforumserver.service.UserService;
@@ -35,7 +37,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private InviteCodeMapper inviteCodeMapper; // 邀请码数据访问层
     @Autowired
-    private AuthServiceImpl authServiceImpl;
+    private AuthService authService;
 
     /**
      * 用户注册实现
@@ -76,6 +78,8 @@ public class UserServiceImpl implements UserService {
         }
 
         try {
+            // 雪花算法
+            user.setId(GlobalIdGenerator.generateId());
             // 插入用户数据
             userMapper.addUser(user);
             // 如果使用了邀请码，更新邀请码使用次数
@@ -98,7 +102,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVO getUserById(Long userId) {
         // 使用缓存服务获取用户信息，优先从缓存读取
-        UserVO userVO = userCacheService.getUserVO(userId);
+        UserVO userVO = userMapper.getUserVOById(userId);
         if (userVO == null) {
             throw new BusinessRuntimeException(I18n.t("user.not.found"));
         }
@@ -149,7 +153,7 @@ public class UserServiceImpl implements UserService {
             String encryptedPassword = PasswordHelper.encryptPassword(newPassword);
             userMapper.resetUserPassword(userId, encryptedPassword);
             // 踢出登录
-            authServiceImpl.logout(loginCheck.id);
+            authService.logout(loginCheck.id);
         } else {
             throw new BusinessRuntimeException(I18n.t("user.password.wrong"));
         }
@@ -198,10 +202,24 @@ public class UserServiceImpl implements UserService {
      * @param status 状态
      */
     @Override
-    public void updateStatus(long userId, String status) {
+    public boolean updateStatus(String handlerRole, long userId, String status) {
+        UserVO userVO = getUserById(userId);
+        if (userVO == null) {
+            return false;
+        }
+        // 检查权限（防止越权）
+        if (userVO.role.equals(UserConstant.ROLE_ADMIN)) {
+            return false;
+        }
+        else if (userVO.role.equals(UserConstant.ROLE_MODERATOR)) {
+            if (!handlerRole.equals(UserConstant.ROLE_ADMIN)) {
+                return false;
+            }
+        }
         userMapper.updateUserStatus(userId, status);
         // 更新缓存中的用户数据（仅当缓存存在时）
         userCacheService.updateUserCache(userId);
+        return true;
     }
 
     /**
@@ -210,8 +228,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void resetUserPassword(long userId) {
-        // 重置密码为默认密码
+        // 重置密码为默认密码（并踢出对应用户）
         userMapper.resetUserPassword(userId,
                 PasswordHelper.encryptPassword((ServerConstant.DEFAULT_PASSWORD)));
+        authService.logout(userId);
     }
 }

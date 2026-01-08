@@ -27,7 +27,7 @@ const AdminComments = () => {
     const [pageSize, setPageSize] = useState(10);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [selectedComments, setSelectedComments] = useState<number[]>([]);
+    const [selectedComments, setSelectedComments] = useState<string[]>([]);
     const [selectAll, setSelectAll] = useState(false);
     const [showAuditDialog, setShowAuditDialog] = useState(false);
 
@@ -63,7 +63,7 @@ const AdminComments = () => {
 
 
     // 处理单个选择
-    const handleSelectComment = (commentId: number) => {
+    const handleSelectComment = (commentId: string) => {
         setSelectedComments(prev => {
             if (prev.includes(commentId)) {
                 // 如果当前已选中，则取消选中，并将全选状态设为false
@@ -143,7 +143,7 @@ const AdminComments = () => {
                 console.error(err);
             });
     };
-    const handleAuditComment = async (commentId: number) => {
+    const handleAuditComment = async (commentId: string) => {
         const menus = [
             PostCommentStatusEnum.PASS,
             PostCommentStatusEnum.REJECT,

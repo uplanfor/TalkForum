@@ -12,12 +12,12 @@ import PostDialog from '../components/PostDialog';
  * 定义了帖子的基本信息结构
  */
 export interface PostType {
-    id: number; // 帖子ID
+    id: string; // 帖子ID
     title: string; // 帖子标题
     brief: string; // 帖子简介
     content: string; // 帖子内容
-    userId: number; // 发布用户ID
-    clubId: number | null; // 所属俱乐部ID（可为空）
+    userId: string; // 发布用户ID
+    clubId: string | null; // 所属俱乐部ID（可为空）
     status: string; // 帖子状态
     isEssence: number; // 是否精华（0：非精华，1：精华）
     createdAt: string; // 创建时间
@@ -38,10 +38,10 @@ export interface PostType {
  */
 export interface PostListParams {
     keyword?: string; // 关键词
-    clubIds?: number[]; // 俱乐部ID列表
-    userIds?: number[]; // 用户ID列表
+    clubIds?: string[]; // 俱乐部ID列表
+    userIds?: string[]; // 用户ID列表
     isEssence?: number; // 是否精华
-    cursor?: number | null; // 游标，用于分页
+    cursor?: string | null; // 游标，用于分页
     pageSize: number; // 每页大小
     tag?: string; // 标签
 }
@@ -53,8 +53,8 @@ export interface PostListParams {
 export interface AdminPostListParams {
     keyword?: string; // 关键词
     status?: string; // 帖子状态
-    clubIds?: number[]; // 俱乐部ID列表
-    userIds?: number[]; // 用户ID列表
+    clubIds?: string[]; // 俱乐部ID列表
+    userIds?: string[]; // 用户ID列表
     isEssence?: number; // 是否精华
     page?: number; // 页码
     pageSize: number; // 每页大小
@@ -77,7 +77,7 @@ export interface PostTypePage {
 export interface PostCreateParams {
     title?: string; // 帖子标题
     content: string; // 帖子内容
-    clubId?: number | null; // 所属圈子ID（可为空）
+    clubId?: string | null; // 所属圈子ID（可为空）
     tag1?: string; // 标签1（可为空）
     tag2?: string; // 标签2（可为空）
     tag3?: string; // 标签3（可为空
@@ -123,7 +123,7 @@ export const postsCommitPostAuth = async (params: PostCreateParams): Promise<Api
  * @returns 帖子详情响应
  */
 export const postsGetPostDetailInformation = async (
-    postId: string | number
+    postId: string
 ): Promise<PostResponse> => {
     return Request.get<PostResponse>(`/api/posts/${postId}`);
 };
@@ -142,7 +142,7 @@ export const postsGetPostList = async (params: PostListParams): Promise<ApiRespo
  * @param postId 帖子ID
  * @returns 删除帖子的响应
  */
-export const postsDeletePostAuth = async (postId: string | number): Promise<ApiResponse> => {
+export const postsDeletePostAuth = async (postId: string): Promise<ApiResponse> => {
     return Request.delete_auth<ApiResponse>(`/api/posts/${postId}`);
 };
 
@@ -155,7 +155,7 @@ export const postsDeletePostAuth = async (postId: string | number): Promise<ApiR
  * @returns 修改帖子的响应
  */
 export const postsModifyPostAuth = async (
-    postId: string | number,
+    postId: string,
     params: PostEditParams
 ): Promise<ApiResponse> => {
     return Request.put_auth<ApiResponse>(`/api/posts/${postId}`, params);
@@ -179,7 +179,7 @@ export const postsAdminGetPostList = async (
  * @returns 审核帖子的响应
  */
 export const postsAdminAuditPost = async (
-    postId: string | number,
+    postId: string,
     status: PostStatus
 ): Promise<ApiResponse> => {
     return Request.put_auth<ApiResponse>(`/api/posts/admin/${postId}/audit`, { status });
@@ -192,7 +192,7 @@ export const postsAdminAuditPost = async (
  * @returns 设置帖子精华的响应
  */
 export const postsAdminSetPostAsEssence = async (
-    postId: string | number,
+    postId: string,
     isEssence: number
 ): Promise<ApiResponse> => {
     return Request.put_auth<ApiResponse>(`/api/posts/admin/${postId}/essence`, { isEssence });
@@ -203,6 +203,6 @@ export const postsAdminSetPostAsEssence = async (
  * @param postId 帖子ID
  * @returns 帖子内容响应
  */
-export const postsAdminGetPostContent = async (PostId: string | number): Promise<ApiResponse> => {
+export const postsAdminGetPostContent = async (PostId: string): Promise<ApiResponse> => {
     return Request.get_auth<PostContentResponse>(`/api/posts/admin/${PostId}/content`);
 };

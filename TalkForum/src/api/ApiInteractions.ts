@@ -35,7 +35,7 @@ export const INTERACT_USER = {
  * @param interactContent 互动内容
  */
 export const interactionMakeInteractionWithUser = (
-    interactId: number,
+    interactId: string,
     interactContent: number
 ): Promise<ApiResponse> => {
     return Request.post_auth<ApiResponse>(`/api/interactions/`, {
@@ -51,7 +51,7 @@ export const interactionMakeInteractionWithUser = (
  * @param interactContent 互动内容
  */
 export const interactionMakeInteractionWithPost = (
-    interactId: number,
+    interactId: string,
     interactContent: number
 ): Promise<ApiResponse> => {
     return Request.post_auth<ApiResponse>(`/api/interactions/`, {
@@ -67,7 +67,7 @@ export const interactionMakeInteractionWithPost = (
  * @param interactContent 互动内容
  */
 export const interactionMakeInteractionWithComment = (
-    interactId: number,
+    interactId: string,
     interactContent: number
 ): Promise<ApiResponse> => {
     return Request.post_auth<ApiResponse>(`/api/interactions/`, {
@@ -84,7 +84,7 @@ export const interactionMakeInteractionWithComment = (
  * @returns
  */
 export const interactionsFollowOrUnfollowUser = (
-    interactId: number,
+    interactId: string,
     follow: boolean
 ): Promise<ApiResponse> => {
     return Request.post_auth<ApiResponse>(`/api/interactions/`, {

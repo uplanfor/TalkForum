@@ -36,10 +36,10 @@ export type PostContainerTargetType =
  * 帖子容器搜索参数接口
  */
 export interface PostsContainerSearchParams {
-    userIds?: number[];
+    userIds?: string[];
     tag?: string;
     keyword: string;
-    clubIds?: number[];
+    clubIds?: string[];
 }
 
 /**
@@ -47,7 +47,7 @@ export interface PostsContainerSearchParams {
  */
 interface PostContainerProps {
     targetType: PostContainerTargetType; // 目标类型
-    targetId?: number; // 目标ID（可选）
+    targetId?: string; // 目标ID（可选）
     defaultTab?: number; // 默认选中的标签索引（可选）
     searchParams?: PostsContainerSearchParams; // 搜索参数（仅SEARCH模式需要）
 }
@@ -77,12 +77,12 @@ const PostContainer = ({
 
     // 使用ref管理状态，防止不必要的重新渲染
     const hasMoreRef = useRef(true);
-    const cursorRef = useRef<number | null>(null);
+    const cursorRef = useRef<string | null>(null);
     const isRefreshingRef = useRef(false);
     const isErrorRef = useRef(false);
     const isLoadingRef = useRef(false);
 
-    const removePost = (id: number) => {
+    const removePost = (id: string) => {
         setPosts(posts.filter(post => post.id !== id));
     };
 
@@ -95,7 +95,7 @@ const PostContainer = ({
         forceUpdate();
     };
 
-    const updateCursor = (value: number | null) => {
+    const updateCursor = (value: string | null) => {
         cursorRef.current = value;
         forceUpdate();
     };
@@ -305,11 +305,12 @@ const PostContainer = ({
             return;
         }
 
-        // 对于SEARCH模式，使用传递的searchParams作为缓存键的一部分
-        const searchParamsString =
-            targetType === PostContainerTargetType.SEARCH && searchParams
-                ? JSON.stringify(searchParams)
-                : undefined;
+
+        // // （根本不会发生）对于SEARCH模式，使用传递的searchParams作为缓存键的一部分
+        // const searchParamsString =
+        //     targetType === PostContainerTargetType.SEARCH && searchParams
+        //         ? JSON.stringify(searchParams)
+        //         : undefined;
 
         // 更新当前选中的标签索引
         setCurTabIndex(index);
@@ -484,7 +485,7 @@ const PostContainer = ({
                         // });
 
                         // 收集需要缓存的用户ID
-                        let needCacheTarget: number[] = [];
+                        let needCacheTarget: string[] = [];
                         if (res.data?.data) {
                             res.data.data.forEach((item: PostCardProps) => {
                                 const userId = item.userId;

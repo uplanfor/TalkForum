@@ -25,11 +25,11 @@ const AuditPostDialog = ({ onClose }: AuditPostDialogProps) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [hasMorePosts, setHasMorePosts] = useState<boolean>(true);
-    const [auditedPosts, setAuditedPosts] = useState<Set<number>>(new Set()); // 跟踪已审核的帖子
+    const [auditedPosts, setAuditedPosts] = useState<Set<string>>(new Set()); // 跟踪已审核的帖子
 
     // 加载帖子内容 - 使用useCallback
     const loadPostContent = useCallback(
-        async (postId: number) => {
+        async (postId: string) => {
             try {
                 const res = await postsAdminGetPostContent(postId);
                 if (res.success) {

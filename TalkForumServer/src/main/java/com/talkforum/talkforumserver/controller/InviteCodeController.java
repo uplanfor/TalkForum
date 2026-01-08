@@ -9,6 +9,7 @@ import com.talkforum.talkforumserver.common.entity.InviteCode;
 import com.talkforum.talkforumserver.common.result.Result;
 import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
+import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.service.InviteCodeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +19,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +35,7 @@ import java.util.Map;
     name = "邀请码管理",
     description = "邀请码相关接口，包括用户获取邀请码、管理员生成/修改/删除邀请码等功能，支持邀请码的批量操作"
 )
+@Validated
 @RequestMapping("/invitecode")
 @RestController
 public class InviteCodeController {
@@ -51,7 +55,7 @@ public class InviteCodeController {
     )
     @LoginRequired
     @GetMapping("/")
-    public Result getInviteCodes(
+    public Result<List<InviteCode>> getInviteCodes(
         @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         Long userId = ((Number)(information.get("id"))).longValue();
@@ -70,7 +74,7 @@ public class InviteCodeController {
     )
     @AdminRequired
     @GetMapping("/admin")
-    public Result adminGetInviteCodes(
+    public Result<PageVO<InviteCode>> adminGetInviteCodes(
             int page,
             int pageSize) {
         return Result.success(I18n.t("invitecode.admin.get.success"), inviteCodeService.adminGetInviteCodes(page, pageSize));
@@ -89,9 +93,9 @@ public class InviteCodeController {
     )
     @AdminRequired
     @PostMapping("/admin")
-    public Result generateInviteCodes(
+    public Result<List<InviteCode>> generateInviteCodes(
             @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token,
-            @RequestBody InviteCodeDTO inviteCodeDTO) {
+            @Valid @RequestBody InviteCodeDTO inviteCodeDTO) {
         Map<String, Object> information = jwtHelper.parseJWTToken(token);
         Long userId = ((Number)(information.get("id"))).longValue();
         List<InviteCode> codes = inviteCodeService.generateInviteCodes(userId, inviteCodeDTO);
@@ -111,7 +115,7 @@ public class InviteCodeController {
     )
     @AdminRequired
     @DeleteMapping("/admin/{code}")
-    public Result deleteInviteCode(
+    public Result<Object> deleteInviteCode(
             @PathVariable String code) {
         boolean success = inviteCodeService.deleteInviteCode(code);
         return success ? 
@@ -130,8 +134,8 @@ public class InviteCodeController {
     )
     @AdminRequired
     @PutMapping("/admin")
-    public Result updateInviteCodes(
-            @RequestBody UpdateInviteCodeDTO updateInviteCodeDTO) {
+    public Result<Object> updateInviteCodes(
+            @Valid @RequestBody UpdateInviteCodeDTO updateInviteCodeDTO) {
         int updatedCount = inviteCodeService.updateInviteCodes(updateInviteCodeDTO);
         return updatedCount > 0 ? 
             Result.success(I18n.t("invitecode.update.success", updatedCount)) :
@@ -149,8 +153,8 @@ public class InviteCodeController {
     )
     @AdminRequired
     @DeleteMapping("/admin")
-    public Result deleteInviteCodes(
-            DeleteInviteCodesDTO deleteInviteCodesDTO) {
+    public Result<Object> deleteInviteCodes(
+            @Valid DeleteInviteCodesDTO deleteInviteCodesDTO) {
         int count = inviteCodeService.deleteInviteCodes(deleteInviteCodesDTO);
         return  Result.success(I18n.t("invitecode.batchDelete.success", count));
     }

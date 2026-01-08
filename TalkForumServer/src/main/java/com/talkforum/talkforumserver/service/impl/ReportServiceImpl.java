@@ -1,6 +1,7 @@
 package com.talkforum.talkforumserver.service.impl;
 
 import com.talkforum.talkforumserver.common.entity.Report;
+import com.talkforum.talkforumserver.common.util.GlobalIdGenerator;
 import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.mapper.ReportMapper;
 import com.talkforum.talkforumserver.service.ReportService;
@@ -18,7 +19,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public void addReport(long userId, String reportType, String reportTargetType, Long reportTarget, String reason) {
-        reportMapper.addReport(userId, reportType, reportTargetType, reportTarget, reason);
+        reportMapper.addReport(GlobalIdGenerator.generateId(), userId, reportType, reportTargetType, reportTarget, reason);
     }
 
     @Override

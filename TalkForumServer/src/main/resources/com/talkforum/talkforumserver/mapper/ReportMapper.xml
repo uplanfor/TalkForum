@@ -27,9 +27,9 @@
 
     <insert id="addReport">
         INSERT INTO report (
-            user_id, report_type, report_target_type, report_target, reason
+            id, user_id, report_type, report_target_type, report_target, reason
         ) VALUES (
-            #{userId}, #{reportType}, #{reportTargetType}, #{reportTarget}, #{reason}
+            #{id}, #{userId}, #{reportType}, #{reportTargetType}, #{reportTarget}, #{reason}
         )
     </insert>
 

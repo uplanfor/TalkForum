@@ -5,7 +5,7 @@ USE TalkForum;
 
 -- 1. 用户表（user）- 先创建核心结构（暂不添加invite_code外键）
 CREATE TABLE `user` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '用户唯一标识',
+  `id` bigint NOT NULL COMMENT '用户唯一标识',
   `email` varchar(64) NOT NULL COMMENT '邮箱（登录账号）',
   `password` varchar(128) NOT NULL COMMENT '加密存储的密码（如bcrypt哈希）',
   `name` varchar(32) NOT NULL COMMENT '用户名',
@@ -41,8 +41,8 @@ CREATE TABLE `invite_code` (
   UNIQUE KEY `uk_invite_code` (`code`) COMMENT '邀请码唯一',
   KEY `idx_invite_code_creator` (`creator_id`) COMMENT '关联创建者',
   KEY `idx_invite_code_expired` (`expired_at`) COMMENT '按过期时间筛选',
-  -- 规范要求：限制已使用次数不超过最大次数（MySQL 5.7+支持CHECK）
-  CHECK (`used_count` <= `max_count`),
+  -- 规范要求：限制已使用次数不超过最大次数（MySQL 5.7+支持CHECK） 不使用MySQL里的
+  -- CHECK (`used_count` <= `max_count`),
   CONSTRAINT `fk_invite_code_creator` FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='邀请码表（记录邀请码）';
 
@@ -53,7 +53,7 @@ REFERENCES `invite_code` (`code`) ON DELETE SET NULL;
 
 -- 5. 圈子表（club）- 修正creator_id约束、补充默认值、调整外键策略
 CREATE TABLE `club` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '圈子唯一标识',
+  `id` bigint NOT NULL  COMMENT '圈子唯一标识',
   `name` varchar(32) NOT NULL COMMENT '圈子名称',
   `description` varchar(512) DEFAULT NULL COMMENT '圈子描述',
   `avatar_link` varchar(256) NOT NULL DEFAULT '/icon.ico' COMMENT '头像链接（按规范设默认值）',
@@ -68,18 +68,17 @@ CREATE TABLE `club` (
   KEY `idx_club_created_at` (`created_at`) COMMENT '按创建时间排序',
   KEY `idx_club_member_count` (`member_count`) COMMENT '按成员数筛选',
   KEY `idx_club_is_deleted` (`is_deleted`) COMMENT '筛选未删除圈子',
-  -- 按规范：用户删除时圈子软删除（业务层同步更新is_deleted=1），SQL层限制删除（避免creator_id非空矛盾）
   CONSTRAINT `fk_club_creator` FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='圈子表（储存所有的圈子；用户删除时圈子软删掉，变为不可加入）';
 
 -- 6. 帖子表（post）- 补充规范要求的复合唯一索引
 CREATE TABLE `post` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '帖子唯一标识',
+  `id` bigint NOT NULL COMMENT '帖子唯一标识',
   `title` varchar(64) COMMENT '帖子标题',
   `brief` text NOT NULL COMMENT '帖子简介',
   `content` text NOT NULL COMMENT '帖子内容',
   `user_id` bigint NOT NULL COMMENT '作者用户ID',
-  `cover_url` varchar(256) NOT NULL COMMENT '封面图片URL',
+  `cover_url` varchar(256) DEFAULT NULL COMMENT '封面图片URL',
   `club_id` bigint DEFAULT NULL COMMENT '所属圈子ID（可选）',
   `status` varchar(16) NOT NULL DEFAULT 'PENDING' COMMENT '状态（PENDING/PASS/REJECT/DELETE）',
   `is_essence` tinyint NOT NULL DEFAULT 0 COMMENT '是否精华（1=是，0=否）',
@@ -108,7 +107,7 @@ CREATE TABLE `post` (
 
 -- 7. 评论表（comment）- 补充规范要求的复合唯一索引
 CREATE TABLE `comment` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '评论唯一标识',
+  `id` bigint NOT NULL COMMENT '评论唯一标识',
   `post_id` bigint NOT NULL COMMENT '关联帖子ID',
   `user_id` bigint NOT NULL COMMENT '评论者用户ID',
   `root_id` bigint DEFAULT NULL COMMENT '根评论ID（顶级评论为null）',
@@ -134,7 +133,7 @@ CREATE TABLE `comment` (
 
 -- 8. 圈子成员表（club_member）- 补充规范要求的双复合唯一索引
 CREATE TABLE `club_member` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '成员关系唯一标识',
+  `id` bigint NOT NULL COMMENT '成员关系唯一标识',
   `club_id` bigint NOT NULL COMMENT '关联圈子ID',
   `user_id` bigint NOT NULL COMMENT '关联用户ID',
   `role` varchar(16) NOT NULL DEFAULT 'MEMBER' COMMENT '成员角色（OWNER/MEMBER）',
@@ -152,7 +151,7 @@ CREATE TABLE `club_member` (
 
 -- 9. 圈子创建申请表（club_apply_create）- 按规范保持一致
 CREATE TABLE `club_apply_create` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '申请唯一标识',
+  `id` bigint NOT NULL COMMENT '申请唯一标识',
   `user_id` bigint NOT NULL COMMENT '申请人用户ID',
   `name` varchar(32) NOT NULL COMMENT '申请创建的圈子名称',
   `description` varchar(512) DEFAULT NULL COMMENT '圈子描述',
@@ -172,7 +171,7 @@ CREATE TABLE `club_apply_create` (
 
 -- 10. 圈子加入申请表（club_apply_join）- 按规范保持一致
 CREATE TABLE `club_apply_join` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '申请唯一标识',
+  `id` bigint NOT NULL COMMENT '申请唯一标识',
   `user_id` bigint NOT NULL COMMENT '申请人用户ID',
   `club_id` bigint NOT NULL COMMENT '申请加入的圈子ID',
   `status` varchar(16) NOT NULL DEFAULT 'PENDING' COMMENT '申请状态（PENDING/PASS/REJECT）',
@@ -192,7 +191,7 @@ CREATE TABLE `club_apply_join` (
 
 -- 11. 通知表（notification）- 修正operator_id约束和外键策略
 CREATE TABLE `notification` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '通知唯一标识',
+  `id` bigint NOT NULL COMMENT '通知唯一标识',
   `user_id` bigint NOT NULL COMMENT '接收通知的用户 ID（谁会收到通知）',
   `type` varchar(32) NOT NULL COMMENT '通知类型（POST_COMMENT：帖子被评论；COMMENT_REPLY：评论被追评；FOLLOW：被关注）',
   `related_id` bigint NOT NULL COMMENT '关联的核心资源 ID：帖子被评论时=帖子ID；评论被追评时=原评论ID；被关注时=被关注者ID',
@@ -214,7 +213,7 @@ CREATE TABLE `notification` (
 
 -- 12. 互动表（interaction）- 按规范保持一致
 CREATE TABLE `interaction` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '互动记录唯一标识',
+  `id` bigint NOT NULL COMMENT '互动记录唯一标识',
   `user_id` bigint NOT NULL COMMENT '发起互动的用户ID（谁进行互动）',
   `interact_content` tinyint NOT NULL COMMENT '互动内容',
   `interact_target_type` varchar(16) NOT NULL COMMENT '被互动的对象类型（COMMENT=评论/POST=帖子/USER=用户）',
@@ -229,7 +228,7 @@ CREATE TABLE `interaction` (
 
 -- 13. 举报表（report）- 按规范保持一致
 CREATE TABLE `report` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '举报记录唯一标识',
+  `id` bigint NOT NULL COMMENT '举报记录唯一标识',
   `user_id` bigint NOT NULL COMMENT '举报人用户ID（谁发起举报）',
   `report_type` varchar(16) NOT NULL COMMENT '举报类型（SPAM=垃圾信息/ILLEGAL=违法内容/OTHER=其他）',
   `report_target_type` varchar(16) NOT NULL COMMENT '被举报的对象类型（COMMENT=评论/POST=帖子/USER=用户）',
@@ -251,7 +250,7 @@ CREATE TABLE `report` (
 
 -- 14. 标签表
 CREATE TABLE `tag` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '标签唯一标识',
+  `id` bigint NOT NULL COMMENT '标签唯一标识',
   `name` varchar(32) NOT NULL COMMENT '标签名称',
   `description` varchar(512) DEFAULT NULL COMMENT '标签描述',
   PRIMARY KEY (`id`),

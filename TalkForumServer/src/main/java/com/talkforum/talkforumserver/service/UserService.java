@@ -82,5 +82,5 @@ public interface UserService {
      * @param userId 用户ID
      * @param status 状态
      */
-    public void updateStatus(long userId, String status);
+    public boolean updateStatus(String handlerRole, long userId, String status);
 }

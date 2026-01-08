@@ -56,6 +56,7 @@ springdoc:
     tags-sorter: alpha
     operations-sorter: alpha
   api-docs:
+    resolve-schema-properties: true # 开启泛型字段的属性解析
     path: /v3/api-docs
   group-configs:
     - group: 'default'
@@ -65,7 +66,13 @@ springdoc:
 # knife4j的增强配置，不需要增强可以不配
 knife4j:
   enable: true
+  # 开启生产环境屏蔽
+#  production: true
   enhancement:
     enable: true # 这个是注解生效的关键，必须开启
   setting:
     language: zh_cn
+
+snowflake:
+  data-center-id: 1 # 数据中心ID，可以使用机器IP地址最后一段数字，范围为0-31
+  machine-id: 1 # 机器ID，可以使用服务器编号，范围为0-31
