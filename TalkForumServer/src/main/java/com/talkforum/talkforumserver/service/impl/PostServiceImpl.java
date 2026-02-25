@@ -16,7 +16,6 @@ import com.talkforum.talkforumserver.constant.InteractionConstant;
 import com.talkforum.talkforumserver.constant.PostConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
 import com.talkforum.talkforumserver.mapper.InteractionMapper;
-import com.talkforum.talkforumserver.service.PostCacheService;
 import com.talkforum.talkforumserver.mapper.PostMapper;
 import com.talkforum.talkforumserver.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +38,6 @@ public class PostServiceImpl implements PostService {
      */
     @Autowired
     private PostMapper postMapper;
-    @Autowired
-    private PostCacheService postCacheService;
     
     /**
      * 互动数据访问层接口
@@ -142,11 +139,7 @@ public class PostServiceImpl implements PostService {
         boolean isUser = role.equals(UserConstant.ROLE_USER);
         postMapper.updatePost(postEditDTO,
                 isUser? PostConstant.PENDING : PostConstant.PASS, brief, coverUrl);
-        
-        // 对立即通过审核的帖子，更新缓存
-        if (!isUser) {
-            postCacheService.editPost(postEditDTO.id);
-        }
+
     }
 
     /**
@@ -166,14 +159,10 @@ public class PostServiceImpl implements PostService {
         // 如果是帖子作者，可以直接删除
         if (post.userId == userId) {
             postMapper.deletePost(postId);
-            // 删除缓存中的帖子数据
-            postCacheService.evictCache(postId);
         } else {
             // 不是作者，需要管理员或风纪权限才能删除
             if (!role.equals(UserConstant.ROLE_USER)) {
                 postMapper.deletePost(postId);
-                // 删除缓存中的帖子数据
-                postCacheService.evictCache(postId);
             } else {
                 throw new BusinessRuntimeException(I18n.t("post.delete.denied"));
             }
@@ -206,11 +195,6 @@ public class PostServiceImpl implements PostService {
     public void auditPost(Long postId, String status) {
         // 调用Mapper更新帖子审核状态
         postMapper.auditPost(postId, status);
-        
-        // 如果审核状态为DELETED，删除对应的缓存数据
-        if (PostConstant.DELETED.equals(status)) {
-            postCacheService.evictCache(postId);
-        }
     }
 
     /**

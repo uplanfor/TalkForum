@@ -3,18 +3,17 @@ import { type PostType } from '../api/ApiPosts';
 import CommentItem from './CommentItem';
 import dayjs from 'dayjs';
 import { ArrowPathIcon } from '@heroicons/react/20/solid';
-import InfiniteScroll from 'react-infinite-scroller';
-import { useState, useCallback, useEffect, useRef, useReducer } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { getSingleSimpleUserInfo, requestSimpleUserInfoCache } from '../utils/simpleUserInfoCache';
 import { debounce } from '../utils/debounce&throttle';
 import { type CommentItemProps } from './CommentItem';
-import { commentGetCommentList, type Comment } from '../api/ApiComments';
+import { commentGetCommentList, commentPostComment, type Comment } from '../api/ApiComments';
 import { type CommentTargetCallback } from '../pages/PostView';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { DefaultAvatarUrl, SpaceViewType } from '../constants/default';
 import Msg from '../utils/msg';
 import { HandThumbUpIcon, HandThumbDownIcon } from '@heroicons/react/24/solid';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { type RootState } from '../store';
 import { interactionMakeInteractionWithPost } from '../api/ApiInteractions';
 import { INTERACT_POST } from '../api/ApiInteractions';
@@ -45,19 +44,16 @@ const PostDocument = (props: PostDocumentProps) => {
         interactContent,
     } = props;
 
-    // 路由导航钩子
     const navigate = useNavigate();
-    // 当前路由信息钩子
     const location = useLocation();
 
-    // 当前点赞数的状态
+
+
     const [curLikeCount, setCurLikeCount] = useState(likeCount);
-
-    // 当前是否点赞的状态
     const [isLiked, setIsLiked] = useState(interactContent === INTERACT_POST.LIKE);
-
-    // 当前是否踩的状态
     const [isDisliked, setIsDisliked] = useState(interactContent === INTERACT_POST.DISLIKE);
+    const commentInputRef = useRef<HTMLTextAreaElement>(null);
+
 
     // 当interactContent变化时，更新点赞/踩状态
     useEffect(() => {
@@ -70,7 +66,6 @@ const PostDocument = (props: PostDocumentProps) => {
         setCurLikeCount(likeCount);
     }, [likeCount]);
 
-    // 从Redux获取用户信息
     const user = useSelector((state: RootState) => state.user);
 
     // 评论相关状态
@@ -83,33 +78,25 @@ const PostDocument = (props: PostDocumentProps) => {
     const isErrorRef = useRef(false);
     const isLoadingRef = useRef(false);
 
-    // 使用useState仅用于触发UI更新
-    const [, forceUpdate] = useReducer(x => x + 1, 0);
-
     // 状态更新辅助函数
     const updateHasMore = (value: boolean) => {
         hasMoreRef.current = value;
-        forceUpdate();
     };
 
     const updateCursor = (value: string | null) => {
         cursorRef.current = value;
-        forceUpdate();
     };
 
     const updateIsRefreshing = (value: boolean) => {
         isRefreshingRef.current = value;
-        forceUpdate();
     };
 
     const updateIsError = (value: boolean) => {
         isErrorRef.current = value;
-        forceUpdate();
     };
 
     const updateIsLoading = (value: boolean) => {
         isLoadingRef.current = value;
-        forceUpdate();
     };
 
     // 用户信息加载状态
@@ -411,13 +398,12 @@ const PostDocument = (props: PostDocumentProps) => {
         // 解析当前路由的类型和ID
         const pathSegments = currentPath.split('/').filter(segment => segment !== '');
 
-        // 判断是否已经在目标页面
+        // 判断是否已经在目标页面，在则不跳转
         if (
             pathSegments.length >= 2 &&
             pathSegments[0] === SpaceViewType.USER &&
             pathSegments[1] === userId
         ) {
-            // 如果已经在目标页面，则不执行跳转
             return;
         }
 
@@ -425,9 +411,37 @@ const PostDocument = (props: PostDocumentProps) => {
         navigate(`/${SpaceViewType.USER}/${userId}`);
     };
 
+
+    const handleSendComment = useCallback(debounce(async () => {
+        if (!user.isLoggedIn) {
+            Msg.error(t('postDocument.loginFirst'));
+            return;
+        }
+
+        if (!commentInputRef.current) {
+            return;
+        }
+
+        const content = commentInputRef.current.value.trim();
+        if (content === '') {
+            Msg.error(t('postView.commentEmpty'))
+            return;
+        }
+
+        await commentPostComment(id, content, null, null).then(res => {
+            if (res.success) {
+                Msg.success(res.message);
+            } else {
+                throw new Error(res.message);
+            }
+        }).catch(err=>{
+            Msg.error(err.message);
+        })
+    }, 300), [id]);
     return (
         <div className='post-document'>
             <div className='post-window'>
+                {/* 帖子头部信息 */}
                 <div className='post-header'>
                     <h1 className='post-title'>{title}</h1>
                     <div className='author-info'>
@@ -461,6 +475,8 @@ const PostDocument = (props: PostDocumentProps) => {
                     </div>
                     <div className='belong'></div>
                 </div>
+
+                {/* 帖子内容 */}
                 <div
                     className='post-content'
                     dangerouslySetInnerHTML={{ __html: renderContent }}
@@ -480,7 +496,10 @@ const PostDocument = (props: PostDocumentProps) => {
                         ></HandThumbDownIcon>
                     </div>
                 </div>
+
+                {/* 评论列表 */}
                 <div className='post-comment'>
+                    {/* 评论头部信息 */}
                     <h2>
                         <div>
                             {t('postDocument.comments')} ({commentCount}){' '}
@@ -497,6 +516,19 @@ const PostDocument = (props: PostDocumentProps) => {
                             )}
                         </button>
                     </h2>
+
+                    <div>
+
+                        <div className="comment-input-zone">
+                            <img src={user.avatarLink} alt="userAvatar" className="avatar" />
+                            <div className="edit-combo">
+                                <textarea ref={commentInputRef} placeholder={user.isLoggedIn ? t("postView.leaveComment") : t("postView.loginToComment")} />
+                                <div className="comment-functions">
+                                    <button onClick={handleSendComment}>{t("postView.send")}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div>
                         {/* 刷新指示器 */}

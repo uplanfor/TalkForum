@@ -17,12 +17,14 @@
         </selectKey>
         <!-- 2. 插入或更新互动记录 -->
         INSERT INTO interaction (
+            id,
             user_id,
             interact_content,
             interact_target_type,
             interact_target,
             interact_date
         ) VALUES (
+            #{id},
             #{userId},
             #{interactContent},
             'USER',
@@ -88,12 +90,14 @@
         
         <!-- 2. 插入或更新互动记录，有则覆盖，无则添加 -->
         INSERT INTO interaction (
+            id,
             user_id,
             interact_content,
             interact_target_type,
             interact_target,
             interact_date
         ) VALUES (
+            #{id},
             #{userId},
             #{interactContent},
             'COMMENT',
@@ -151,12 +155,14 @@
         
         <!-- 2. 插入或更新互动记录，有则覆盖，无则添加 -->
         INSERT INTO interaction (
+            id,
             user_id,
             interact_content,
             interact_target_type,
             interact_target,
             interact_date
         ) VALUES (
+            #{id},
             #{userId},
             #{interactContent},
             'POST',

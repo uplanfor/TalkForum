@@ -26,9 +26,7 @@ export interface PostType {
     likeCount: number; // 点赞数
     commentCount: number; // 评论数
     coverUrl: string | null; // 帖子封面URL（可为空）
-    tag1: string | null; // 标签1（可为空）
-    tag2: string | null; // 标签2（可为空）
-    tag3: string | null; // 标签3（可为空）
+    tags: string | null; // 标签（可为空）
     interactContent: number; // 互动内容(（参考interaction接口）
 }
 
@@ -78,9 +76,7 @@ export interface PostCreateParams {
     title?: string; // 帖子标题
     content: string; // 帖子内容
     clubId?: string | null; // 所属圈子ID（可为空）
-    tag1?: string; // 标签1（可为空）
-    tag2?: string; // 标签2（可为空）
-    tag3?: string; // 标签3（可为空
+    tags?: string; // 标签
 }
 
 /**

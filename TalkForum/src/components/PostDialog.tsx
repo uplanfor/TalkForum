@@ -23,9 +23,7 @@ interface PostDialogProps {
     clubInputId?: string; // 俱乐部ID（可选）
     content?: string; // 帖子内容（编辑时使用）
     postId?: string | null; // 帖子ID（编辑时使用，新建时为null）
-    tag1?: string | null; // 标签1
-    tag2?: string | null; // 标签2
-    tag3?: string | null; // 标签3
+    tags: string; // 标签
 }
 
 /**
@@ -39,24 +37,20 @@ const PostDialog = ({
     clubInputId = "0",
     content = '',
     postId = null,
-    tag1 = '',
-    tag2 = '',
-    tag3 = '',
+    tags = '',
 }: PostDialogProps) => {
-    // 国际化钩子
     const { t } = useTranslation();
 
     // 标题输入框引用
     const titleRef = useRef<HTMLInputElement>(null);
-
     // 内容文本域引用
     const contentRef = useRef<HTMLTextAreaElement>(null);
 
-    // 俱乐部ID状态
     const [clubId, setClubId] = useState<string>(clubInputId);
+    
 
     // 标签状态
-    const [tags, setTags] = useState<string[]>([]);
+    const [dividedTags, setDividedTags] = useState<string[]>(tags.split(';') || []);
     const [tagInput, setTagInput] = useState<string>('');
     const [isAddingTag, setIsAddingTag] = useState<boolean>(false);
     const tagRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -64,22 +58,22 @@ const PostDialog = ({
 
     // 节流处理标签添加，控制添加频率
     const throttledAddTag = useCallback(
-        throttle(() => {
-            if (tags.length < 3 && !isAddingTag) {
-                setIsAddingTag(true);
-                const newTags = [...tags, ''];
-                setTags(newTags);
+            throttle(() => {
+                if (dividedTags.length < 8 && !isAddingTag) {
+                    setIsAddingTag(true);
+                    const newdividedTags = [...dividedTags, ''];
+                    setDividedTags(newdividedTags);
 
                 // 聚焦到新添加标签的输入框
                 setTimeout(() => {
-                    const newIndex = newTags.length - 1;
+                    const newIndex = newdividedTags.length - 1;
                     if (tagInputRefs.current[newIndex]) {
                         tagInputRefs.current[newIndex]?.focus();
                     }
                 }, 10);
             }
         }, 500),
-        [tags, isAddingTag]
+        [dividedTags, isAddingTag]
     );
 
     // 添加标签
@@ -90,13 +84,13 @@ const PostDialog = ({
     // 删除标签
     const handleRemoveTag = useCallback(
         (index: number) => {
-            setTags(prevTags => {
-                const newTags = prevTags.filter((_, i) => i !== index);
+            setDividedTags(prevdividedTags => {
+                const newdividedTags = prevdividedTags.filter((_, i) => i !== index);
                 // 如果删除的是正在添加的空标签，重置添加状态
-                if (isAddingTag && index === prevTags.length - 1 && !prevTags[index].trim()) {
+                if (isAddingTag && index === prevdividedTags.length - 1 && !prevdividedTags[index].trim()) {
                     setIsAddingTag(false);
                 }
-                return newTags;
+                return newdividedTags;
             });
 
             // 更新引用数组
@@ -121,17 +115,17 @@ const PostDialog = ({
     const handleTagChange = useCallback(
         (index: number, value: string) => {
             // 直接更新标签值，不触发额外验证
-            const newTags = [...tags];
-            newTags[index] = value;
-            setTags(newTags);
+            const newdividedTags = [...dividedTags];
+            newdividedTags[index] = value;
+            setDividedTags(newdividedTags);
         },
-        [tags]
+        [dividedTags]
     );
 
     // 处理标签失去焦点
     const handleTagBlur = useCallback(
         (index: number) => {
-            const tag = tags[index];
+            const tag = dividedTags[index];
             // 去除前后空格
             const trimmedTag = tag.trim();
 
@@ -140,28 +134,41 @@ const PostDialog = ({
                 handleRemoveTag(index);
             } else {
                 // 更新标签内容（去除前后空格）
-                const newTags = [...tags];
-                newTags[index] = trimmedTag;
-                setTags(newTags);
+                const newdividedTags = [...dividedTags];
+                newdividedTags[index] = trimmedTag;
+                setDividedTags(newdividedTags);
 
                 // 如果是正在添加的标签，重置添加状态
-                if (isAddingTag && index === tags.length - 1) {
+                if (isAddingTag && index === dividedTags.length - 1) {
                     setIsAddingTag(false);
                 }
             }
         },
-        [tags, isAddingTag, handleRemoveTag]
+        [dividedTags, isAddingTag, handleRemoveTag]
     );
 
     // 处理标签键盘事件
     const handleTagKeyDown = useCallback(
         (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-            // If pressing Backspace, focus to previous tag without validation
-            if (e.key === 'Backspace' && tags.length > 1) {
-                e.preventDefault();
-                // 聚焦到前一个标签
-                if (tagInputRefs.current[index - 1]) {
-                    tagInputRefs.current[index - 1]?.focus();
+            // Handle backspace key
+            if (e.key === 'Backspace') {
+                const input = e.currentTarget;
+                // Only handle if cursor is at start and content is/will be empty
+                if (input.selectionStart === 0 && (!input.value || input.value.length === 1)) {
+                    e.preventDefault();
+                    // Delete tag if empty or will be empty after backspace
+                    handleRemoveTag(index);
+                    
+                    // Focus previous tag if exists
+                    if (index > 0) {
+                        const prevInput = tagInputRefs.current[index - 1];
+                        if (prevInput) {
+                            setTimeout(() => {
+                                prevInput.focus();
+                                prevInput.setSelectionRange(prevInput.value.length, prevInput.value.length);
+                            }, 10);
+                        }
+                    }
                 }
             }
             // 如果按右箭头且在标签末尾，移动到下一个标签或输入框
@@ -169,9 +176,9 @@ const PostDialog = ({
                 const inputElement = tagInputRefs.current[index];
                 if (inputElement && e.currentTarget.selectionStart === inputElement.value.length) {
                     e.preventDefault();
-                    if (index < tags.length - 1) {
+                    if (index < dividedTags.length - 1) {
                         tagInputRefs.current[index + 1]?.focus();
-                    } else if (tags.length < 3) {
+                    } else if (dividedTags.length < 8) {
                         // 聚焦到输入框
                         const inputElement = document.querySelector('.post-dialog-tag-input');
                         if (inputElement) {
@@ -194,7 +201,7 @@ const PostDialog = ({
                 }
             }
         },
-        [tags]
+        [dividedTags]
     );
 
     // 创建稳定的ref回调函数
@@ -215,8 +222,8 @@ const PostDialog = ({
     // 使用useMemo优化标签渲染，避免不必要的重新渲染
     const tagElements = useMemo(
         () =>
-            tags.map((tag, index) => (
-                <div key={`tag-${index}`} className={`post-tag${index + 1}`} ref={setTagRef(index)}>
+            dividedTags.map((tag, index) => (
+                <div key={`tag-${index}`} className={`post-tag`} ref={setTagRef(index)}>
                     <button
                         className='post-tag-remove'
                         onClick={e => {
@@ -243,7 +250,7 @@ const PostDialog = ({
                 </div>
             )),
         [
-            tags,
+            dividedTags,
             handleRemoveTag,
             handleTagChange,
             handleTagBlur,
@@ -256,12 +263,12 @@ const PostDialog = ({
     // 使用useMemo优化添加按钮渲染
     const addTagButton = useMemo(
         () =>
-            tags.length < 3 ? (
-                <button className='post-dialog-tag-add-btn' onClick={handleAddTag}>
-                    {t('postDialog.addTag')}
-                </button>
-            ) : null,
-        [tags.length, handleAddTag]
+                dividedTags.length < 8 ? (
+                    <button className='post-dialog-tag-add-btn' onClick={handleAddTag}>
+                        {t('postDialog.addTag')}
+                    </button>
+                ) : null,
+            [dividedTags.length, handleAddTag]
     );
 
     /**
@@ -273,10 +280,7 @@ const PostDialog = ({
             return;
         }
 
-        // 将tags数组转换为三个独立的标签参数
-        const tag1 = tags[0] || '';
-        const tag2 = tags[1] || '';
-        const tag3 = tags[2] || '';
+        const stringDividedTags = dividedTags.join(';');
 
         // 判断是否是修改帖子还是发布帖子
         if (postId == null) {
@@ -285,9 +289,7 @@ const PostDialog = ({
                 content: contentRef.current.value,
                 title: titleRef.current?.value,
                 clubId: clubId == "0" ? null : clubId,
-                tag1,
-                tag2,
-                tag3,
+                tags: stringDividedTags,
             })
                 .then(res => {
                     if (res.success) {
@@ -306,9 +308,7 @@ const PostDialog = ({
                 content: contentRef.current.value,
                 title: titleRef.current?.value,
                 clubId: clubId == "0" ? null : clubId,
-                tag1,
-                tag2,
-                tag3,
+                tags: stringDividedTags,
             })
                 .then(res => {
                     if (res.success) {
@@ -366,13 +366,6 @@ const PostDialog = ({
             contentRef.current.value = content;
             contentRef.current.focus();
         }
-
-        // 初始化标签
-        const initialTags = [];
-        if (tag1?.trim()) initialTags.push(tag1.trim());
-        if (tag2?.trim()) initialTags.push(tag2.trim());
-        if (tag3?.trim()) initialTags.push(tag3.trim());
-        setTags(initialTags);
     }, []);
 
     return (
@@ -394,7 +387,7 @@ const PostDialog = ({
                 />
 
                 {/* 标签编辑区域 */}
-                <div className='post-dialog-tags-container'>
+                <div className='post-dialog-dividedTags-container'>
                     <div className='post-dialog-tag-editor'>
                         {/* 已添加的标签 */}
                         {tagElements}

@@ -57,7 +57,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             // 未登录，返回401状态码和错误信息
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":401,\"success\":false,\"message\":\"Please sign in so you can use the function!\"}");
+            response.getWriter().write("{\"code\":401,\"success\":false,\"message\":\"Please sign in!\"}");
             return false;
         } else {
             try {

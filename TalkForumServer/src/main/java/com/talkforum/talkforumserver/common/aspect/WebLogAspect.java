@@ -31,9 +31,7 @@ import java.util.regex.Pattern;
 @Component
 public class WebLogAspect {
 
-    // 1. 修复线程安全问题：使用线程安全的DateTimeFormatter，替代SimpleDateFormat
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    // 线程安全的ObjectMapper（Jackson自带的JavaTimeModule处理日期）
     private final ObjectMapper objectMapper;
 
     // 内网IP正则（排除内网IP，只取公网IP）
@@ -41,12 +39,10 @@ public class WebLogAspect {
             "(^127\\.)|(^10\\.)|(^172\\.1[6-9]\\.)|(^172\\.2[0-9]\\.)|(^172\\.3[0-1]\\.)|(^192\\.168\\.)|(^0:0:0:0:0:0:0:1$)"
     );
 
-    // 初始化ObjectMapper（线程安全）
     public WebLogAspect() {
         this.objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        // 注册JavaTimeModule处理日期，替代线程不安全的SimpleDateFormat
         JavaTimeModule javaTimeModule = new JavaTimeModule();
         javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DATE_TIME_FORMATTER));
         objectMapper.registerModule(javaTimeModule);
@@ -146,10 +142,9 @@ public class WebLogAspect {
      * 敏感参数脱敏：根据参数名匹配脱敏规则
      */
     private Object desensitizeValue(String paramName, Object value) {
-        if (value == null || !(value instanceof String)) {
+        if (!(value instanceof String strValue)) {
             return value;
         }
-        String strValue = (String) value;
         // 匹配敏感参数名（可扩展）
         if (paramName.contains("password") || paramName.contains("pwd")) {
             return "******";

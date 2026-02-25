@@ -10,9 +10,9 @@ public class I18nConfig {
     @Bean
     public ResourceBundleMessageSource messageSource() {
         ResourceBundleMessageSource ms = new ResourceBundleMessageSource();
-        ms.setBasename("com.talkforum.talkforumserver.i18n.messages"); // ✅ 正确的完整路径
-        ms.setDefaultEncoding("UTF-8"); // 解决中文乱码
-        ms.setUseCodeAsDefaultMessage(true); // 文本缺失时返回key本身（便于排查）
+        ms.setBasename("com.talkforum.talkforumserver.i18n.messages");
+        ms.setDefaultEncoding("UTF-8");
+        ms.setUseCodeAsDefaultMessage(true); // 文本缺失时返回key本身
         return ms;
     }
 }

@@ -99,9 +99,7 @@ class InternalRenderer extends Renderer {
         const codeContent = `
       <div class="code-block-content">
         <div class="code-container">
-          <!-- 行号列 -->
           <div class="code-line-numbers">${lineNumbersHtml}</div>
-          <!-- 代码列（保留原有高亮） -->
           <pre><code class="hljs language-${language}">${highlightedCode}</code></pre>
         </div>
       </div>
@@ -163,9 +161,8 @@ export async function parseMarkdown(
         };
     } catch (error) {
         console.error('Markdown Parser Error:', error);
-        // 失败兜底：返回错误提示 HTML + 空目录
         return {
-            html: `<p>failed to parse content!</p>`,
+            html: `Invalid Content`,
             tocNodeTree: [],
         };
     }

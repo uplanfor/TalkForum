@@ -38,9 +38,7 @@ export interface PostCardProps {
     createdAt: string; // 发布时间
     interactContent?: number; // 互动内容（参考interaction接口）
     removeSelf: (id: string)=>void;  // 删掉自己的帖子回调函数
-    tag1?: string | null; // 标签1（可为空）
-    tag2?: string | null; // 标签2（可为空）
-    tag3?: string | null; // 标签3（可为空）
+    tags?: string | null; // 标签（可为空）
 }
 
 /**
@@ -48,7 +46,6 @@ export interface PostCardProps {
  * @param {PostCardProps} props - 组件属性
  */
 const PostCard = (props: PostCardProps) => {
-    // 解构组件属性
     const {
         title,
         brief,
@@ -63,29 +60,18 @@ const PostCard = (props: PostCardProps) => {
         commentCount,
         interactContent,
         removeSelf,
-        tag1,
-        tag2,
-        tag3,
+        tags
     } = props;
 
-    // 国际化钩子
     const { t } = useTranslation();
 
-    // 路由导航钩子
     const navigate = useNavigate();
-    // 当前路由信息钩子
     const location = useLocation();
 
-    // 从Redux获取用户信息
     const user = useSelector((state: RootState) => state.user);
 
-    // 当前帖子是否精华的状态
     const [curEssence, setCurEssence] = useState(isEssence);
-
-    // 当前点赞数的状态
     const [curLikeCount, setCurLikeCount] = useState(likeCount);
-
-    // 点赞状态
     const [isLiked, setIsLiked] = useState(interactContent === INTERACT_POST.LIKE);
 
     /**
@@ -93,9 +79,7 @@ const PostCard = (props: PostCardProps) => {
      * @param {string} id - 帖子ID
      */
     const essencePost = async (id: string) => {
-        // 计算目标精华状态（取反当前状态）
         const targetEssence = curEssence != 0 ? 0 : 1;
-        // 调用API设置精华状态
         await postsAdminSetPostAsEssence(id, targetEssence)
             .then(res => {
                 if (res.success) {
@@ -118,7 +102,6 @@ const PostCard = (props: PostCardProps) => {
      */
     const openPost = (id: string, target: string) => {
         if (target === PostViewType.EDIT) {
-            // 使用正常的push模式导航，保留历史记录
             navigate(`/post/${id}?edit=true`);
         } else {
             navigate(`/post/${id}`);
@@ -142,9 +125,8 @@ const PostCard = (props: PostCardProps) => {
         try {
             const res = await interactionMakeInteractionWithPost(id, targetInteractContent);
             if (res.success) {
-                // 更新点赞状态
+                // 更新点赞状态和点赞数
                 setIsLiked(!isLiked);
-                // 更新点赞数
                 setCurLikeCount(prev => (isLiked ? prev - 1 : prev + 1));
                 Msg.success(isLiked ? t('postCard.likeRemovedSuccess') : t('postCard.likeSuccess'));
             } else {
@@ -205,7 +187,6 @@ const PostCard = (props: PostCardProps) => {
             pathSegments[0] === targetType &&
             pathSegments[1] === targetId
         ) {
-            // 如果已经在目标页面，则不执行跳转
             return;
         }
 
@@ -281,9 +262,7 @@ const PostCard = (props: PostCardProps) => {
                 {clubId && (
                     <span onClick={() => openSpaceView(clubId, SpaceViewType.CLUB)}>{clubId}</span>
                 )}
-                {tag1 && <span className='tag tag1'>{tag1}</span>}
-                {tag2 && <span className='tag tag2'>{tag2}</span>}
-                {tag3 && <span className='tag tag3'>{tag3}</span>}
+                {tags && tags.split(';').map(tag => <span key={tag} className='tag'>{tag}</span>)}
             </div>
 
             {/* 帖子操作菜单 */}

@@ -10,7 +10,7 @@
             id, title, brief, user_id, content, cover_url,
             club_id, status, is_essence, created_at, updated_at,
             view_count, like_count, comment_count,
-            tag1, tag2, tag3
+            tags
         FROM post
         WHERE id = #{postId} AND status = 'PASS'
     </select>
@@ -28,7 +28,7 @@
             id, title, brief, user_id, cover_url,
             club_id, status, is_essence, created_at,
             view_count, like_count, comment_count,
-            tag1, tag2, tag3
+            tags
         FROM post
         <where>
             status = 'PASS'
@@ -46,7 +46,7 @@
                 </foreach>
             </if>
             <if test="tag != null">
-                AND (tag1 = #{tag} OR tag2 = #{tag} OR tag3 = #{tag})</if>
+                AND tags LIKE CONTACT('%', #{keyword}, '%')</if>
             <if test="isEssence != null">AND is_essence = #{isEssence}</if>
             <if test="keyword != null and keyword.trim() != ''">
                 AND (
@@ -54,17 +54,17 @@
                     OR brief LIKE CONCAT('%', #{keyword}, '%')
                 )</if>
         </where>
-        ORDER BY id DESC <!-- 按id降序，id越大越新 -->
+        ORDER BY id DESC
         LIMIT #{pageSize}
     </select>
 
     <insert id="addPost" useGeneratedKeys="true" keyProperty="postCommitDTO.id" keyColumn="id">
         INSERT INTO post (
-            id, title, content, user_id, club_id, status, brief, tag1, tag2, tag3, cover_url
+            id, title, content, user_id, club_id, status, brief, tags, cover_url
         ) VALUES (
             #{postCommitDTO.id}, #{postCommitDTO.title}, #{postCommitDTO.content}, #{postCommitDTO.userId},
                   #{postCommitDTO.clubId}, #{status}, #{brief},
-                  #{postCommitDTO.tag1}, #{postCommitDTO.tag2}, #{postCommitDTO.tag3},
+                  #{postCommitDTO.tags},
                   #{coverUrl}
         )
     </insert>
@@ -74,10 +74,8 @@
         <set>
             <if test="postEditDTO.title != null">title = #{postEditDTO.title},</if>
             <if test="postEditDTO.content != null">content = #{postEditDTO.content},</if>
-            <if test="postEditDTO.tag1 != null">tag1 = #{postEditDTO.tag1},</if>
-            <if test="postEditDTO.tag2 != null">tag2 = #{postEditDTO.tag2},</if>
-            <if test="postEditDTO.tag3 != null">tag3 = #{postEditDTO.tag3},</if>
             <if test="status != null">status = #{status},</if>
+            tags = #{postEditDTO.tags}
             updated_at = NOW(),
             brief = #{brief},
             cover_url = #{coverUrl}
@@ -104,7 +102,7 @@
             id, title, brief, user_id,
             club_id, status, is_essence, created_at,
             view_count, like_count, comment_count,
-            tag1, tag2, tag3
+            tags
         FROM post
         <where>
             <if test="status != null">AND status = #{status}</if>
@@ -121,7 +119,7 @@
                 </foreach>
             </if>
             <if test="tag != null">
-                AND (tag1 = #{tag} OR tag2 = #{tag} OR tag3 = #{tag})
+                AND tags LIKE CONTACT('%', #{tag}, '%')
             </if>
         </where>
         ORDER BY id DESC

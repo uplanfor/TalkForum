@@ -34,28 +34,12 @@ public class PostEditDTO {
 
 
     @Schema(
-            description = "帖子所属标签",
-            maxLength = 16,
-            example = "能源电力"
+            description = "帖子所属标签，支持多个标签，每个标签以英文分号结尾，每个标签文本长度小于等于16,最多8个标签",
+            maxLength = 256,
+            example = "创作者计划;这就是螺蛳粉"
     )
-    @Size(max = 16, message = "Tag cannot be too long!")
-    public String tag1;
-
-    @Schema(
-            description = "帖子所属标签",
-            maxLength = 16,
-            example = "能源电力"
-    )
-    @Size(max = 16, message = "Tag cannot be too long!")
-    public String tag2;
-
-    @Schema(
-            description = "帖子所属标签",
-            maxLength = 16,
-            example = "能源电力"
-    )
-    @Size(max = 16, message = "Tag cannot be too long!")
-    public String tag3;
+    @Size(max = 256, message = "Too much tags!")
+    public String tags;
 
     @Schema(
             description = "帖子内容",
@@ -67,16 +51,4 @@ public class PostEditDTO {
             message = "The characters of the post must be between 1 and 25000!")
     public String content;
 
-
-    public void setTag1(String tag1) {
-        this.tag1 = tag1 == null ? tag1 : tag1.trim();
-    }
-
-    public void setTag2(String tag2) {
-        this.tag2 = tag2 == null ? tag2 : tag2.trim();
-    }
-
-    public void setTag3(String tag3) {
-        this.tag3 = tag3 == null ? tag3 : tag3.trim();
-    }
 }

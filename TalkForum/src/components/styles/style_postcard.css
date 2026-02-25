@@ -55,6 +55,7 @@
     list-style: none;
     width: 75px;
     height: 30px;
+    line-height: 30px;
     text-align: center;
     color: var(--neutral-text-main);
 }
@@ -166,30 +167,19 @@
     display: flex;
 }
 
-.post-card .belong span {
-    display: block;
-    width: fit-content;
-    height: 28px;
-    text-align: center;
-}
-
 .post-card .belong span.tag {
+    display: block;
     margin-right: 3px;
     padding: 5px;
+
+    width: fit-content;
+    height: 28px;
+    line-height: 18px;
+    text-align: center;
     color: var(--neutral-module);
     border-radius: 9px;
-}
-
-.post-card .belong span.tag.tag1 {
+    
     background-color: var(--primary);
-}
-
-.post-card .belong span.tag.tag2 {
-    background-color: var(--secondary-warm-1);
-}
-
-.post-card .belong span.tag.tag3 {
-    background-color: var(--secondary-warm-2);
 }
 
 .post-card .belong span.tag::before {

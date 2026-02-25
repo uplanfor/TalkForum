@@ -21,13 +21,15 @@ CREATE TABLE `user` (
   `used_invite_code` varchar(16) DEFAULT NULL COMMENT '注册使用的邀请码（恢复缺失字段）',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_email` (`email`) COMMENT '邮箱唯一，避免重复注册',
+  UNIQUE KEY `uk_name` (`name`) COMMENT '用户名唯一，避免重复注册',
   KEY `idx_user_role` (`role`) COMMENT '按角色查询用户',
   KEY `idx_user_created_at` (`created_at`) COMMENT '按注册时间排序',
   KEY `idx_user_status` (`status`) COMMENT '按状态筛选用户',
   KEY `fk_user_invite_code` (`used_invite_code`) COMMENT '关联邀请码表（后续添加外键）'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表（储存用户信息）';
 
--- 2.令牌表 直接废弃
+-- 2.令牌表
+
 
 -- 3. 邀请码表（invite_code）- 提前创建（依赖user表，此时user表已存在）
 CREATE TABLE `invite_code` (
@@ -41,15 +43,9 @@ CREATE TABLE `invite_code` (
   UNIQUE KEY `uk_invite_code` (`code`) COMMENT '邀请码唯一',
   KEY `idx_invite_code_creator` (`creator_id`) COMMENT '关联创建者',
   KEY `idx_invite_code_expired` (`expired_at`) COMMENT '按过期时间筛选',
-  -- 规范要求：限制已使用次数不超过最大次数（MySQL 5.7+支持CHECK） 不使用MySQL里的
-  -- CHECK (`used_count` <= `max_count`),
   CONSTRAINT `fk_invite_code_creator` FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='邀请码表（记录邀请码）';
 
--- 4. 给user表添加used_invite_code外键（此时invite_code表已存在，无引用冲突）
-ALTER TABLE `user`
-ADD CONSTRAINT `fk_user_invite_code` FOREIGN KEY (`used_invite_code`) 
-REFERENCES `invite_code` (`code`) ON DELETE SET NULL;
 
 -- 5. 圈子表（club）- 修正creator_id约束、补充默认值、调整外键策略
 CREATE TABLE `club` (
@@ -87,9 +83,7 @@ CREATE TABLE `post` (
   `view_count` int NOT NULL DEFAULT 0 COMMENT '阅读次数',
   `like_count` int NOT NULL DEFAULT 0 COMMENT '点赞数量',
   `comment_count` int NOT NULL DEFAULT 0 COMMENT '评论数量',
-  `tag1` varchar(32) DEFAULT NULL COMMENT '标签1',
-  `tag2` varchar(32) DEFAULT NULL COMMENT '标签2',
-  `tag3` varchar(32) DEFAULT NULL COMMENT '标签3',
+  `tags` varchar(256) DEFAULT NULL COMMENT '标签列表',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_post_club_status_created` (`club_id`, `status`, `created_at` DESC) COMMENT '规范要求：复合唯一索引（圈子+状态+创建时间倒序）',
   KEY `fk_post_user` (`user_id`) COMMENT '关联作者',
@@ -98,9 +92,7 @@ CREATE TABLE `post` (
   KEY `idx_post_is_essence` (`is_essence`) COMMENT '筛选精华帖',
   KEY `idx_post_created_at` (`created_at`) COMMENT '按创建时间排序',
   KEY `idx_post_updated_at` (`updated_at`) COMMENT '按更新时间排序',
-  KEY `idx_post_tag1` (`tag1`) COMMENT '按标签1筛选帖子',
-  KEY `idx_post_tag2` (`tag2`) COMMENT '按标签2筛选帖子',
-  KEY `idx_post_tag3` (`tag3`) COMMENT '按标签3筛选帖子',
+  KEY `idx_post_tags` (`tags`) COMMENT '按标签筛选帖子',
   CONSTRAINT `fk_post_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_post_club` FOREIGN KEY (`club_id`) REFERENCES `club` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='帖子表（储存所有帖子，作者删除时级联删除帖子；圈子删除时级联删除帖子）';

@@ -30,6 +30,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import NotFound from './NotFound';
 import { ReportTargetConstant, ReportTypeEnum } from '../constants/report_constant';
 import { useTranslation } from 'react-i18next';
+import Loading from './Loading';
 
 /**
  * 评论目标接口
@@ -53,21 +54,17 @@ export type CommentTargetCallback = (target: CommentTarget) => void;
  * 展示帖子详细内容和评论
  */
 const PostView = () => {
-    // 国际化钩子
     const { t } = useTranslation();
-    // 从URL参数中获取帖子ID
     const { postId } = useParams<{ postId: string }>();
-    // 路由导航钩子
+
     const navigate = useNavigate();
-    // 获取当前路由位置
     const location = useLocation();
-    // 帖子是否存在的状态
+
+    const loadingRef = useRef(true);
     const [ok, setOk] = useState(true);
-    // 渲染的帖子内容（Markdown转换后的HTML）
     const [renderContent, setRenderContent] = useState<string>('');
-    // 从Redux获取用户登录状态
     const { isLoggedIn, role } = useSelector((state: any) => state.user);
-    // 评论回复目标状态
+
     const [commentTarget, setCommentTarget] = useState<CommentTarget>({
         parentId: null,
         rootId: null,
@@ -95,9 +92,7 @@ const PostView = () => {
         likeCount: 0,
         commentCount: 0,
         interactContent: 0,
-        tag1: null,
-        tag2: null,
-        tag3: null,
+        tags: null,
     });
 
     // 目录数据状态
@@ -120,6 +115,11 @@ const PostView = () => {
                 let content = commentContentRef.current.value.trim();
                 if (content === '') {
                     Msg.error(t('postView.commentEmpty'));
+                    return;
+                }
+
+                if (!isLoggedIn) {
+                    Msg.error(t("postDocument.loginFirst"));
                     return;
                 }
 
@@ -167,7 +167,7 @@ const PostView = () => {
                     .then(async res => {
                         if (res.success) {
                             const post_result: PostType = res.data;
-                            console.log(post_result);
+                            // console.log(post_result);
                             setPost({ ...post_result });
 
                             const { html, tocNodeTree } = await parseMarkdown(post_result.content);
@@ -181,6 +181,9 @@ const PostView = () => {
                     .catch(err => {
                         console.log(err);
                         setOk(false); // 加载失败，显示404
+                    })
+                    .finally(() => {
+                        loadingRef.current = false;
                     });
             } else {
                 setOk(false); // 帖子不存在，显示404
@@ -193,7 +196,11 @@ const PostView = () => {
      * 组件挂载或postId变化时加载帖子详情
      */
     useEffect(() => {
-        loadPostDetail(postId!);
+        if (loadingRef.current) {
+
+            loadPostDetail(postId!);
+            return;
+        }
         // 检测URL中的参数，如果存在则自动打开对应的对话框
         const params = new URLSearchParams(location.search);
         let hasParamToRemove = false;
@@ -215,7 +222,8 @@ const PostView = () => {
         if (hasParamToRemove) {
             navigate({ search: params.toString() }, { replace: true });
         }
-    }, [postId, loadPostDetail, location.search, navigate]);
+    }, [postId, loadingRef.current]);
+
 
     /**
      * 渲染目录树的递归函数
@@ -255,63 +263,69 @@ const PostView = () => {
         navigate(-1); // 返回上一页
     };
 
-    return ok ? (
+
+    /**
+     * 弹出菜单
+     */
+    const handleMenu = async () => {
+        let menus;
+        if (isLoggedIn && role != UserType.USER) {
+            menus = [
+                t('postView.sharePost'),
+                t('postView.reportPost'),
+                t('postView.editPost'),
+                t('postView.deletePost'),
+            ];
+        } else {
+            menus = [t('postView.sharePost'), t('postView.reportPost')];
+        }
+
+        await Msg.menu(menus, t('postView.menuTitle')).then(async res => {
+            switch (res) {
+                case 0:
+                    Msg.success(t('postView.linkCopied'));
+                    copyToClipboard(`${window.location.origin}/post/${postId}`);
+                    break;
+                case 1:
+                    setShowReportDialog(true);
+                    break;
+                case 2:
+                    setShowPostDialog(true);
+                    break;
+                case 3:
+                    Msg.confirm(t('postView.deleteConfirm')).then(async res => {
+                        if (res) {
+                            await postsDeletePostAuth(post.id)
+                                .then(res => {
+                                    if (res.success) {
+                                        Msg.success(res.message);
+                                        handleClose();
+                                    } else {
+                                        throw new Error(res.message);
+                                    }
+                                })
+                                .catch(err => {
+                                    Msg.error(err);
+                                    console.log(err);
+                                });
+                        }
+                    });
+                    break;
+            }
+        });
+    };
+
+    return loadingRef.current ? <Loading /> : (ok ? (
         <div className='post-view-cover'>
             <div className='title'>
                 {t('postView.title')}
                 <ArrowLeftIcon onClick={handleClose} />
 
                 <EllipsisHorizontalIcon
-                    onClick={async () => {
-                        let menus;
-                        if (isLoggedIn && role != UserType.USER) {
-                            menus = [
-                                t('postView.sharePost'),
-                                t('postView.reportPost'),
-                                t('postView.editPost'),
-                                t('postView.deletePost'),
-                            ];
-                        } else {
-                            menus = [t('postView.sharePost'), t('postView.reportPost')];
-                        }
-
-                        await Msg.menu(menus, t('postView.menuTitle')).then(async res => {
-                            switch (res) {
-                                case 0:
-                                    Msg.success(t('postView.linkCopied'));
-                                    copyToClipboard(`${window.location.origin}/post/${postId}`);
-                                    break;
-                                case 1:
-                                    setShowReportDialog(true);
-                                    break;
-                                case 2:
-                                    setShowPostDialog(true);
-                                    break;
-                                case 3:
-                                    Msg.confirm(t('postView.deleteConfirm')).then(async res => {
-                                        if (res) {
-                                            await postsDeletePostAuth(post.id)
-                                                .then(res => {
-                                                    if (res.success) {
-                                                        Msg.success(res.message);
-                                                        handleClose();
-                                                    } else {
-                                                        throw new Error(res.message);
-                                                    }
-                                                })
-                                                .catch(err => {
-                                                    Msg.error(err);
-                                                    console.log(err);
-                                                });
-                                        }
-                                    });
-                                    break;
-                            }
-                        });
-                    }}
+                    onClick={handleMenu}
                 ></EllipsisHorizontalIcon>
             </div>
-            <BackgroundImg src={DefaultBackgroundUrl} />
+            <BackgroundImg src={post.coverUrl == null || post.coverUrl.trim().length == 0 ? DefaultBackgroundUrl : post.coverUrl!} />
 
             {/* 目录结构 - 桌面端 */}
             {tocNodeTree.length > 0 && (
@@ -343,11 +357,14 @@ const PostView = () => {
                 </div>
             )}
 
+            {/* 帖子文档视图 */}
             <PostDocument
                 {...post}
                 renderContent={renderContent}
                 setCommentTarget={setCommentTarget}
             />
+
+            {/* 评论输入区域 */}
             <div className='comment-input'>
                 {commentTarget.parentId && commentTarget.userId && (
                     <div className='comment-reply-show'>
@@ -385,9 +402,7 @@ const PostView = () => {
                         notification={t('postView.editPost')}
                         title={post.title}
                         content={post.content}
-                        tag1={post.tag1}
-                        tag2={post.tag2}
-                        tag3={post.tag3}
+                        tags={post.tags || ""}
                         postId={post.id}
                         onClose={() => setShowPostDialog(false)}
                     />,
@@ -414,7 +429,7 @@ const PostView = () => {
         </div>
     ) : (
         <NotFound />
-    );
+    ));
 };
 
 export default PostView;

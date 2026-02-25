@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
     public Result<Object> handleValidationException(MethodArgumentNotValidException e) {
         BindingResult bindingResult = e.getBindingResult();
         // 第一行固定文本，后续每个错误单独换行
-        StringBuilder errorMsg = new StringBuilder("failed to validate arguments:");
+        StringBuilder errorMsg = new StringBuilder();
 
         // 提取所有字段的错误信息，每个错误单独一行
         for (FieldError fieldError : bindingResult.getFieldErrors()) {

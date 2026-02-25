@@ -14,7 +14,6 @@ import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
 import com.talkforum.talkforumserver.mapper.InviteCodeMapper;
 import com.talkforum.talkforumserver.service.AuthService;
-import com.talkforum.talkforumserver.service.UserCacheService;
 import com.talkforum.talkforumserver.mapper.UserMapper;
 import com.talkforum.talkforumserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +31,6 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper; // 用户数据访问层
-    @Autowired
-    private UserCacheService userCacheService; // 用户缓存服务
     @Autowired
     private InviteCodeMapper inviteCodeMapper; // 邀请码数据访问层
     @Autowired
@@ -126,8 +123,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void setUserProfile(UserProfileDTO user) {
         userMapper.setUserProfile(user);
-        // 更新缓存中的用户数据（仅当缓存存在时）
-        userCacheService.updateUserCache(user.id);
     }
 
     /**
@@ -192,8 +187,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void setUserRole(long userId, String role) {
         userMapper.setUserRole(userId, role);
-        // 更新缓存中的用户数据（仅当缓存存在时）
-        userCacheService.updateUserCache(userId);
     }
 
     /**
@@ -217,8 +210,6 @@ public class UserServiceImpl implements UserService {
             }
         }
         userMapper.updateUserStatus(userId, status);
-        // 更新缓存中的用户数据（仅当缓存存在时）
-        userCacheService.updateUserCache(userId);
         return true;
     }
 

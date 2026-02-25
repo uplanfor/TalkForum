@@ -1,7 +1,6 @@
 package com.talkforum.talkforumserver.common.dto;
 
 import com.talkforum.talkforumserver.constant.PostConstant;
-import com.talkforum.talkforumserver.service.PostCacheService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

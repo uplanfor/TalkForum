@@ -10,14 +10,12 @@ import BackgroundImg from '../components/BackgroundImg';
 import PostsContainer, { PostContainerTargetType } from '../components/PostsContainer';
 import { DefaultBackgroundUrl } from '../constants/default';
 import { useTranslation } from 'react-i18next';
-// import KeepAlive from "react-activation";
 
 /**
  * 首页组件
  * 论坛的主页面，展示最新和精华帖子
  */
 const Home = () => {
-    // 国际化钩子
     const { t } = useTranslation();
 
     return (

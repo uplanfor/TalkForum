@@ -520,3 +520,54 @@
     cursor: not-allowed;
     text-decoration: none;
 }
+
+
+.post-document .comment-input-zone {
+    display: flex;
+}
+
+
+.post-comment .comment-input-zone img.avatar {
+    display: block;
+    width: 50px;
+    height: 50px;
+    background-color: var(--neutral-module);
+    border: 1px solid var(--neutral-border);
+    border-radius: 50%;
+}
+
+
+.post-comment .comment-input-zone .edit-combo {
+    display: block;
+    flex: 1;
+    margin-left: 9px;
+}
+
+.post-comment .comment-input-zone .edit-combo textarea {
+    display: block;
+    width: 100%;
+    padding: 9px;
+    height: 90px;
+    background-color: var(--neutral-module);
+    border: 1px solid var(--neutral-border);
+    outline: none;
+    border-radius: 18px;
+    resize: none;
+}
+
+.post-comment .comment-input-zone .edit-combo .comment-functions {
+    display: flex;
+    margin: 9px 0;
+    flex-direction: row-reverse;
+}
+
+
+.post-comment .comment-input-zone .edit-combo .comment-functions button {
+    margin-left: auto;
+    width: 50px;
+    height: 30px;
+    color: var(--neutral-module);
+    background-color: var(--primary);
+    border-radius: 18px;
+    border: 0;
+}

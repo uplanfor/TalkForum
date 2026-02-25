@@ -137,6 +137,16 @@ public class Comment {
     )
     public Integer commentCount;
 
+
+    /**
+     * 回复的图片
+     */
+    @Schema(
+            description = "评论的图片链接列表，每个链接用分号隔开,最多5张图片",
+            example = "https://asfsdfs.top/a.png;https://affhosf.top/b.png"
+    )
+    public String images;
+
     /**
      * 默认构造函数
      * 初始化评论的默认值
@@ -151,6 +161,7 @@ public class Comment {
         createdAt = new Date(); // 当前时间
         likeCount = 0; // 初始点赞数为0
         commentCount = 0; // 初始回复数为0
+        images = "";
     }
 
     /**
