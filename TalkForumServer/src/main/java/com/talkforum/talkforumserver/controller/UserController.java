@@ -129,7 +129,7 @@ public class UserController {
     public Result<Object> setUserProfile(
         @Valid @RequestBody UserProfileDTO user, 
         @Parameter(description = "用户登录凭证Cookie") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
+        Map<String, Object> information = jwtHelper.parseJWT(token); // 解析Token获取用户信息
         user.id = ((Number)(information.get("id"))).longValue(); // 设置用户ID
         userService.setUserProfile(user); // 更新用户资料
         return  Result.success(I18n.t("user.profile.update.success"));
@@ -161,7 +161,7 @@ public class UserController {
             @Parameter(description = "修改密码的请求参数", required = true) @Valid @RequestBody ChangePasswordDTO dto,
             @Parameter(description = "用户登录凭证Cookie")  @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token,
             @Parameter(description = "HTTP响应对象，用于清除Cookie", hidden = true) HttpServletResponse httpServletResponse) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
+        Map<String, Object> information = jwtHelper.parseJWT(token); // 解析Token获取用户信息
         long userId = ((Number)(information.get("id"))).longValue(); // 获取用户ID
         userService.changePassword(userId, dto.getOldPassword(), dto.getNewPassword()); // 修改密码
         return Result.success(I18n.t("user.password.change.success"));
@@ -276,7 +276,7 @@ public class UserController {
             @CookieValue(name = ServerConstant.LOGIN_COOKIE, required = true) String token,
             @Parameter(description = "用户ID", example = "1234567890", required = true) @PathVariable long userId,
             @Parameter(description = "状态更新请求参数", required = true) @RequestBody UserStatusDTO dto) {
-        Map<String, Object> map = jwtHelper.parseJWTToken(token);
+        Map<String, Object> map = jwtHelper.parseJWT(token);
         String role = (String) map.get("role");
         // 更新状态并踢出用户
         if (userService.updateStatus(role, userId, dto.getStatus())) {

@@ -13,11 +13,6 @@ import com.talkforum.talkforumserver.common.vo.PageVO;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.service.InviteCodeService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +52,7 @@ public class InviteCodeController {
     @GetMapping("/")
     public Result<List<InviteCode>> getInviteCodes(
         @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token);
+        Map<String, Object> information = jwtHelper.parseJWT(token);
         Long userId = ((Number)(information.get("id"))).longValue();
         return Result.success(I18n.t("invitecode.get.success"), inviteCodeService.getInviteCodes(userId));
     }
@@ -96,7 +91,7 @@ public class InviteCodeController {
     public Result<List<InviteCode>> generateInviteCodes(
             @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token,
             @Valid @RequestBody InviteCodeDTO inviteCodeDTO) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token);
+        Map<String, Object> information = jwtHelper.parseJWT(token);
         Long userId = ((Number)(information.get("id"))).longValue();
         List<InviteCode> codes = inviteCodeService.generateInviteCodes(userId, inviteCodeDTO);
 

@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import BackgroundImg from './BackgroundImg';
 import dayjs from 'dayjs';
 import { usersGetDetailedUserInfo, type UserVO } from '../api/ApiUsers';
-import { changeUserFollowing } from '../store/slices/userSlice';
+import { changeUserFollowing, userLogin } from '../store/slices/userSlice';
 import Msg from '../utils/msg';
 import { interactionsFollowOrUnfollowUser } from '../api/ApiInteractions';
 import { createPortal } from 'react-dom';

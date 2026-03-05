@@ -12,6 +12,7 @@ import java.io.IOException;
 /**
  * Jackson 序列化配置类
  */
+// 解决了id 序列化的问题
 @Configuration
 public class JacksonConfig {
 

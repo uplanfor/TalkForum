@@ -9,16 +9,16 @@ import java.util.List;
 
 @Mapper
 public interface CommentMapper {
-    public List<Comment> getComments(Long postId, Integer cursor, int pageSize);
-    public List<Comment> getCommentReplies(Long postId, Integer cursor, int pageSize, Long rootId, Long parentId);
-    public Comment getComment(Long commentId);
-    public Comment checkDeleteComment(Long commentId);
-    public int countExistComment(Long postId, Long rootId, Long parentId);
-    public void addCommentWithPostCommentCountIncreased(Comment comment);
+    List<Comment> getComments(Long postId, Integer cursor, int pageSize);
+    List<Comment> getCommentReplies(Long postId, Integer cursor, int pageSize, Long rootId, Long parentId);
+    Comment getComment(Long commentId);
+    Comment checkDeleteComment(Long commentId);
+    int countExistComment(Long postId, Long rootId, Long parentId);
+    void addCommentWithPostCommentCountIncreased(Comment comment);
 
     List<Comment> adminGetCommentsByPage(AdminGetCommentsDTO adminGetCommentsDTO);
     long adminCountComments(AdminGetCommentsDTO adminGetCommentsDTO);
-    public void auditComment(Long commentId, String status);
+    void auditComment(Long commentId, String status);
 
     int auditComments(AdminAuditCommentsDTO adminAuditCommentsDTO);
 

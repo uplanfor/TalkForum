@@ -18,14 +18,12 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private RateLimitInterceptor rateLimitInterceptor;
 
-    /**
-     * 注册拦截器
-     * @param registry 拦截器注册表
-     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(rateLimitInterceptor).addPathPatterns("/**").excludePathPatterns("/doc.html", "/webjars/**", "/knife4j/**", "/v3/api-docs/**"); // 限流
-        registry.addInterceptor(loginInterceptor).addPathPatterns("/**").excludePathPatterns("/doc.html", "/webjars/**", "/knife4j/**", "/v3/api-docs/**");
+        registry.addInterceptor(rateLimitInterceptor).addPathPatterns("/**").
+                excludePathPatterns("/doc.html", "/webjars/**", "/knife4j/**", "/v3/api-docs/**");
+        registry.addInterceptor(loginInterceptor).addPathPatterns("/**").
+                excludePathPatterns("/doc.html", "/webjars/**", "/knife4j/**", "/v3/api-docs/**");
     }
 
 }

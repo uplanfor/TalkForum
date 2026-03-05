@@ -1,15 +1,12 @@
 package com.talkforum.talkforumserver.service.impl;
 
-import com.talkforum.talkforumserver.service.AuthCacheService;
+import com.talkforum.talkforumserver.common.util.*;
+import com.talkforum.talkforumserver.constant.RedisConstant;
 import com.talkforum.talkforumserver.service.AuthService;
 import com.talkforum.talkforumserver.mapper.AuthMapper;
 import com.talkforum.talkforumserver.common.dto.LoginDTO;
 import com.talkforum.talkforumserver.common.entity.User;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
-import com.talkforum.talkforumserver.common.util.CookieHelper;
-import com.talkforum.talkforumserver.common.util.I18n;
-import com.talkforum.talkforumserver.common.util.JWTHelper;
-import com.talkforum.talkforumserver.common.util.PasswordHelper;
 import com.talkforum.talkforumserver.common.vo.AdminHomeVO;
 import com.talkforum.talkforumserver.common.vo.AuthVO;
 import com.talkforum.talkforumserver.common.vo.UserVO;
@@ -41,9 +38,9 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private InteractionMapper interactionMapper;
     @Autowired
-    private AuthCacheService authCacheService;
-    @Autowired
     private AuthMapper authMapper;
+    @Autowired
+    private RedisHelper redisHelper;
 
     @Override
     public AuthVO login(LoginDTO loginDTO, HttpServletResponse response) throws BusinessRuntimeException {
@@ -63,12 +60,12 @@ public class AuthServiceImpl implements AuthService {
             information.put("id", loginCheck.id);
             information.put("role", loginCheck.role);
             userMapper.updateLoginTime(loginCheck.id);
-            String jwtToken = (jwtHelper.generateJWTToken(information));
+            String jwtToken = (jwtHelper.generateJWT(information));
             loginCheck.lastLoginAt = new Date();
 
             // 存入Redis和HttpOnlyCookie
             CookieHelper.setCookie(response, ServerConstant.LOGIN_COOKIE, jwtToken);
-            authCacheService.setLoginToken(loginCheck.id, jwtToken, (long)jwtHelper.getExpire(), TimeUnit.MILLISECONDS);
+            setLoginToken(loginCheck.id, jwtToken, (long)jwtHelper.getExpire(), TimeUnit.MILLISECONDS);
             // 生成认证信息
             return new AuthVO(new UserVO(loginCheck),
                     interactionMapper.queryInteractFollowingByUserId(loginCheck.id));
@@ -86,7 +83,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logout(long userId) {
-        authCacheService.removeLoginToken(userId);
+        removeLoginToken(userId);
     }
 
 
@@ -114,5 +111,19 @@ public class AuthServiceImpl implements AuthService {
             logout(userId, response);
         }
         return adminHomeVO;
+    }
+
+    private void removeLoginToken(Long userId) {
+        redisHelper.stringDelete(RedisConstant.TOKEN_USER_PREFIX + userId);
+    }
+
+    private void setLoginToken(Long userId, String token, Long expireTime, TimeUnit timeUnit) {
+        redisHelper.stringSet(
+                RedisConstant.TOKEN_USER_PREFIX + userId, token, expireTime, timeUnit);
+    }
+
+    @Override
+    public Object getLoginToken(long userId) {
+        return redisHelper.stringGet(RedisConstant.TOKEN_USER_PREFIX + userId);
     }
 }

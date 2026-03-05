@@ -62,7 +62,7 @@ public class AuthController {
     public Result<Object> logout(
             @Parameter(description = "登录token，用于解析登录情况") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token,
             HttpServletResponse response) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token);
+        Map<String, Object> information = jwtHelper.parseJWT(token);
         long userId = ((Number)(information.get("id"))).longValue();
         authService.logout(userId, response);
         return Result.success(I18n.t("auth.logout.success"));
@@ -85,7 +85,7 @@ public class AuthController {
     public Result<AuthVO> auth(
             @Parameter(description = "登录token，用于解析登录情况") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token,
             HttpServletResponse response) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token);
+        Map<String, Object> information = jwtHelper.parseJWT(token);
         long userId = ((Number)(information.get("id"))).longValue();
         AuthVO authVO = authService.auth(userId, response);
         if (authVO == null) {
@@ -113,7 +113,7 @@ public class AuthController {
     public Result<AuthVO> authAdmin(
             @Parameter(description = "登录token，用于解析登录情况") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token,
             HttpServletResponse response) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token);
+        Map<String, Object> information = jwtHelper.parseJWT(token);
         long userId = ((Number)(information.get("id"))).longValue();
         AuthVO authVO = authService.auth(userId, response);
         if (authVO == null || authVO.getRole().equals(UserConstant.ROLE_USER)) {
@@ -140,7 +140,7 @@ public class AuthController {
     public Result<AdminHomeVO> getAdminHome(
             @Parameter(description = "登录token，用于解析登录情况") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token,
             HttpServletResponse response) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token);
+        Map<String, Object> information = jwtHelper.parseJWT(token);
         long userId = ((Number)(information.get("id"))).longValue();
         return Result.success(I18n.t("auth.admin.home.success"), authService.getAdminHomeInfo(userId, response));
     }

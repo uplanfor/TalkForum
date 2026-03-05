@@ -2,8 +2,8 @@
  * 举报相关API请求
  * 包含提交举报、管理员获取举报列表以及处理举报等功能
  */
-import type ApiResponse from './ApiResponse';
-import Request from '../utils/Request';
+
+import Request, {type ApiResponse} from '../utils/Request';
 
 /**
  * 举报接口
@@ -69,7 +69,7 @@ export const reportsAdminGetReports = async (
     reportTargetType?: string,
     status?: string
 ) => {
-    return Request.get_auth<ReportResponce>(`/api/reports/admin`, {
+    return Request.getAuth<ReportResponce>(`/api/reports/admin`, {
         page,
         pageSize,
         reportTargetType,
@@ -85,5 +85,5 @@ export const reportsAdminGetReports = async (
  * @returns {Promise<ApiResponse>} 处理结果响应
  */
 export const reportsAdminHandleReport = async (reportIds: string[], status: string) => {
-    return Request.put_auth<ApiResponse>(`/api/reports/admin`, { reportIds, status });
+    return Request.putAuth<ApiResponse>(`/api/reports/admin`, { reportIds, status });
 };

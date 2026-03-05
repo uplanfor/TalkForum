@@ -1,7 +1,7 @@
 package com.talkforum.talkforumserver.common.dto;
 
-import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -39,4 +39,12 @@ public class InviteCodeDTO {
     )
     @NotNull
     private Integer maxCount;  // 最大使用次数
+
+    public InviteCodeDTO() {}
+
+    public InviteCodeDTO(Integer count, Integer expiredDays, Integer maxCount) {
+        this.count = count;
+        this.expiredDays = expiredDays;
+        this.maxCount = maxCount;
+    }
 }

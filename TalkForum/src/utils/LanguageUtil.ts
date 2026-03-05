@@ -1,4 +1,4 @@
-import i18n from '../i18n/index'; // 对应src/i18n/index.ts
+import i18n from '../i18n/index';
 
 const LANG_CONFIG = {
     DEFAULT_LANG: 'en', // 仅保留简写：en/zh

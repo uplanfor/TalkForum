@@ -35,12 +35,6 @@ class ThemeUtil {
 
         // 更新当前主题
         this.currentThemeKey = themeKey;
-
-        // // 只有非default主题才保存到localStorage
-        // if (themeKey !== DEFAULT_THEME_KEY) {
-        //   localStorage.setItem('theme', themeKey);
-        // }
-
         localStorage.setItem('theme', themeKey);
 
         // 触发回调

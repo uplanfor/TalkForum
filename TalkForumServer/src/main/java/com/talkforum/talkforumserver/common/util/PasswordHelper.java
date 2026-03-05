@@ -4,8 +4,6 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class PasswordHelper {
 
-    // 移除：Spring Security 的 BCryptPasswordEncoder 实例（无需再创建）
-
     /**
      * 加密密码（功能不变，底层换成原生 jbcrypt）
      * @param rawPassword 原始明文密码
@@ -28,7 +26,6 @@ public class PasswordHelper {
         return BCrypt.checkpw(rawPassword, encodedPassword);
     }
 
-    // 可选优化：添加加密强度配置（默认 10，与 Spring Security 一致，可按需调整）
     public static String encryptPassword(String rawPassword, int strength) {
         // 强度范围 4-31，推荐 10-12
         return BCrypt.hashpw(rawPassword, BCrypt.gensalt(strength));

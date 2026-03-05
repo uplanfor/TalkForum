@@ -113,7 +113,7 @@ const createBlockDialog = (
             boxSizing: 'border-box', // 盒模型适配
         });
 
-        // 3. 提示文本（【修改】menu类型标题按需显示）
+        // 3. 提示文本
         let textEl: HTMLDivElement | null = null;
         if (type === 'menu') {
             // 【核心修改】title为null/undefined则不创建标题元素

@@ -7,10 +7,10 @@ import java.util.List;
 
 @Mapper
 public interface InteractionMapper {
-    public int makeInteractionWithUser(InteractionRequestDTO interactionRequestDTO);
-    public int makeInteractionWithPost(InteractionRequestDTO interactionRequestDTO);
-    public int makeInteractionWithComment(InteractionRequestDTO interactionRequestDTO);
-    public List<Integer> queryInteractContentByPostOrComment(String interactTargetType, Long[] interactTargets, Long userId);
-    public List<Long> queryInteractFollowingByUserId(Long userId);
+    int makeInteractionWithUser(InteractionRequestDTO interactionRequestDTO);
+    int makeInteractionWithPost(InteractionRequestDTO interactionRequestDTO);
+    int makeInteractionWithComment(InteractionRequestDTO interactionRequestDTO);
+    List<Integer> queryInteractContentByPostOrComment(String interactTargetType, Long[] interactTargets, Long userId);
+    List<Long> queryInteractFollowingByUserId(Long userId);
 
 }

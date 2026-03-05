@@ -2,8 +2,7 @@
  * 用户相关API请求
  * 包含用户注册、获取用户信息、更新用户资料、修改密码以及管理员用户管理等功能
  */
-import type ApiResponse from './ApiResponse';
-import Request from '../utils/Request';
+import Request, {type ApiResponse} from '../utils/Request';
 import type { UserRole, UserStatus } from '../constants/user_constant';
 
 /**
@@ -112,7 +111,7 @@ export const usersSignOn = async (
  * @returns {Promise<ApiResponse>} 更新结果响应
  */
 export const usersUpdateProfileAuth = async (profile: UserProfile): Promise<ApiResponse> => {
-    return Request.put_auth<ApiResponse>('/api/users/', profile);
+    return Request.putAuth<ApiResponse>('/api/users/', profile);
 };
 
 /**
@@ -125,7 +124,7 @@ export const usersChangePasswordAuth = async (
     oldPassword: string,
     newPassword: string
 ): Promise<ApiResponse> => {
-    return Request.put_auth<ApiResponse>('/api/users/changePassword', { oldPassword, newPassword });
+    return Request.putAuth<ApiResponse>('/api/users/changePassword', { oldPassword, newPassword });
 };
 
 /**
@@ -138,7 +137,7 @@ export const usersAdminGetUsersByPage = async (
     page: number,
     pageSize: number
 ): Promise<UserVOPageResponse> => {
-    return Request.get_auth<UserVOPageResponse>('/api/users/admin', { page, pageSize });
+    return Request.getAuth<UserVOPageResponse>('/api/users/admin', { page, pageSize });
 };
 
 /**
@@ -173,5 +172,5 @@ export const usersAdminSetUserStatus = async (
  * @returns {Promise<ApiResponse>} 重置结果响应
  */
 export const usersAdminResetUserPassword = async (userId: string): Promise<ApiResponse> => {
-    return Request.put_auth<ApiResponse>(`/api/users/admin/${userId}/reset`, { userId });
+    return Request.putAuth<ApiResponse>(`/api/users/admin/${userId}/reset`, { userId });
 };

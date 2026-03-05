@@ -109,6 +109,7 @@
 
 .post-view-cover .title svg {
     position: absolute;
+    display: block;
     width: 24px;
     height: 24px;
     top: 50%;
@@ -123,6 +124,21 @@
 .post-view-cover .title svg:last-child {
     right: 9px;
 }
+
+
+.post-view-cover .post-window .post-comment .refresh-button {
+    position: relative;
+}
+
+.post-view-cover .post-window .post-comment .refresh-button svg {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+} 
 
 /* 目录基础样式 */
 .toc-title {

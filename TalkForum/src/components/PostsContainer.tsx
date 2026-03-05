@@ -11,10 +11,10 @@ import PostCardPlaceholder from './PostCardPlaceholder';
 import { postsGetPostList } from '../api/ApiPosts';
 import { debounce } from '../utils/debounce&throttle';
 import { requestSimpleUserInfoCache } from '../utils/simpleUserInfoCache';
-import type ApiResponse from '../api/ApiResponse';
 import { useDispatch, useSelector } from 'react-redux';
 import { type RootState, type AppDispatch } from '../store';
 import { useTranslation } from 'react-i18next';
+import type { ApiResponse } from '../utils/Request';
 
 /**
  * 帖子容器组件的目标类型常量
@@ -60,10 +60,12 @@ const PostContainer = ({
     targetType,
     targetId,
     defaultTab = 0,
-    searchParams,
+    searchParams
 }: PostContainerProps) => {
+    console.log("search params init", searchParams);
+    
     const { t } = useTranslation();
-    const dispatch = useDispatch<AppDispatch>();
+    // const dispatch = useDispatch<AppDispatch>();
 
     const { following } = useSelector((state: RootState) => state.user);
 
@@ -80,48 +82,19 @@ const PostContainer = ({
         setPosts(posts.filter(post => post.id !== id));
     };
 
-    // 状态更新辅助函数
-    const updateHasMore = (value: boolean) => {
-        hasMoreRef.current = value;
-    };
-
-    const updateCursor = (value: string | null) => {
-        cursorRef.current = value;
-    };
-
-    const updateIsRefreshing = (value: boolean) => {
-        isRefreshingRef.current = value;
-    };
-
-    const updateIsError = (value: boolean) => {
-        isErrorRef.current = value;
-    };
-
-    const updateIsLoading = (value: boolean) => {
-        isLoadingRef.current = value;
-    };
-
     // 根据targetType生成对应的tabs
     const [tabs, setTabs] = useState<string[]>([]);
 
     // 当前选中的标签索引状态
     const [curTabIndex, setCurTabIndex] = useState(defaultTab);
 
-    // 使用ref存储当前标签和tab信息，避免闭包问题
     const curTabIndexRef = useRef(curTabIndex);
     const tabsRef = useRef(tabs);
-
-    // 使用useRef来跟踪是否已经执行过初始加载，解决React StrictMode下重复加载的问题
     const hasInitialLoaded = useRef(false);
 
     // 同步ref和state
-    useEffect(() => {
-        curTabIndexRef.current = curTabIndex;
-    }, [curTabIndex]);
-
-    useEffect(() => {
-        tabsRef.current = tabs;
-    }, [tabs]);
+    curTabIndexRef.current = curTabIndex;
+    tabsRef.current = tabs;
 
     // 统一处理缓存检查、tabs生成和初始加载的useEffect
     useEffect(() => {
@@ -160,11 +133,12 @@ const PostContainer = ({
 
         setTabs(newTabs);
 
-        updateCursor(null);
+        cursorRef.current = null;
         setPosts([]);
-        updateIsError(false);
-        updateHasMore(true);
-        updateIsRefreshing(false);
+        isErrorRef.current = false;
+        hasMoreRef.current = true;
+        isRefreshingRef.current = false;
+        
         // 设置默认标签索引，确保不超出新生成的tabs长度
         setCurTabIndex(Math.min(defaultTab, newTabs.length - 1));
 
@@ -172,7 +146,7 @@ const PostContainer = ({
         if (!hasInitialLoaded.current) {
             hasInitialLoaded.current = true;
         }
-    }, [targetType, targetId, defaultTab, following, searchParams]); // 添加searchParams作为依赖项
+    }, [targetType, targetId, defaultTab, searchParams]);
 
     // 监听搜索参数变化，如果是SEARCH模式，则重新加载数据
     useEffect(() => {
@@ -183,12 +157,11 @@ const PostContainer = ({
             searchParams
         ) {
             // 重置状态
-            updateCursor(null);
+            cursorRef.current = null;
             setPosts([]);
-            updateIsError(false);
-            updateHasMore(true);
-            // updateIsRefreshing(true);
-
+            isErrorRef.current = false;
+            hasMoreRef.current = true;
+            // isRefreshingRef.current = true;
         }
     }, [searchParams, targetType, targetId]);
 
@@ -201,14 +174,13 @@ const PostContainer = ({
         if (isLoadingRef.current) {
             return;
         }
-        updateIsRefreshing(true);
-        updateCursor(null);
+        isRefreshingRef.current = true;
+        cursorRef.current = null;
         setPosts([]);
-        updateIsError(false);
-        updateHasMore(true);
-        // 不重置hasInitialLoaded，避免影响初始加载逻辑
+        isErrorRef.current = false;
+        hasMoreRef.current = true;
 
-        updateIsRefreshing(false);
+        isRefreshingRef.current = false;
     };
 
     /**
@@ -216,11 +188,9 @@ const PostContainer = ({
      * 重置错误状态，尝试重新加载帖子
      */
     const handleReload = async () => {
-        updateIsError(false);
-        updateHasMore(true);
-        // 不重置hasInitialLoaded，避免影响初始加载逻辑
-        // 触发loadMore来重新加载帖子
-        await loadMore();
+        isErrorRef.current = false;
+        hasMoreRef.current = true;
+        loadMore();
     };
 
     /**
@@ -242,18 +212,13 @@ const PostContainer = ({
         setCurTabIndex(index);
 
         // 重置所有状态到第一次加载的状态
-        // updateIsRefreshing(true);
-        updateCursor(null);
+        // isRefreshingRef.current = true;
+        cursorRef.current = null;
         setPosts([]);
-        updateIsError(false);
-        updateHasMore(true);
+        isErrorRef.current = false;
+        hasMoreRef.current = true;
 
-        // 等待状态更新后再调用loadMore
-        await new Promise(resolve => {
-            setTimeout(resolve, 0);
-        });
-
-        // 再次检查是否仍然需要加载（防止用户快速切换标签）
+        // 再次检查是否仍然需要加载
         if (index === curTabIndexRef.current) {
             loadMore();
         }
@@ -264,34 +229,24 @@ const PostContainer = ({
      * 根据targetType、targetId和当前标签获取对应的帖子列表
      */
     const loadMore = useCallback(async () => {
-        // console.log('try load more');
-        // 如果没有更多帖子、发生错误、正在刷新或API请求已在进行中，则不执行任何操作
         if (
             !hasMoreRef.current ||
             isErrorRef.current ||
             isRefreshingRef.current ||
             isLoadingRef.current
         ) {
-            // console.log(
-            //     !hasMoreRef.current,
-            //     isErrorRef.current,
-            //     isRefreshingRef.current,
-            //     isLoadingRef.current,
-            //     'hit!'
-            // );
             return;
         }
 
         // 获取当前标签
         const currentTab = tabsRef.current[curTabIndexRef.current];
         if (currentTab == undefined) {
-            // console.log('hit!');
             return;
         }
 
         // 如果是CLUB类型
         if (targetType === PostContainerTargetType.CLUB) {
-            updateHasMore(false);
+            hasMoreRef.current = false;
             return;
         }
 
@@ -301,20 +256,18 @@ const PostContainer = ({
                 targetType === PostContainerTargetType.USER) &&
             currentTab === 'Likes'
         ) {
-            updateHasMore(false);
+            hasMoreRef.current = false;
             return;
         }
 
+        console.log("call loadmore? ", searchParams);
+
         try {
             isLoadingRef.current = true;
-            updateIsLoading(true);
-
-            // 根据当前标签和targetType确定查询参数
-            const queryParams: any = { cursor: cursorRef.current, pageSize: 10 };
+            let queryParams: any = { cursor: cursorRef.current, pageSize: 10 };
 
             // 根据当前标签设置过滤条件
             if (currentTab === t('postsContainer.essenceTab')) {
-                // 查询精华帖 - 确保传递isEssence参数
                 queryParams.isEssence = 1;
             } else if (currentTab === t('postsContainer.latestTab')) {
                 // 查询最新帖子（默认就是按时间倒序，不需要额外参数）
@@ -330,7 +283,10 @@ const PostContainer = ({
                     // HOME类型：查询首页帖子，可能需要根据标签过滤
                     if (currentTab === t('postsContainer.followingTab')) {
                         // 添加关注用户的ID到查询参数
-                        queryParams.userIds = [0, ...following];
+                        console.log("following", following);
+                        
+                        queryParams.userIds = ["0", ...following];
+                        console.log("userIDs", queryParams.userIds)
                     }
                     break;
                 case PostContainerTargetType.USER:
@@ -339,26 +295,11 @@ const PostContainer = ({
                     break;
                 case PostContainerTargetType.SEARCH:
                     // SEARCH类型：使用父组件传递的搜索参数
+                    console.log("search", searchParams);
+                    
                     if (searchParams) {
-                        // 添加关键词
-                        if (searchParams.keyword) {
-                            queryParams.keyword = searchParams.keyword;
-                        }
-
-                        // 添加用户ID列表
-                        if (searchParams.userIds && searchParams.userIds.length > 0) {
-                            queryParams.userIds = searchParams.userIds;
-                        }
-
-                        // 添加标签
-                        if (searchParams.tag) {
-                            queryParams.tag = searchParams.tag;
-                        }
-
-                        // 添加俱乐部ID列表
-                        if (searchParams.clubIds && searchParams.clubIds.length > 0) {
-                            queryParams.clubIds = searchParams.clubIds;
-                        }
+                        queryParams = { ...queryParams, ...searchParams };
+                        console.log(queryParams);
                     }
                     break;
                 // case PostContainerTargetType.CLUB:
@@ -368,17 +309,11 @@ const PostContainer = ({
 
             // console.log('real load more!');
 
-            // 使用Promise包装API请求，添加延迟以模拟真实网络请求
             const result = await new Promise<ApiResponse>((resolve, reject) => {
                 setTimeout(async () => {
                     try {
                         // 获取帖子列表
                         const res = await postsGetPostList(queryParams);
-                        // console.log("API响应:", {
-                        //   dataCount: res.data?.data?.length || 0,
-                        //   nextCursor: res.data?.nextCursor,
-                        //   isEssenceParam: queryParams.isEssence
-                        // });
 
                         // 收集需要缓存的用户ID
                         let needCacheTarget: string[] = [];
@@ -397,7 +332,6 @@ const PostContainer = ({
                         }
                         resolve(res);
                     } catch (err) {
-                        // console.error("API调用失败:", err);
                         reject(err);
                     }
                 }, 1024);
@@ -418,30 +352,20 @@ const PostContainer = ({
 
             // 更新分页游标
             const updatedCursor = result.data?.cursor || null;
-            updateCursor(updatedCursor);
+            cursorRef.current = updatedCursor;
 
             // 设置是否还有更多帖子
             const updatedHasMore = result.data?.hasMore === true;
-            updateHasMore(updatedHasMore);
+            hasMoreRef.current = updatedHasMore;
         } catch (error) {
-            // 加载失败，设置错误状态
-            updateIsError(true);
-            // console.error("加载帖子失败:", error);
-
-            // 发生错误时不更新缓存，保持之前的数据
+            isErrorRef.current = true;
         } finally {
-            // 无论请求成功还是失败，都释放API请求锁
             isLoadingRef.current = false;
-            updateIsLoading(false);
-            updateIsRefreshing(false);
+            isRefreshingRef.current = false;
         }
-    }, [targetType, targetId, following, searchParams]);
+    }, [targetType, targetId, searchParams]);
 
-    /**
-     * 防抖处理的加载更多方法
-     * 限制调用频率，防止频繁请求API
-     */
-    const debounceLoadMore = useRef(debounce(loadMore, 500)).current;
+    const debounceLoadMore = debounce(loadMore, 500);
 
     return (
         <div className='container'>

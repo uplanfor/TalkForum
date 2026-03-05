@@ -10,6 +10,8 @@ import BackgroundImg from '../components/BackgroundImg';
 import PostsContainer, { PostContainerTargetType } from '../components/PostsContainer';
 import { DefaultBackgroundUrl } from '../constants/default';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../store';
 
 /**
  * 首页组件
@@ -17,6 +19,8 @@ import { useTranslation } from 'react-i18next';
  */
 const Home = () => {
     const { t } = useTranslation();
+    
+    const { following } = useSelector((state: RootState) => state.user);
 
     return (
         <>
@@ -46,7 +50,7 @@ const Home = () => {
             {/* <BackgroundImg src="https://bing.img.run/1366x768.php" /> */}
 
             {/* 帖子容器组件，首页模式，支持最新、精华和关注标签页 */}
-            <PostsContainer targetType={PostContainerTargetType.HOME} />
+            <PostsContainer targetType={PostContainerTargetType.HOME}/>
         </>
     );
 };

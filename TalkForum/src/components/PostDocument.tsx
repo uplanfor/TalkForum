@@ -46,9 +46,6 @@ const PostDocument = (props: PostDocumentProps) => {
 
     const navigate = useNavigate();
     const location = useLocation();
-
-
-
     const [curLikeCount, setCurLikeCount] = useState(likeCount);
     const [isLiked, setIsLiked] = useState(interactContent === INTERACT_POST.LIKE);
     const [isDisliked, setIsDisliked] = useState(interactContent === INTERACT_POST.DISLIKE);
@@ -431,6 +428,12 @@ const PostDocument = (props: PostDocumentProps) => {
         await commentPostComment(id, content, null, null).then(res => {
             if (res.success) {
                 Msg.success(res.message);
+                // 评论成功后清空输入框
+                if (commentInputRef.current) {
+                    commentInputRef.current.value = '';
+                }
+                // 动态更新评论区域
+                handleRefresh();
             } else {
                 throw new Error(res.message);
             }
@@ -438,6 +441,15 @@ const PostDocument = (props: PostDocumentProps) => {
             Msg.error(err.message);
         })
     }, 300), [id]);
+
+    /**
+     * 处理评论删除
+     * @param {string} commentId - 要删除的评论ID
+     */
+    const handleCommentDelete = (commentId: string) => {
+        // 从评论列表中删除指定ID的评论
+        setComments(prevComments =>  prevComments.filter(comment => comment.id !== commentId));
+        };
     return (
         <div className='post-document'>
             <div className='post-window'>
@@ -555,6 +567,7 @@ const PostDocument = (props: PostDocumentProps) => {
                                     {...comment}
                                     setCommentTarget={setCommentTarget}
                                     onInteractionChange={handleCommentInteractionChange}
+                                    onCommentDelete={handleCommentDelete}
                                 />
                             ))
                         )}

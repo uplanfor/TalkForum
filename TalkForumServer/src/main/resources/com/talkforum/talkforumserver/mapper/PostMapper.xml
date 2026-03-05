@@ -75,7 +75,7 @@
             <if test="postEditDTO.title != null">title = #{postEditDTO.title},</if>
             <if test="postEditDTO.content != null">content = #{postEditDTO.content},</if>
             <if test="status != null">status = #{status},</if>
-            tags = #{postEditDTO.tags}
+            tags = #{postEditDTO.tags},
             updated_at = NOW(),
             brief = #{brief},
             cover_url = #{coverUrl}

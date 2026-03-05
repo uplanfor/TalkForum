@@ -53,7 +53,7 @@
         <if test="parentId != null">INNER JOIN `comment` cp ON cp.id = #{rootId}</if>
         WHERE
         c.status = 'PASS'
-        AND c.id = #{rootId}
+        AND c.id = #{rootId} LIMIT 1
     </select>
 
     <select id="checkDeleteComment" resultType="com.talkforum.talkforumserver.common.entity.Comment">

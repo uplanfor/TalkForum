@@ -16,10 +16,9 @@ public class PostEditDTO {
     public Long userId;
 
     @Schema(
-            description = "被修改帖子id",
-            requiredMode =  Schema.RequiredMode.REQUIRED
+            description = "被修改帖子id(被回传)",
+            requiredMode =  Schema.RequiredMode.NOT_REQUIRED
     )
-    @NotNull(message = "Post id cannot be null!")
     public Long id;
 
     @Schema(

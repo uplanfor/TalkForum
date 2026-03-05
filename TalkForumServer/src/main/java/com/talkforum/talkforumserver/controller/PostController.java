@@ -32,7 +32,7 @@ import java.util.Map;
 @RequestMapping("/posts")
 @RestController
 @Validated
-@CustomRateLimit(window=2000, threefold = 1)
+@CustomRateLimit(window=2000, threefold = 5)
 public class PostController {
     @Autowired
     PostService postService; // 帖子服务层
@@ -53,7 +53,7 @@ public class PostController {
         // 解析Token获取用户ID，未登录则为null
         Long userId = null;
         if (token != null) {
-            Map<String, Object> information = jwtHelper.parseJWTToken(token);
+            Map<String, Object> information = jwtHelper.parseJWT(token);
             userId = ((Number)information.get("id")).longValue();
         }
         
@@ -76,7 +76,7 @@ public class PostController {
         Long userId = null;
         try {
             if (token != null) {
-                Map<String, Object> information = jwtHelper.parseJWTToken(token);
+                Map<String, Object> information = jwtHelper.parseJWT(token);
                 userId = ((Number)information.get("id")).longValue();
             }
         } catch (Exception e) {
@@ -99,7 +99,7 @@ public class PostController {
     public Result<Post> commitPost(
             @Valid @RequestBody PostCommitDTO postCommitDTO,
             @Parameter(description = "用户登录凭证Cookie") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
+        Map<String, Object> information = jwtHelper.parseJWT(token); // 解析Token获取用户信息
         postCommitDTO.userId = ((Number)(information.get("id"))).longValue(); // 设置用户ID
         String role = (String) information.get("role");
         return Result.success(
@@ -122,7 +122,7 @@ public class PostController {
             @Parameter(description = "帖子ID", example = "1234567890") @PathVariable Long postId,
             @Valid @RequestBody PostEditDTO postEditDTO,
             @Parameter(description = "用户登录凭证Cookie") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
+        Map<String, Object> information = jwtHelper.parseJWT(token); // 解析Token获取用户信息
         postEditDTO.userId = ((Number)(information.get("id"))).longValue(); // 设置用户ID
         postEditDTO.id = postId; // 设置帖子ID
         String role = (String) information.get("role");
@@ -142,7 +142,7 @@ public class PostController {
     public Result<Object> deletePost(
             @Parameter(description = "帖子ID", example = "1234567890") @PathVariable Long postId,
             @Parameter(description = "用户登录凭证Cookie") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
+        Map<String, Object> information = jwtHelper.parseJWT(token); // 解析Token获取用户信息
         long userId = ((Number)(information.get("id"))).longValue(); // 获取用户ID
         String role = (String)(information.get("role")); // 获取用户角色
         postService.deletePost(postId, userId, role); // 调用服务层删除帖子

@@ -41,6 +41,7 @@ public class PostRequestDTO {
 
     @Schema(
             description = "分页大小",
+            minimum = "5",
             maximum = "10",
             requiredMode = Schema.RequiredMode.REQUIRED
     )

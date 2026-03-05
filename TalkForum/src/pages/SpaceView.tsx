@@ -57,8 +57,7 @@ const SpaceView = ({}: SpaceViewProps) => {
                     // 俱乐部接口未实现，暂时忽略验证
                     setOk(false);
                 } else {
-                    // 调用用户详情API，判断用户是否存在
-                    // 使用现有的usersGetDetailedUserInfo方法来验证用户是否存在
+                    // 判断用户是否存在
                     const res = await usersGetDetailedUserInfo(spaceId);
                     if (res.success) {
                         setOk(true);

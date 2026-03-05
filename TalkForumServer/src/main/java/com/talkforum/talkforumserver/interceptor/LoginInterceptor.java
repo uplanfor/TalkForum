@@ -3,12 +3,12 @@ package com.talkforum.talkforumserver.interceptor;
 import com.talkforum.talkforumserver.common.anno.AdminRequired;
 import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
 import com.talkforum.talkforumserver.constant.UserConstant;
-import com.talkforum.talkforumserver.service.AuthCacheService;
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
 import com.talkforum.talkforumserver.common.exception.BusinessRuntimeException;
 import com.talkforum.talkforumserver.common.util.CookieHelper;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.constant.ServerConstant;
+import com.talkforum.talkforumserver.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +26,9 @@ import java.util.Map;
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
     @Autowired
-    private JWTHelper jwtHelper; // JWT工具类，用于解析和验证JWT令牌
+    private JWTHelper jwtHelper;
     @Autowired
-    private AuthCacheService authCacheService;
+    private AuthService authService;
 
     /**
      * 处理请求前的拦截方法
@@ -44,6 +44,8 @@ public class LoginInterceptor implements HandlerInterceptor {
         if(!(handler instanceof HandlerMethod handlerMethod)){
             return true;
         }
+
+        // 检查注解
         LoginRequired loginRequired = handlerMethod.getMethodAnnotation(LoginRequired.class);
         ModeratorRequired moderatorRequired = handlerMethod.getMethodAnnotation(ModeratorRequired.class);
         AdminRequired  adminRequired = handlerMethod.getMethodAnnotation(AdminRequired.class);
@@ -62,10 +64,10 @@ public class LoginInterceptor implements HandlerInterceptor {
         } else {
             try {
                 // 解析JWT令牌
-                Map<String, Object> information = jwtHelper.parseJWTToken(value);
+                Map<String, Object> information = jwtHelper.parseJWT(value);
                 long userId = ((Number)(information.get("id"))).longValue();
-                // 验证令牌是否在Redis中存在（用于单点登录和令牌吊销）
-                Object v =  authCacheService.getLoginToken(userId);
+                // 验证令牌是否在Redis中存在
+                Object v =  authService.getLoginToken(userId);
                 if (v == null || !((String)v).equals(value)) {
                     throw new BusinessRuntimeException("invalid token");
                 }

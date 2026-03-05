@@ -54,18 +54,17 @@ const userSlice = createSlice({
             const targetId = action.payload;
             const index = state.following.indexOf(targetId);
             if (index === -1) {
-                state.following.push(targetId);
-                state.followingCount += 1;
-                if (targetId == state.id) {
-                    state.fansCount += 1;
-                }
+                return {...state, 
+                    following: [...state.following, targetId], 
+                    followingCount: state.followingCount + 1, 
+                    fansCount: state.id === targetId? state.fansCount : state.fansCount + 1 };
             } else {
-                state.following.splice(index, 1);
-                state.followingCount -= 1;
-                if (targetId == state.id) {
-                    state.fansCount -= 1;
-                }
-            }
+                return {...state, 
+                    following: state.following.filter((_, i) => i !== index), 
+                    followingCount: state.followingCount - 1,
+                    fansCount: state.id === targetId? state.fansCount - 1 : state.fansCount };
+            };
+            
         },
     },
 });

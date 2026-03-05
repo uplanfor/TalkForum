@@ -2,8 +2,8 @@
  * 评论相关API请求
  * 包含获取评论列表、获取评论回复列表、发布评论、删除评论和管理员获取评论等功能
  */
-import type ApiResponse from './ApiResponse';
-import Request from '../utils/Request';
+
+import Request, {type ApiResponse} from '../utils/Request';
 import { type CommentStatus } from '../constants/post_comment_status';
 
 /**
@@ -146,7 +146,7 @@ export const commentAdminGetCommentsByPage = (
     pageSize: number,
     status?: CommentStatus | null
 ): Promise<CommentPageResponse> => {
-    return Request.get_auth<CommentPageResponse>('/api/comments/admin', {
+    return Request.getAuth<CommentPageResponse>('/api/comments/admin', {
         page,
         pageSize,
         status,
@@ -163,7 +163,7 @@ export const commentAdminAuditComments = (
     commentIds: string[],
     status: CommentStatus
 ): Promise<ApiResponse> => {
-    return Request.put_auth<ApiResponse>('/api/comments/admin/audit', {
+    return Request.putAuth<ApiResponse>('/api/comments/admin/audit', {
         commentIds,
         status,
     });
@@ -177,7 +177,7 @@ export const commentAdminAuditComments = (
 export const commentAdminGetCommentsContent = (
     commentIds: string[]
 ): Promise<ApiResponse<Comment[]>> => {
-    return Request.get_auth<ApiResponse<Comment[]>>('/api/comments/admin/content', {
+    return Request.getAuth<ApiResponse<Comment[]>>('/api/comments/admin/content', {
         commentIds,
     });
 };

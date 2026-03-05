@@ -2,7 +2,6 @@ package com.talkforum.talkforumserver.controller;
 
 import com.talkforum.talkforumserver.common.vo.CommentListVO;
 import com.talkforum.talkforumserver.common.vo.PageVO;
-import com.talkforum.talkforumserver.mapper.CommentMapper;
 import com.talkforum.talkforumserver.service.CommentService;
 import com.talkforum.talkforumserver.common.anno.LoginRequired;
 import com.talkforum.talkforumserver.common.anno.ModeratorRequired;
@@ -15,19 +14,15 @@ import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.util.JWTHelper;
 import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
-import com.talkforum.talkforumserver.mapper.UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -87,7 +82,7 @@ public class CommentController {
         Long userId = null;
         try {
             if (token != null) {
-                Map<String, Object> information = jwtHelper.parseJWTToken(token);
+                Map<String, Object> information = jwtHelper.parseJWT(token);
                 userId = ((Number) information.get("id")).longValue();
             }
         } catch (Exception e) {
@@ -135,7 +130,7 @@ public class CommentController {
         // 处理登录的状况
         try {
             if (token != null) {
-                Map<String, Object> information = jwtHelper.parseJWTToken(token);
+                Map<String, Object> information = jwtHelper.parseJWT(token);
                 userId = ((Number) information.get("id")).longValue();
             }
         } catch (Exception e) {
@@ -174,7 +169,7 @@ public class CommentController {
     public Result<Comment> addComment(
             @RequestBody @Valid AddCommentDTO addCommentDTO,
             @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
+        Map<String, Object> information = jwtHelper.parseJWT(token); // 解析Token获取用户信息
         long userId = ((Number)(information.get("id"))).longValue(); // 获取用户ID
         String role = (String)(information.get("role")); // 获取用户角色
 
@@ -210,7 +205,7 @@ public class CommentController {
     public Result<Object> deleteComment(
             @PathVariable long commentId,
             @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token); // 解析Token获取用户信息
+        Map<String, Object> information = jwtHelper.parseJWT(token); // 解析Token获取用户信息
         long userId = ((Number)(information.get("id"))).longValue(); // 获取用户ID
         String role = (String)(information.get("role")); // 获取用户角色
         commentService.deleteComment(commentId, userId, role); // 删除评论

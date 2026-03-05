@@ -3,8 +3,8 @@
  * 支持点赞，踩，关注
  */
 
-import type ApiResponse from './ApiResponse';
-import Request from '../utils/Request';
+
+import Request, {type ApiResponse} from '../utils/Request';
 
 export const INTERACT_TYPE = {
     USER: 'USER',
@@ -38,7 +38,7 @@ export const interactionMakeInteractionWithUser = (
     interactId: string,
     interactContent: number
 ): Promise<ApiResponse> => {
-    return Request.post_auth<ApiResponse>(`/api/interactions/`, {
+    return Request.postAuth<ApiResponse>(`/api/interactions/`, {
         interactId,
         interactContent,
         interactType: INTERACT_TYPE.USER,
@@ -54,7 +54,7 @@ export const interactionMakeInteractionWithPost = (
     interactId: string,
     interactContent: number
 ): Promise<ApiResponse> => {
-    return Request.post_auth<ApiResponse>(`/api/interactions/`, {
+    return Request.postAuth<ApiResponse>(`/api/interactions/`, {
         interactId,
         interactContent,
         interactType: INTERACT_TYPE.POST,
@@ -70,7 +70,7 @@ export const interactionMakeInteractionWithComment = (
     interactId: string,
     interactContent: number
 ): Promise<ApiResponse> => {
-    return Request.post_auth<ApiResponse>(`/api/interactions/`, {
+    return Request.postAuth<ApiResponse>(`/api/interactions/`, {
         interactId,
         interactContent,
         interactType: INTERACT_TYPE.COMMENT,
@@ -87,7 +87,7 @@ export const interactionsFollowOrUnfollowUser = (
     interactId: string,
     follow: boolean
 ): Promise<ApiResponse> => {
-    return Request.post_auth<ApiResponse>(`/api/interactions/`, {
+    return Request.postAuth<ApiResponse>(`/api/interactions/`, {
         interactId,
         interactContent: follow ? INTERACT_USER.FOLLOW : INTERACT_USER.UNFOLLOW,
         interactType: INTERACT_TYPE.USER,

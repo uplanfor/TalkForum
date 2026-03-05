@@ -64,6 +64,7 @@ const Search = () => {
         const tag = searchParams.get('tag');
         const clubId = searchParams.get('clubId');
         const userIds = searchParams.get('userIds');
+        // console.log(keyword, tag, clubId, userIds)
 
         // 设置输入框的值
         if (keywordInput.current) {
@@ -88,12 +89,8 @@ const Search = () => {
             tag: tag || undefined,
             userIds: parsedUserIds,
         };
-
-        // console.log(newSearchParams);
-
         // 更新状态，确保PostsContainer能够重新加载
         setMySearchParams(newSearchParams);
-        // console.log(newSearchParams);
     }, [location.search]); // 监听URL参数的变化
 
     return (

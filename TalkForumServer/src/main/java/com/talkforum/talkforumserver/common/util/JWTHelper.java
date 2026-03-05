@@ -27,7 +27,7 @@ public class JWTHelper {
      * @param secret 签名密钥
      * @return 生成的JWT令牌字符串
      */
-    public String generateJWTToken(Map<String, Object> claims, int duration, String secret) {
+    public String generateJWT(Map<String, Object> claims, int duration, String secret) {
         return Jwts.builder().signWith(SignatureAlgorithm.HS256, secret)
                 .addClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + duration))
@@ -40,8 +40,8 @@ public class JWTHelper {
      * @param duration 过期时间，单位毫秒
      * @return 生成的JWT令牌字符串
      */
-    public String generateJWTToken(Map<String, Object> claims, int duration) {
-        return generateJWTToken(claims, duration, secret_key);
+    public String generateJWT(Map<String, Object> claims, int duration) {
+        return generateJWT(claims, duration, secret_key);
     }
 
     /**
@@ -49,8 +49,8 @@ public class JWTHelper {
      * @param claims 令牌中的自定义声明
      * @return 生成的JWT令牌字符串
      */
-    public String generateJWTToken(Map<String, Object> claims) {
-        return generateJWTToken(claims, expire, secret_key);
+    public String generateJWT(Map<String, Object> claims) {
+        return generateJWT(claims, expire, secret_key);
     }
 
     /**
@@ -59,7 +59,7 @@ public class JWTHelper {
      * @param secret 签名密钥
      * @return 令牌中的声明Map
      */
-    public Map<String, Object> parseJWTToken(String jwt, String secret) {
+    public Map<String, Object> parseJWT(String jwt, String secret) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(jwt).getBody();
     }
 
@@ -69,8 +69,8 @@ public class JWTHelper {
      * @return 令牌中的声明Map
      * @throws JwtException JWT解析异常
      */
-    public Map<String, Object> parseJWTToken(String jwt) throws JwtException {
-        return parseJWTToken(jwt, secret_key);
+    public Map<String, Object> parseJWT(String jwt) throws JwtException {
+        return parseJWT(jwt, secret_key);
     }
 
     /**

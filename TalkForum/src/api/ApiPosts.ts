@@ -2,10 +2,9 @@
  * 帖子相关API请求
  * 处理帖子的发布、获取、删除、修改以及管理员相关操作
  */
-import type ApiResponse from './ApiResponse';
-import Request from '../utils/Request';
+
+import Request, {type ApiResponse} from '../utils/Request';
 import { PostCommentStatusEnum, type PostStatus } from '../constants/post_comment_status';
-import PostDialog from '../components/PostDialog';
 
 /**
  * 帖子类型接口
@@ -110,7 +109,7 @@ interface PostContentResponse extends ApiResponse<string> {}
  * @returns 发布帖子的响应
  */
 export const postsCommitPostAuth = async (params: PostCreateParams): Promise<ApiResponse> => {
-    return Request.post_auth<ApiResponse>('/api/posts/', params);
+    return Request.postAuth<ApiResponse>('/api/posts/', params);
 };
 
 /**
@@ -130,6 +129,7 @@ export const postsGetPostDetailInformation = async (
  * @returns 帖子列表响应
  */
 export const postsGetPostList = async (params: PostListParams): Promise<ApiResponse> => {
+    // debugger;
     return Request.get<ApiResponse>('/api/posts/', params);
 };
 
@@ -139,7 +139,7 @@ export const postsGetPostList = async (params: PostListParams): Promise<ApiRespo
  * @returns 删除帖子的响应
  */
 export const postsDeletePostAuth = async (postId: string): Promise<ApiResponse> => {
-    return Request.delete_auth<ApiResponse>(`/api/posts/${postId}`);
+    return Request.deleteAuth<ApiResponse>(`/api/posts/${postId}`);
 };
 
 /**
@@ -154,7 +154,7 @@ export const postsModifyPostAuth = async (
     postId: string,
     params: PostEditParams
 ): Promise<ApiResponse> => {
-    return Request.put_auth<ApiResponse>(`/api/posts/${postId}`, params);
+    return Request.putAuth<ApiResponse>(`/api/posts/${postId}`, params);
 };
 
 /**
@@ -165,7 +165,7 @@ export const postsModifyPostAuth = async (
 export const postsAdminGetPostList = async (
     params: AdminPostListParams
 ): Promise<PostTypePageResponse> => {
-    return Request.get_auth<PostTypePageResponse>('/api/posts/admin', params);
+    return Request.getAuth<PostTypePageResponse>('/api/posts/admin', params);
 };
 
 /**
@@ -178,7 +178,7 @@ export const postsAdminAuditPost = async (
     postId: string,
     status: PostStatus
 ): Promise<ApiResponse> => {
-    return Request.put_auth<ApiResponse>(`/api/posts/admin/${postId}/audit`, { status });
+    return Request.putAuth<ApiResponse>(`/api/posts/admin/${postId}/audit`, { status });
 };
 
 /**
@@ -191,7 +191,7 @@ export const postsAdminSetPostAsEssence = async (
     postId: string,
     isEssence: number
 ): Promise<ApiResponse> => {
-    return Request.put_auth<ApiResponse>(`/api/posts/admin/${postId}/essence`, { isEssence });
+    return Request.putAuth<ApiResponse>(`/api/posts/admin/${postId}/essence`, { isEssence });
 };
 
 /**
@@ -200,5 +200,5 @@ export const postsAdminSetPostAsEssence = async (
  * @returns 帖子内容响应
  */
 export const postsAdminGetPostContent = async (PostId: string): Promise<ApiResponse> => {
-    return Request.get_auth<PostContentResponse>(`/api/posts/admin/${PostId}/content`);
+    return Request.getAuth<PostContentResponse>(`/api/posts/admin/${PostId}/content`);
 };

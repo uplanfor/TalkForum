@@ -6,16 +6,15 @@ import java.util.List;
 import com.talkforum.talkforumserver.common.anno.CustomRateLimit;
 import com.talkforum.talkforumserver.common.anno.NoRateLimit;
 import com.talkforum.talkforumserver.common.util.I18n;
+import com.talkforum.talkforumserver.common.util.IpHelper;
 import com.talkforum.talkforumserver.constant.RedisConstant;
 import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
-import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -39,7 +38,30 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     @PostConstruct
     public void init() {
         rateLimitScript = new DefaultRedisScript<>();
-        rateLimitScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("lua/rate_limit.lua")));
+        rateLimitScript.setScriptText("""
+             local key = KEYS[1]
+             local window = tonumber(ARGV[1])
+             local limit = tonumber(ARGV[2])
+             local now = tonumber(ARGV[3])
+             local expire = window + 1000
+             
+             -- 1. 删除窗口外的过期记录（score < now - window）
+             redis.call('ZREMRANGEBYSCORE', key, 0, now - window)
+             -- 2. 统计当前窗口内的请求数
+             local count = redis.call('ZCARD', key)
+             -- 3. 判断是否超限
+             if count < limit then
+                 -- 3.1 未超限：添加当前时间戳（value用UUID避免重复）
+                 redis.call('ZADD', key, now, now .. '_' .. math.random(100000))
+                 -- 3.2 设置Key过期时间
+                 redis.call('EXPIRE', key, expire / 1000)
+                 -- 3.3 返回1（放行）
+                 return 1
+             else
+                 -- 3.4 超限：返回0（拦截）
+                 return 0
+             end
+             """);
         rateLimitScript.setResultType(Long.class);
     }
 
@@ -69,7 +91,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         String limitId = extractLimitId(request);
         if (StringUtils.isBlank(limitId)) {
             // 无ID时默认拦截（或根据业务调整）
-            returnJson(response, I18n.t("common.equestrianism"));
+            returnLimitResponse(response, I18n.t("common.equestrianism"));
             return false;
         }
         String redisKey = RedisConstant.RATE_LIMIT_PREFIX + limitId; // RedisKey前缀
@@ -83,7 +105,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
         // 6. 判断结果：1=放行，0=限流
         if (result == 0) {
-            returnJson(response, I18n.t("common.equestrianism"));
+            returnLimitResponse(response, I18n.t("common.equestrianism"));
             return false;
         }
         return true;
@@ -104,51 +126,16 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         // return request.getRequestURI();
 //        return null;
 
-        return getIpAddress(request) + ":" + request.getRequestURI();
+        return IpHelper.getRealIp(request) + ":" + request.getRequestURI();
     }
 
     /**
      * 返回限流提示JSON
      */
-    private void returnJson(HttpServletResponse response, String msg) throws IOException {
+    private void returnLimitResponse(HttpServletResponse response, String msg) throws IOException {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=utf-8");
         response.getWriter().write("{\"code\":429,\"message\":\"" + msg + "\",\"success\":false,\"data\":null}");
     }
 
-    /**
-     * （可选）获取客户端IP
-     */
-    private String getIpAddress(HttpServletRequest request) {
-// 优先从反向代理头获取
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip.trim())) {
-            // 多个IP时取第一个（X-Forwarded-For 格式：clientIp, proxyIp1, proxyIp2）
-            String[] ipArray = ip.split(",");
-            for (String tempIp : ipArray) {
-                String trimIp = tempIp.trim();
-                if (!"unknown".equalsIgnoreCase(trimIp)) {
-                    ip = trimIp;
-                    break;
-                }
-            }
-            return ip;
-        }
-
-        // 备选：Proxy-Client-IP（部分代理服务器使用）
-        ip = request.getHeader("Proxy-Client-IP");
-        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip.trim())) {
-            return ip.trim();
-        }
-
-        // 备选：WL-Proxy-Client-IP（WebLogic 代理）
-        ip = request.getHeader("WL-Proxy-Client-IP");
-        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip.trim())) {
-            return ip.trim();
-        }
-
-        // 最后取原生 RemoteAddr（本地环境可能是 0:0:0:0:0:0:0:1，转为 127.0.0.1）
-        ip = request.getRemoteAddr();
-        return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;
-    }
 }

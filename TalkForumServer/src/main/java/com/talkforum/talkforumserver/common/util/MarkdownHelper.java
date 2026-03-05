@@ -26,11 +26,6 @@ public final class MarkdownHelper {
         FLEXMARK_PARSER = Parser.builder(options).build();
     }
 
-    // 私有构造器：禁止实例化，保证纯静态工具类
-    private MarkdownHelper() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-    }
-
     /**
      * 提取Markdown文本的简介（严格匹配指定方法签名）
      * @param markdown 原始Markdown文本

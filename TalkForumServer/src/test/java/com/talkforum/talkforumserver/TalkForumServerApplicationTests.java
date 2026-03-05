@@ -21,10 +21,10 @@ class TalkForumServerApplicationTests {
     @Test
     void testJWTHelper() {
         Map<String, Object> claims = new HashMap<>();
-        String jwt = jwtHelper.generateJWTToken(claims);
+        String jwt = jwtHelper.generateJWT(claims);
         System.out.println(jwt);
         try {
-            Map<String, Object> claims2 = jwtHelper.parseJWTToken(jwt);
+            Map<String, Object> claims2 = jwtHelper.parseJWT(jwt);
         }
         catch (Exception e) {
             e.printStackTrace();

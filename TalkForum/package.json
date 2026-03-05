@@ -14,7 +14,6 @@
   "dependencies": {
     "@heroicons/react": "2.2.0",
     "@reduxjs/toolkit": "2.10.1",
-    "@types/slate": "0.47.16",
     "axios": "1.13.1",
     "dayjs": "1.11.19",
     "dompurify": "3.3.0",
@@ -42,6 +41,7 @@
     "@tauri-apps/cli": "2.9.6",
     "@types/node": "24.6.0",
     "@types/qs": "^6.14.0",
+    "@types/slate": "0.47.16",
     "@types/react": "19.1.16",
     "@types/react-dom": "19.1.9",
     "@types/react-infinite-scroller": "1.2.5",

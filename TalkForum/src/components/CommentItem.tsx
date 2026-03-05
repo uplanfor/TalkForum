@@ -332,6 +332,11 @@ const CommentItem = ({
         }
     }, [id, onCommentDelete]);
 
+    /**
+     * 处理删除回复
+     */
+    const handleReplyDelete = ()=> setReplyList(prev => prev.filter(reply => reply.id !== id));
+
     return (
         <div className='comment-item'>
             {/* 用户头像 */}
@@ -398,7 +403,7 @@ const CommentItem = ({
                                     setCommentTarget={setCommentTarget}
                                     rootId={id}
                                     onInteractionChange={onInteractionChange}
-                                    onCommentDelete={onCommentDelete}
+                                    onCommentDelete={handleReplyDelete}
                                 />
                             ))}
 

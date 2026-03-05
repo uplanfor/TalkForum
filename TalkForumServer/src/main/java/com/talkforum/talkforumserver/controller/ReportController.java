@@ -37,7 +37,7 @@ public class ReportController {
             @Valid @RequestBody AddReportDTO addReportDTO,
             @Parameter(description = "用户登录凭证Cookie") @CookieValue(name = ServerConstant.LOGIN_COOKIE)
             String token) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token);
+        Map<String, Object> information = jwtHelper.parseJWT(token);
         long userId = ((Number)(information.get("id"))).longValue();
         reportService.addReport(userId, addReportDTO.reportType, addReportDTO.reportTargetType,
                 addReportDTO.reportTarget, addReportDTO.reason);
@@ -63,7 +63,7 @@ public class ReportController {
     public Result<Object> handleReports(
             @Valid @RequestBody HandleReportDTO handleReportDTO,
             @Parameter(description = "用户登录凭证Cookie") @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token);
+        Map<String, Object> information = jwtHelper.parseJWT(token);
         long userId = ((Number)(information.get("id"))).longValue();
         reportService.handleReports(handleReportDTO.getStatus(), handleReportDTO.getReportIds(), userId);
         return Result.success(I18n.t("report.handle.success"));

@@ -12,4 +12,6 @@ public interface AuthService {
     AuthVO auth(long userId, HttpServletResponse response);
 
     AdminHomeVO getAdminHomeInfo(long userId, HttpServletResponse response);
+
+    Object getLoginToken(long userId);
 }

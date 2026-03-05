@@ -18,7 +18,6 @@ public class CookieHelper {
         throw new AssertionError("工具类不能实例化");
     }
 
-    // ==================== 读取 Cookie（原有方法，优化编码处理）====================
     /**
      * 根据 Cookie 名称读取 Cookie 值（自动 URL 解码，兼容特殊字符）
      *
@@ -40,14 +39,12 @@ public class CookieHelper {
         // 遍历匹配 Cookie 名称，解码值（处理特殊字符）
         for (Cookie cookie : cookies) {
             if (cookieName.equals(cookie.getName())) {
-                // URL 解码：对应写入时的编码，避免特殊字符（如空格、&、=）失效
                 return java.net.URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
             }
         }
         return null;
     }
 
-    // ==================== 写入 Cookie（新增核心方法）====================
     /**
      * 基础写入 Cookie（默认配置：HttpOnly=true、路径="/"、会话级有效期、SameSite=Lax）
      * 适合登录 token 等需要安全防护的场景
@@ -155,7 +152,6 @@ public class CookieHelper {
     }
 
 
-    // ==================== 快速删除 Cookie（新增辅助方法）====================
     /**
      * 根据名称删除 Cookie（本质是设置有效期为 0）
      *

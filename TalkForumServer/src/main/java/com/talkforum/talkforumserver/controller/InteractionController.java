@@ -8,10 +8,6 @@ import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.service.InteractionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +42,7 @@ public class InteractionController {
                 description = "用户登录凭证Cookie"
             )
             @CookieValue(name = ServerConstant.LOGIN_COOKIE) String token) {
-        Map<String, Object> information = jwtHelper.parseJWTToken(token);
+        Map<String, Object> information = jwtHelper.parseJWT(token);
 
         interactionRequestDTO.setUserId(((Number)(information.get("id"))).longValue());
         return interactionService.makeInteraction(interactionRequestDTO);

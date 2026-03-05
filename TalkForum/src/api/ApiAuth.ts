@@ -2,8 +2,7 @@
  * 认证相关API请求
  * 处理用户登录、登出和获取用户信息等功能
  */
-import type ApiResponse from './ApiResponse';
-import Request from '../utils/Request';
+import Request, { type ApiResponse } from '../utils/Request';
 
 /**
  * 用户信息接口
@@ -38,7 +37,6 @@ export interface AuthInfo extends UserInfo {
 
 /**
  * 认证响应接口
- * 扩展了ApiResponse接口，包含UserInfo类型的数据
  */
 export interface AuthResponse extends ApiResponse<AuthInfo> {}
 

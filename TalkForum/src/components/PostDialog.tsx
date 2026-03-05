@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import Msg from '../utils/msg';
 import { postsCommitPostAuth, postsModifyPostAuth } from '../api/ApiPosts';
 import { throttle, debounce } from '../utils/debounce&throttle';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * 帖子对话框组件属性接口
@@ -23,7 +24,7 @@ interface PostDialogProps {
     clubInputId?: string; // 俱乐部ID（可选）
     content?: string; // 帖子内容（编辑时使用）
     postId?: string | null; // 帖子ID（编辑时使用，新建时为null）
-    tags: string; // 标签
+    tags?: string; // 标签
 }
 
 /**
@@ -40,6 +41,7 @@ const PostDialog = ({
     tags = '',
 }: PostDialogProps) => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     // 标题输入框引用
     const titleRef = useRef<HTMLInputElement>(null);
@@ -47,8 +49,6 @@ const PostDialog = ({
     const contentRef = useRef<HTMLTextAreaElement>(null);
 
     const [clubId, setClubId] = useState<string>(clubInputId);
-    
-
     // 标签状态
     const [dividedTags, setDividedTags] = useState<string[]>(tags.split(';') || []);
     const [tagInput, setTagInput] = useState<string>('');

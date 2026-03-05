@@ -8,7 +8,7 @@
  *
  * 该页面使用React.lazy进行组件懒加载，提高性能
  */
-import { useEffect, useState, lazy, type ReactNode } from 'react';
+import { useEffect, useState, lazy, type ReactNode, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { type RootState, type AppDispatch } from '../store';
 import {
@@ -29,16 +29,15 @@ import './styles/style_admin.css';
 import NotFound from './NotFound';
 import UserInfoSmall from '../components/UserInfoSmall';
 
-// 懒加载各管理组件，提高初始加载性能
-const AdminHome = lazy(() => import('../components/AdminHome'));
-const AdminInsights = lazy(() => import('../components/AdminInsights'));
-const AdminUsers = lazy(() => import('../components/AdminUsers'));
-const AdminPosts = lazy(() => import('../components/AdminPosts'));
-const AdminComments = lazy(() => import('../components/AdminComments'));
-const AdminClubs = lazy(() => import('../components/AdminClubs'));
-const AdminApplications = lazy(() => import('../components/AdminApplications'));
-const AdminInviteCodes = lazy(() => import('../components/AdminInviteCodes'));
-const AdminReports = lazy(() => import('../components/AdminReports'));
+import AdminHome from '../components/AdminHome';
+import AdminInsights from '../components/AdminInsights';
+import AdminClubs from '../components/AdminClubs';
+import AdminInviteCodes from '../components/AdminInviteCodes';
+import AdminReports from '../components/AdminReports';
+import AdminApplications from '../components/AdminApplications';
+import AdminUsers from '../components/AdminUsers';
+import AdminPosts from '../components/AdminPosts';
+import AdminComments from '../components/AdminComments';
 
 /**
  * 菜单项接口
@@ -67,19 +66,67 @@ const Admin = () => {
 
     // 侧边导航菜单配置
     const menuItems: MenuItem[] = [
-        { icon: HomeIcon, label: 'Home', component: <AdminHome /> },
-        { icon: ChartBarIcon, label: 'Insights', component: <AdminInsights /> },
-        { icon: UsersIcon, label: 'Users', component: <AdminUsers /> },
-        { icon: DocumentTextIcon, label: 'Posts', component: <AdminPosts /> },
-        { icon: ChatBubbleLeftRightIcon, label: 'Comments', component: <AdminComments /> },
-        { icon: ClipboardDocumentListIcon, label: 'Reports', component: <AdminReports /> },
+        {
+            icon: HomeIcon,
+            label: 'Home',
+            component: <AdminHome />
+        },
+        {
+            icon: ChartBarIcon,
+            label: 'Insights',
+            component: (
+                <AdminInsights />
+            )
+        },
+        {
+            icon: UsersIcon,
+            label: 'Users',
+            component: (
+                <AdminUsers />
+            )
+        },
+        {
+            icon: DocumentTextIcon,
+            label: 'Posts',
+            component: (
+                <AdminPosts />
+            )
+        },
+        {
+            icon: ChatBubbleLeftRightIcon,
+            label: 'Comments',
+            component: (
+                <AdminComments />
+            )
+        },
+        {
+            icon: ClipboardDocumentListIcon,
+            label: 'Reports',
+            component: (
+                <AdminReports />
+            )
+        },
         {
             icon: ClipboardDocumentListIcon,
             label: 'Applications',
-            component: <AdminApplications />,
+            component: (
+                <AdminApplications />
+            )
         },
-        { icon: UserGroupIcon, label: 'Clubs', component: <AdminClubs /> },
-        { icon: KeyIcon, label: 'Invite Codes', component: <AdminInviteCodes /> },
+        {
+            icon: UserGroupIcon,
+            label: 'Clubs',
+            component: (
+                <AdminClubs />
+            )
+        },
+        {
+            icon: KeyIcon,
+            label: 'Invite Codes',
+            component: (
+                <AdminInviteCodes />
+            )
+        },
     ];
 
     // 当前选中的菜单项索引

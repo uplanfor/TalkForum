@@ -2,8 +2,8 @@
  * 邀请码相关API请求
  * 包含获取邀请码、管理员获取邀请码列表以及生成邀请码等功能
  */
-import type ApiResponse from './ApiResponse';
-import Request from '../utils/Request';
+
+import Request, { type ApiResponse } from '../utils/Request';
 
 /**
  * 邀请码接口

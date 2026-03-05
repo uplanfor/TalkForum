@@ -11,9 +11,7 @@ export interface TocNode {
     children: TocNode[]; // 子标题（嵌套结构）
 }
 
-/** 内部使用的 Renderer：独立收集目录，避免污染 */
 class InternalRenderer extends Renderer {
-    // 目录容器：每个 Renderer 实例独立持有（函数每次调用都会新建实例，天然隔离）
     private tocTree: TocNode[] = [];
     private currentParents: TocNode[] = [];
 
@@ -72,7 +70,7 @@ class InternalRenderer extends Renderer {
         const codeBlockId = `code-block-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
         const codeLines = highlightedCode.split('\n'); // 按换行符分割代码
-        const lineCount = codeLines.length; // 总行数（含空行，确保行号连续）
+        const lineCount = codeLines.length;
         const lineNumbersHtml = Array.from(
             { length: lineCount },
             (_, i) => `<span class="code-line-number">${i + 1}</span>`
@@ -147,17 +145,10 @@ export async function parseMarkdown(
         // 4. 注册自定义 Renderer（收集目录）.解析 Markdown
         const html = await markedInstance.parse(text, { renderer });
 
-        // // 4.1 将树转换为json格式
-
-        // const tocNodeTree = renderer.getTocTree();
-        // const jsonTocNodeTree = JSON.stringify(tocNodeTree);
-        // console.log("目录树：", renderer.getTocTree());
-        // console.log("目录树JSON：", jsonTocNodeTree);
-
         // 5. 返回结果（严格匹配用户要求的结构）
         return {
             html: DOMPurify.sanitize(html),
-            tocNodeTree: renderer.getTocTree(), // 从独立 Renderer 中拿目录树
+            tocNodeTree: renderer.getTocTree(),
         };
     } catch (error) {
         console.error('Markdown Parser Error:', error);
