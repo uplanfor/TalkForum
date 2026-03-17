@@ -51,7 +51,6 @@ const PostDocument = (props: PostDocumentProps) => {
     const [isDisliked, setIsDisliked] = useState(interactContent === INTERACT_POST.DISLIKE);
     const commentInputRef = useRef<HTMLTextAreaElement>(null);
 
-
     // 当interactContent变化时，更新点赞/踩状态
     useEffect(() => {
         setIsLiked(interactContent === INTERACT_POST.LIKE);
@@ -75,33 +74,12 @@ const PostDocument = (props: PostDocumentProps) => {
     const isErrorRef = useRef(false);
     const isLoadingRef = useRef(false);
 
-    // 状态更新辅助函数
-    const updateHasMore = (value: boolean) => {
-        hasMoreRef.current = value;
-    };
-
-    const updateCursor = (value: string | null) => {
-        cursorRef.current = value;
-    };
-
-    const updateIsRefreshing = (value: boolean) => {
-        isRefreshingRef.current = value;
-    };
-
-    const updateIsError = (value: boolean) => {
-        isErrorRef.current = value;
-    };
-
-    const updateIsLoading = (value: boolean) => {
-        isLoadingRef.current = value;
-    };
-
     // 用户信息加载状态
     const [isUserInfoLoading, setIsUserInfoLoading] = useState(true);
 
     // 请求缓存用户信息，替换立即执行函数
     useEffect(() => {
-        const loadUserInfo = async () => {
+        (async () => {
             setIsUserInfoLoading(true);
             try {
                 await requestSimpleUserInfoCache([userId]);
@@ -110,8 +88,7 @@ const PostDocument = (props: PostDocumentProps) => {
             } finally {
                 setIsUserInfoLoading(false);
             }
-        };
-        loadUserInfo();
+        })();
     }, [userId]);
 
     // 处理评论刷新
@@ -121,11 +98,11 @@ const PostDocument = (props: PostDocumentProps) => {
             return;
         }
 
-        updateIsRefreshing(true);
-        updateIsError(false);
-        updateCursor(null);
+        isRefreshingRef.current = true;
+        isErrorRef.current = false;
+        cursorRef.current = null;
         setComments([]);
-        updateHasMore(true);
+        hasMoreRef.current = true;
         // 重置初始加载标记，允许重新加载
         hasInitialLoaded.current = false;
     };
@@ -137,8 +114,8 @@ const PostDocument = (props: PostDocumentProps) => {
             return;
         }
 
-        updateIsError(false);
-        updateHasMore(true);
+        isErrorRef.current = false;
+        hasMoreRef.current = true;
         // 重置初始加载标记，允许重新加载
         hasInitialLoaded.current = false;
         await loadMore();
@@ -162,9 +139,7 @@ const PostDocument = (props: PostDocumentProps) => {
         }
 
         try {
-            // 设置API请求锁为true（使用ref立即更新）
             isLoadingRef.current = true;
-            updateIsLoading(true);
 
             const res = await commentGetCommentList(id, cursorRef.current, 10);
 
@@ -181,7 +156,7 @@ const PostDocument = (props: PostDocumentProps) => {
             await requestSimpleUserInfoCache(needCacheTarget);
 
             if (res.success) {
-                updateCursor(res.data.cursor);
+                cursorRef.current = res.data.cursor;
 
                 // 如果是刷新状态，替换评论列表，否则追加
                 if (isRefreshingRef.current) {
@@ -227,15 +202,17 @@ const PostDocument = (props: PostDocumentProps) => {
                         return updatedComments;
                     });
                 }
-                updateHasMore(res.data.hasMore);
+                hasMoreRef.current = res.data.hasMore;
+            } else {
+                isErrorRef.current = true;
+                console.error(t('postDocument.loadCommentsError'), res.message);
             }
         } catch (error) {
-            updateIsError(true);
+            isErrorRef.current = true;
             console.error(t('postDocument.loadCommentsError'), error);
         } finally {
             // 无论请求成功还是失败，都释放API请求锁
             isLoadingRef.current = false;
-            updateIsLoading(false);
         }
     }, [id, setCommentTarget]);
 
@@ -244,10 +221,10 @@ const PostDocument = (props: PostDocumentProps) => {
 
     // 重置状态，确保每次组件更新时都能重新初始化
     useEffect(() => {
-        updateCursor(null);
+        cursorRef.current = null;
         setComments([]);
-        updateIsError(false);
-        updateHasMore(true);
+        isErrorRef.current = false;
+        hasMoreRef.current = true;
         hasInitialLoaded.current = false;
     }, [id]);
 
@@ -268,13 +245,12 @@ const PostDocument = (props: PostDocumentProps) => {
     // 监听刷新状态变化，触发加载
     useEffect(() => {
         if (isRefreshingRef.current) {
-            const refreshComments = async () => {
+            (async () => {
                 loadMore();
-                updateIsRefreshing(false);
-            };
-            refreshComments();
+                isRefreshingRef.current = false;
+            })();
         }
-    }, [isRefreshingRef.current, loadMore]);
+    }, [isRefreshingRef.current]);
 
     /**
      * 处理评论互动状态变化
@@ -390,9 +366,8 @@ const PostDocument = (props: PostDocumentProps) => {
      * @param {string} userId - 用户ID
      */
     const openSpaceView = (userId: string) => {
-        // 获取当前路由路径
+        // 获取当前路由路径 和 解析当前路由的类型和ID
         const currentPath = location.pathname;
-        // 解析当前路由的类型和ID
         const pathSegments = currentPath.split('/').filter(segment => segment !== '');
 
         // 判断是否已经在目标页面，在则不跳转
@@ -572,13 +547,13 @@ const PostDocument = (props: PostDocumentProps) => {
                             ))
                         )}
 
-                        {isLoadingRef.current && (
+                        {isLoadingRef.current && !isErrorRef.current && (
                             <div style={{ textAlign: 'center', marginTop: '20px' }}>
                                 {t('postDocument.loadingComments')}
                             </div>
                         )}
 
-                        {!isLoadingRef.current && hasMoreRef.current && (
+                        {!isLoadingRef.current && !isErrorRef.current && hasMoreRef.current && (
                             <div style={{ textAlign: 'center', marginTop: '20px' }}>
                                 {t('postDocument.click')}{' '}
                                 <button
@@ -592,7 +567,7 @@ const PostDocument = (props: PostDocumentProps) => {
                             </div>
                         )}
 
-                        {!hasMoreRef.current && comments.length > 0 && (
+                        {!hasMoreRef.current && isLoadingRef.current && comments.length > 0 && (
                             <div style={{ textAlign: 'center', marginTop: '20px' }}>
                                 {t('postDocument.noMoreComments')}
                             </div>

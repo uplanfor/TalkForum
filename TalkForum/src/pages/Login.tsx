@@ -7,8 +7,7 @@
  * - 表单验证
  * - 登录状态检查
  */
-import '../assets/normalize.css';
-import React, { useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import './styles/style_login.css';
 import { useNavigate } from 'react-router-dom';
 import Msg from '../utils/msg.ts';
@@ -32,16 +31,31 @@ const PrivacyDialog = lazy(() => import('../components/PrivacyDialog'));
  * 处理用户登录和注册功能
  */
 const Login = () => {
-    // 国际化钩子
     const { t } = useTranslation();
 
     // 控制当前显示的是登录表单还是注册表单
-    const [isLogin, setIsLogin] = React.useState(true);
+    const [isLogin, setIsLogin] = useState(true);
     // 路由导航钩子
     const navigate = useNavigate();
     // Redux dispatch钩子
     const dispatch = useDispatch<AppDispatch>();
 
+    // 表单数据状态管理
+    const [formData, setFormData] = useState({
+        username: '', // 登录/注册共用
+        email: '', // 仅注册
+        password: '', // 登录/注册共用（保留值）
+        confirmPassword: '', // 仅注册
+        inviteCode: '', // 仅注册（可选）
+    });
+
+    // 隐私协议同意状态
+    const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
+
+    // 隐私政策对话框显示状态
+    const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
+
+    
     /**
      * 组件挂载时检查用户登录状态
      * - 检查浏览器是否支持cookie
@@ -66,21 +80,6 @@ const Login = () => {
             }
         })();
     }, []);
-
-    // 表单数据状态管理
-    const [formData, setFormData] = React.useState({
-        username: '', // 登录/注册共用
-        email: '', // 仅注册
-        password: '', // 登录/注册共用（保留值）
-        confirmPassword: '', // 仅注册
-        inviteCode: '', // 仅注册（可选）
-    });
-
-    // 隐私协议同意状态
-    const [agreedToPrivacy, setAgreedToPrivacy] = React.useState(false);
-
-    // 隐私政策对话框显示状态
-    const [showPrivacyDialog, setShowPrivacyDialog] = React.useState(false);
 
     /**
      * 输入框变更事件处理函数
@@ -200,7 +199,6 @@ const Login = () => {
                 }
             }
         } catch (error) {
-            console.error('Login/Register failed:', error);
             Msg.error(isLogin ? t('login.signInError') : t('login.signUpError'), 3000);
         }
     };

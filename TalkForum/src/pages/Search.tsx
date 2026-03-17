@@ -4,20 +4,46 @@ import PostsContainer, {
     type PostsContainerSearchParams,
 } from '../components/PostsContainer';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
-import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
+import { memo, useState, useRef, useEffect, type KeyboardEvent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import './styles/style_search.css';
 
-const Search = () => {
+const Search = memo(() => {
     const navigate = useNavigate();
     const location = useLocation();
     const { t } = useTranslation();
-    const [mySearchParams, setMySearchParams] = useState<PostsContainerSearchParams>();
     const [showFilters, setShowFilters] = useState(false);
     const keywordInput = useRef<HTMLInputElement>(null);
     const tagInput = useRef<HTMLInputElement>(null);
     const clubIdInput = useRef<HTMLInputElement>(null);
     const userIdsInput = useRef<HTMLInputElement>(null);
+
+    // 获取搜索参数
+    const searchParams = new URLSearchParams(location.search);
+    const keyword = searchParams.get('keyword');
+    const tag = searchParams.get('tag');
+    const clubId = searchParams.get('clubId');
+    const userIds = searchParams.get('userIds');
+
+    const mySearchParams = useMemo<PostsContainerSearchParams>(() => ({
+        keyword: keyword ?? '',
+        tag: tag ?? undefined,
+    }), [keyword, tag]);
+
+    useEffect(() => {
+        if (keywordInput.current) {
+            keywordInput.current.value = keyword || '';
+        }
+        if (tagInput.current) {
+            tagInput.current.value = tag || '';
+        }
+        if (clubIdInput.current) {
+            clubIdInput.current.value = clubId || '';
+        }
+        if (userIdsInput.current) {
+            userIdsInput.current.value = userIds || '';
+        }
+    }, [keyword, tag, clubId, userIds]);
 
     // 处理搜索功能
     const handleSearch = () => {
@@ -44,9 +70,11 @@ const Search = () => {
 
         // console.log (newParams.toString());
 
+        console.log("导航");
+        
         // // 替换当前页面url，重新加载
         navigate(`/search?${newParams.toString()}`, { replace: true });
-        setShowFilters(false);
+        // setShowFilters(false);
     };
 
     // 处理回车键搜索
@@ -55,43 +83,6 @@ const Search = () => {
             handleSearch();
         }
     };
-
-    // 当URL参数变化时，更新搜索参数并触发PostsContainer重新加载
-    useEffect(() => {
-        // 获取搜索参数
-        const searchParams = new URLSearchParams(location.search);
-        const keyword = searchParams.get('keyword');
-        const tag = searchParams.get('tag');
-        const clubId = searchParams.get('clubId');
-        const userIds = searchParams.get('userIds');
-        // console.log(keyword, tag, clubId, userIds)
-
-        // 设置输入框的值
-        if (keywordInput.current) {
-            keywordInput.current.value = keyword || '';
-        }
-        if (tagInput.current) {
-            tagInput.current.value = tag || '';
-        }
-        if (clubIdInput.current) {
-            clubIdInput.current.value = clubId || '';
-        }
-        if (userIdsInput.current) {
-            userIdsInput.current.value = userIds || '';
-        }
-
-        // 处理userIds参数
-        let parsedUserIds: string[] | undefined;
-
-        // 构建搜索参数对象
-        const newSearchParams: PostsContainerSearchParams = {
-            keyword: keyword || '',
-            tag: tag || undefined,
-            userIds: parsedUserIds,
-        };
-        // 更新状态，确保PostsContainer能够重新加载
-        setMySearchParams(newSearchParams);
-    }, [location.search]); // 监听URL参数的变化
 
     return (
         <>
@@ -179,6 +170,6 @@ const Search = () => {
             ></PostsContainer>
         </>
     );
-};
+});
 
 export default Search;

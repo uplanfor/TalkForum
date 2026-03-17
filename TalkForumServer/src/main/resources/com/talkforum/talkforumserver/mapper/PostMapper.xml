@@ -63,9 +63,9 @@
             id, title, content, user_id, club_id, status, brief, tags, cover_url
         ) VALUES (
             #{postCommitDTO.id}, #{postCommitDTO.title}, #{postCommitDTO.content}, #{postCommitDTO.userId},
-                  #{postCommitDTO.clubId}, #{status}, #{brief},
-                  #{postCommitDTO.tags},
-                  #{coverUrl}
+            #{postCommitDTO.clubId}, #{status}, #{brief},
+            #{postCommitDTO.tags},
+            #{coverUrl}
         )
     </insert>
 

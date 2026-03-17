@@ -56,7 +56,7 @@ springdoc:
     tags-sorter: alpha
     operations-sorter: alpha
   api-docs:
-    resolve-schema-properties: true # 开启泛型字段的属性解析
+#    resolve-schema-properties: true # 开启泛型字段的属性解析
     path: /v3/api-docs
   group-configs:
     - group: 'default'

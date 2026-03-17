@@ -47,13 +47,15 @@
     </select>
 
     <select id="countExistComment" resultType="int">
-        SELECT COUNT(*)
-        FROM `comment` c
-        INNER JOIN post p ON c.post_id = p.id
-        <if test="parentId != null">INNER JOIN `comment` cp ON cp.id = #{rootId}</if>
-        WHERE
-        c.status = 'PASS'
-        AND c.id = #{rootId} LIMIT 1
+        SELECT COALESCE(
+            (SELECT EXISTS(
+                SELECT FROM `comment` c
+                INNER JOIN post p ON c.post_id = p.id
+                <if test="parentId != null">INNER JOIN `comment` cp ON cp.id = #{rootId}</if>
+                WHERE c.status = 'PASS' AND c.id = #{rootId})
+            ), 0
+        );
+
     </select>
 
     <select id="checkDeleteComment" resultType="com.talkforum.talkforumserver.common.entity.Comment">

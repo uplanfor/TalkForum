@@ -16,9 +16,6 @@ import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -62,17 +59,6 @@ public class CommentController {
         summary = "获取评论列表",
         description = "根据帖子ID获取该帖子下的评论列表，支持分页查询和用户互动状态显示，注意，这个只要执行了获取动作，success都会为true"
     )
-    @ApiResponse(
-            responseCode = "200", // 响应状态码
-            description = "请求成功",
-            content = @Content( // 指定响应内容
-                    mediaType = "application/json", // 媒体类型（JSON格式）
-                    schema = @Schema(
-                            implementation = Result.class,
-                            subTypes = CommentListVO.class
-                    )
-            )
-    )
     @GetMapping("/")
     public Result<CommentListVO> getCommentList(
             @Parameter(description = "帖子id", example = "1") @NotNull long postId,
@@ -108,14 +94,6 @@ public class CommentController {
     @Operation(
         summary = "获取评论回复列表",
         description = "获取指定评论下的回复列表，支持多级评论结构，可选用户互动状态显示"
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "请求成功",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = Result.class, subTypes =  CommentListVO.class)
-            )
     )
     @GetMapping("/replies")
     @Validated
@@ -153,17 +131,6 @@ public class CommentController {
         summary = "添加评论",
         description = "用户发表评论，需要登录权限，支持直接评论帖子和回复其他评论"
     )
-    @ApiResponse(
-            responseCode = "200",
-            description = "请求成功",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                            implementation = Result.class,
-                            subTypes = Comment.class
-                    )
-            )
-    )
     @LoginRequired
     @PostMapping("/")
     public Result<Comment> addComment(
@@ -184,7 +151,7 @@ public class CommentController {
             return Result.success(role.equals(UserConstant.ROLE_USER) ?
                     I18n.t("comment.add.user.success") : I18n.t("comment.add.admin.success"), comment);
         }
-        return Result.error(I18n.t("comment.add.failed"));
+        return Result.fail(I18n.t("comment.add.failed"));
     }
 
     /**
@@ -223,17 +190,6 @@ public class CommentController {
     @Operation(
         summary = "管理员获取评论列表",
         description = "管理员获取评论列表，支持按状态筛选和分页查询，需要管理员或版主权限"
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "请求成功",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                            implementation = Result.class,
-                            subTypes = PageVO.class
-                    )
-            )
     )
     @ModeratorRequired
     @GetMapping("/admin")
@@ -275,17 +231,6 @@ public class CommentController {
     @Operation(
         summary = "管理员获取评论内容",
         description = "管理员批量获取评论的详细内容，用于审核或查看，需要管理员或版主权限"
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "请求成功",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                            implementation = Result.class,
-                            subTypes = List.class
-                    )
-            )
     )
     @ModeratorRequired
     @GetMapping("/admin/content")

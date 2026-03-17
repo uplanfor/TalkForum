@@ -6,10 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * API统一响应结果类
  * 用于封装所有API接口的响应数据，确保返回格式一致
  */
-@Schema(
-        name = "Result",
-        description = "API统一响应结果封装类"
-)
 public class Result<T>{
     /**
      * 响应状态码
@@ -119,7 +115,7 @@ public class Result<T>{
      * @param data 响应数据
      * @return Result对象
      */
-    public static <E> Result<E> error(Integer code, String message, E data){
+    public static <E> Result<E> fail(Integer code, String message, E data){
         return new Result<>(code, false, message, data);
     }
 
@@ -129,7 +125,7 @@ public class Result<T>{
      * @param message 响应消息
      * @return Result对象
      */
-    public static <E> Result<E> error(Integer code, String message){
+    public static <E> Result<E> fail(Integer code, String message){
         return new Result<>(code, false, message, null);
     }
 
@@ -138,7 +134,7 @@ public class Result<T>{
      * @param message 响应消息
      * @return Result对象
      */
-    public static <E> Result<E> error(String message){
+    public static <E> Result<E> fail(String message){
         return new Result<E>(400, false, message, null);
     }
 
@@ -148,7 +144,7 @@ public class Result<T>{
      * @param data 响应数据
      * @return Result对象
      */
-    public static <E> Result<E> error(String message, E data){
+    public static <E> Result<E> fail(String message, E data){
         return new Result<>(400, false, message, data);
     }
 
@@ -156,7 +152,7 @@ public class Result<T>{
      * 错误响应 - 无参数
      * @return Result对象
      */
-    public static <E> Result<E> error(){
+    public static <E> Result<E> fail(){
         return new Result<E>(400, false, "error", null);
     }
 }

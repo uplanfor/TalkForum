@@ -5,8 +5,6 @@
  * - 管理员权限验证
  * - 动态加载各管理模块
  * - 响应式设计，支持移动端和桌面端
- *
- * 该页面使用React.lazy进行组件懒加载，提高性能
  */
 import { useEffect, useState, lazy, type ReactNode, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -131,12 +129,8 @@ const Admin = () => {
 
     // 当前选中的菜单项索引
     const [curIndex, setCurIndex] = useState(0);
-
-    // 从Redux获取用户信息
     const user = useSelector((state: RootState) => state.user);
-    // 加载状态，用于显示加载动画
     const [loading, setLoading] = useState(user.role === 'user' ? false : true);
-    // 管理员权限验证结果
     const [ok, setOk] = useState(false);
     // 管理员首页信息
 

@@ -63,7 +63,7 @@ const PostContainer = ({
     searchParams
 }: PostContainerProps) => {
     console.log("search params init", searchParams);
-    
+
     const { t } = useTranslation();
     // const dispatch = useDispatch<AppDispatch>();
 
@@ -138,7 +138,7 @@ const PostContainer = ({
         isErrorRef.current = false;
         hasMoreRef.current = true;
         isRefreshingRef.current = false;
-        
+
         // 设置默认标签索引，确保不超出新生成的tabs长度
         setCurTabIndex(Math.min(defaultTab, newTabs.length - 1));
 
@@ -284,7 +284,7 @@ const PostContainer = ({
                     if (currentTab === t('postsContainer.followingTab')) {
                         // 添加关注用户的ID到查询参数
                         console.log("following", following);
-                        
+
                         queryParams.userIds = ["0", ...following];
                         console.log("userIDs", queryParams.userIds)
                     }
@@ -296,7 +296,7 @@ const PostContainer = ({
                 case PostContainerTargetType.SEARCH:
                     // SEARCH类型：使用父组件传递的搜索参数
                     console.log("search", searchParams);
-                    
+
                     if (searchParams) {
                         queryParams = { ...queryParams, ...searchParams };
                         console.log(queryParams);
@@ -314,22 +314,27 @@ const PostContainer = ({
                     try {
                         // 获取帖子列表
                         const res = await postsGetPostList(queryParams);
+                        if (res.success) {
+                            // 收集需要缓存的用户ID
+                            let needCacheTarget: string[] = [];
+                            if (res.data?.data) {
+                                res.data.data.forEach((item: PostCardProps) => {
+                                    const userId = item.userId;
+                                    if (!needCacheTarget.includes(userId)) {
+                                        needCacheTarget.push(userId);
+                                    }
+                                });
+                            }
 
-                        // 收集需要缓存的用户ID
-                        let needCacheTarget: string[] = [];
-                        if (res.data?.data) {
-                            res.data.data.forEach((item: PostCardProps) => {
-                                const userId = item.userId;
-                                if (!needCacheTarget.includes(userId)) {
-                                    needCacheTarget.push(userId);
-                                }
-                            });
+                            // 缓存用户信息
+                            if (needCacheTarget.length > 0) {
+                                await requestSimpleUserInfoCache(needCacheTarget);
+                            }
+                        } else {
+                            isErrorRef.current = true;
+                            reject(new Error(res.message));
                         }
 
-                        // 缓存用户信息
-                        if (needCacheTarget.length > 0) {
-                            await requestSimpleUserInfoCache(needCacheTarget);
-                        }
                         resolve(res);
                     } catch (err) {
                         reject(err);

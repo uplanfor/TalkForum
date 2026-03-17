@@ -13,9 +13,6 @@ import com.talkforum.talkforumserver.constant.ServerConstant;
 import com.talkforum.talkforumserver.constant.UserConstant;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -37,17 +34,6 @@ public class AuthController {
     private JWTHelper jwtHelper;
 
     @Operation(summary = "请求登录")
-    @ApiResponse(
-            responseCode = "200",
-            description = "请求成功，返回用户信息",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                            implementation = Result.class,
-                            subTypes = AuthVO.class
-                    )
-            )
-    )
     @PostMapping("/login")
     public Result<AuthVO> login(
             @RequestBody @Valid LoginDTO loginDTO,
@@ -69,17 +55,6 @@ public class AuthController {
     }
 
     @Operation(summary = "获取此时是否登录")
-    @ApiResponse(
-            responseCode = "200",
-            description = "请求成功，返回用户信息",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                            implementation = Result.class,
-                            subTypes = {AuthVO.class}
-                    )
-            )
-    )
     @LoginRequired
     @GetMapping("/")
     public Result<AuthVO> auth(
@@ -90,24 +65,13 @@ public class AuthController {
         AuthVO authVO = authService.auth(userId, response);
         if (authVO == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return Result.error(I18n.t("auth.user.notfound"));
+            return Result.fail(I18n.t("auth.user.notfound"));
         }
         return Result.success(I18n.t("auth.information.update"), authVO);
     }
 
 
     @Operation(summary = "获取此时是否管理员登录")
-    @ApiResponse(
-            responseCode = "200",
-            description = "请求成功，返回用户信息",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                            implementation = Result.class,
-                            subTypes = {AuthVO.class}
-                    )
-            )
-    )
     @ModeratorRequired
     @GetMapping("/admin")
     public Result<AuthVO> authAdmin(
@@ -118,23 +82,12 @@ public class AuthController {
         AuthVO authVO = authService.auth(userId, response);
         if (authVO == null || authVO.getRole().equals(UserConstant.ROLE_USER)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return Result.error(I18n.t("auth.admin.unauthorized"), authVO);
+            return Result.fail(I18n.t("auth.admin.unauthorized"), authVO);
         }
         return Result.success(I18n.t("auth.admin.update.success"), authVO);
     }
 
     @Operation(summary = "获取管理员HOME页面信息")
-    @ApiResponse(
-            responseCode = "200",
-            description = "请求成功，返回用户信息",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(
-                            implementation = Result.class,
-                            subTypes = {AdminHomeVO.class}
-                    )
-            )
-    )
     @ModeratorRequired
     @GetMapping("/admin/home")
     public Result<AdminHomeVO> getAdminHome(

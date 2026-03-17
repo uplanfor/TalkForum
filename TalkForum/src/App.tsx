@@ -60,7 +60,10 @@ const App = () => {
                         <Route path='/login' element={<Login />} />
                         <Route path='/admin' element={<Admin />} />
                         <Route path='/search' element={
-                            <Search />
+                            <KeepAliveHelper name='search'>
+
+                                <Search />
+                            </KeepAliveHelper>
                         } />
                         <Route path='/post/:postId' element={<PostView />} />
                         <Route path='/:type/:id' element={<SpaceView />} />

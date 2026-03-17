@@ -17,9 +17,6 @@ import com.talkforum.talkforumserver.constant.UserConstant;
 import com.talkforum.talkforumserver.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -68,14 +65,6 @@ public class UserController {
         summary = "获取用户详情",
         description = "根据用户ID获取用户详细信息，包括基本资料、统计信息等"
     )
-    @ApiResponse(
-        responseCode = "200",
-        description = "请求成功",
-        content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = Result.class, subTypes = UserVO.class)
-        )
-    )
     @GetMapping("/{userId}")
     public Result<UserVO> getUser(
         @Parameter(description = "用户ID", example = "1234567890", required = true) @PathVariable long userId) {
@@ -90,14 +79,6 @@ public class UserController {
     @Operation(
         summary = "批量获取用户简单信息",
         description = "批量获取用户的简单信息，包括ID、用户名、头像等基本信息"
-    )
-    @ApiResponse(
-        responseCode = "200",
-        description = "请求成功",
-        content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = Result.class, subTypes = {List.class, SimpleUserVO.class})
-        )
     )
     @GetMapping("/simple")
     public Result<List<SimpleUserVO>> getSimpleUsersInfo(
@@ -115,14 +96,6 @@ public class UserController {
     @Operation(
         summary = "更新用户资料",
         description = "用户更新自己的个人资料，包括昵称、头像等信息，需要登录权限"
-    )
-    @ApiResponse(
-        responseCode = "200",
-        description = "请求成功",
-        content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = Result.class)
-        )
     )
     @LoginRequired
     @PutMapping("/")
@@ -145,14 +118,6 @@ public class UserController {
     @Operation(
         summary = "修改用户密码",
         description = "用户修改自己的登录密码，修改成功后需要重新登录，需要登录权限"
-    )
-    @ApiResponse(
-        responseCode = "200",
-        description = "请求成功",
-        content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = Result.class)
-        )
     )
     @LoginRequired
     @PutMapping("/changePassword")
@@ -177,14 +142,6 @@ public class UserController {
         summary = "管理员获取用户列表",
         description = "管理员分页获取系统中的用户列表，需要管理员或版主权限"
     )
-    @ApiResponse(
-        responseCode = "200",
-        description = "请求成功",
-        content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = Result.class, subTypes = PageVO.class)
-        )
-    )
     @ModeratorRequired
     @GetMapping("/admin")
     public Result<PageVO<UserVO>> getUsersByPage(
@@ -202,14 +159,6 @@ public class UserController {
     @Operation(
         summary = "管理员设置用户角色",
         description = "管理员设置用户的角色（用户或版主），需要管理员权限"
-    )
-    @ApiResponse(
-        responseCode = "200",
-        description = "请求成功",
-        content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = Result.class)
-        )
     )
     @AdminRequired
     @PutMapping("/admin/{userId}/role")
@@ -235,14 +184,6 @@ public class UserController {
         summary = "管理员重置用户密码",
         description = "管理员重置用户密码为默认密码，并强制用户重新登录，需要管理员权限"
     )
-    @ApiResponse(
-        responseCode = "200",
-        description = "请求成功",
-        content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = Result.class)
-        )
-    )
     @AdminRequired
     @PutMapping("/admin/{userId}/reset")
     public Result<Object> resetUserPassword(
@@ -261,14 +202,6 @@ public class UserController {
         summary = "管理员更新用户状态",
         description = "管理员更新用户状态（正常、禁用等），并强制用户重新登录，需要管理员或版主权限"
     )
-    @ApiResponse(
-        responseCode = "200",
-        description = "请求成功",
-        content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = Result.class)
-        )
-    )
     @ModeratorRequired
     @PutMapping("/admin/{userId}/status")
     @Validated
@@ -283,7 +216,7 @@ public class UserController {
             authService.logout(userId);
             return Result.success(I18n.t("user.admin.status.update.success"), dto.getStatus());
         } else {
-            return Result.error(I18n.t("user.admin.status.update.failure"));
+            return Result.fail(I18n.t("user.admin.status.update.failure"));
         }
     }
 }

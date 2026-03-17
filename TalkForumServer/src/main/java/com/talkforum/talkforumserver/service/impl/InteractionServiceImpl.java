@@ -39,7 +39,7 @@ public class InteractionServiceImpl implements InteractionService {
 //                break;
             }
             default: {
-                return Result.error("Unknown interaction type!");
+                return Result.fail("Unknown interaction type!");
             }
         }
         return Result.success();

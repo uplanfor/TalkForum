@@ -40,12 +40,5 @@ public class WebLogAspect {
         }
         return result;
     }
-    
-    private String filterFiledArgsToString(Object[] args) {
-        if (args == null || args.length == 0) {
-            return "";
-        }
-        Object[] temp = Arrays.copyOf(args, args.length);
-        return Arrays.toString(temp);
-    }
+
 }

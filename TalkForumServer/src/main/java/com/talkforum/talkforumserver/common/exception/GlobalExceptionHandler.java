@@ -5,8 +5,11 @@ import com.talkforum.talkforumserver.common.util.I18n;
 import com.talkforum.talkforumserver.common.util.IpHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -36,7 +39,7 @@ public class GlobalExceptionHandler {
                 clientIp, requestUri, exceptionType, exceptionMsg, e); // 最后一个 e 输出完整堆栈
 
         // 3. 直接返回自定义异常的消息（无需过滤，业务异常消息由开发者控制）
-        return Result.error(exceptionMsg);
+        return Result.fail(exceptionMsg);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -58,7 +61,29 @@ public class GlobalExceptionHandler {
         log.warn("[INVALID DTO CHECK] CLASS {} {}",  e.getParameter().getParameterType().getSimpleName(), errorMsg.toString().trim());
 
         // 直接返回拼接后的错误信息（无需去掉结尾分号，按目标格式保留）
-        return Result.error(errorMsg.toString());
+        return Result.fail(errorMsg.toString());
+    }
+
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public Result<Object> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        log.error(e.getMessage());
+        return Result.fail("Unsupported http method!");
+    }
+
+    // 请求体格式化错误
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public Result<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        String errorMsg;
+        if (e.getMessage().contains("JSON parse error")) {
+            errorMsg = "Invalid JSON parse error";
+        } else if (e.getMessage().contains("Required request body is missing")) {
+            errorMsg = "Required request body is missing";
+        } else {
+            errorMsg = "请求体解析失败：" + e.getMostSpecificCause().getMessage();
+        }
+        log.error(errorMsg);
+        return Result.fail(HttpStatus.BAD_REQUEST.value(), errorMsg);
     }
 
     /**
@@ -82,7 +107,7 @@ public class GlobalExceptionHandler {
                 clientIp, requestUri, exceptionType, exceptionMsg, e); // 输出完整堆栈
 
         // 3. 统一返回固定提示（避免泄露技术细节）
-        return Result.error(I18n.t("common.server.error"));
+        return Result.fail(I18n.t("common.server.error"));
     }
 
 }

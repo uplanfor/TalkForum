@@ -20,7 +20,7 @@ export interface ApiResponse<T = any> {
 
 
 const myAxiosInstance = axios.create({
-    timeout: 10000,
+    timeout: 5000,
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json;charset=utf-8',
@@ -69,7 +69,7 @@ async function sendAnyRequest<T>(
                 : { data: data }),
         })
 
-        if (isAuth && (res.data as ApiResponse<T>).code === 401) {
+        if (isAuth && (res.data as ApiResponse<T>).code === 400) {
             throw new Error((res.data as ApiResponse<T>).message);
         }
 

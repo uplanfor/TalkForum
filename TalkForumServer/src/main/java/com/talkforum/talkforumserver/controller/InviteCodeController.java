@@ -115,7 +115,7 @@ public class InviteCodeController {
         boolean success = inviteCodeService.deleteInviteCode(code);
         return success ? 
             Result.success(I18n.t("invitecode.delete.success")) :
-            Result.error(I18n.t("invitecode.delete.failed"));
+            Result.fail(I18n.t("invitecode.delete.failed"));
     }
     
     /**
@@ -134,7 +134,7 @@ public class InviteCodeController {
         int updatedCount = inviteCodeService.updateInviteCodes(updateInviteCodeDTO);
         return updatedCount > 0 ? 
             Result.success(I18n.t("invitecode.update.success", updatedCount)) :
-            Result.error(I18n.t("invitecode.update.failed"));
+            Result.fail(I18n.t("invitecode.update.failed"));
     }
     
     /**
