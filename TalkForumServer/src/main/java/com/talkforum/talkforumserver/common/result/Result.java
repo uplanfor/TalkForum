@@ -27,6 +27,7 @@ public class Result<T>{
             allowableValues = {"true", "false"}
     )
     public Boolean success;
+
     /**
      * 响应消息
      */
